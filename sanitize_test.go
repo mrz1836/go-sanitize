@@ -1,7 +1,7 @@
 /*
-Package goSanitize is a custom library of various sanitation methods to transform data
+Package gosanitize is a custom library of various sanitation methods to transform data
 */
-package goSanitize
+package gosanitize
 
 import (
 	"testing"
@@ -9,11 +9,81 @@ import (
 
 //TestAlpha tests the alpha sanitize method
 func TestAlpha(t *testing.T) {
+
+	//Test removing spaces and punctuation - preserve the case of the letters
 	var originalString = "Test This String-!123"
-	var expectedOutput = "Test This String"
+	var expectedOutput = "TestThisString"
 
-	result := Alpha(originalString)
+	result := Alpha(originalString, false)
+	if result != expectedOutput {
+		t.Fatal("Alpha Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
 
+	//Test removing all symbols
+	originalString = `~!@#$%^&*()-_Symbols=+[{]};:'"<>,./?`
+	expectedOutput = "Symbols"
+
+	result = Alpha(originalString, false)
+	if result != expectedOutput {
+		t.Fatal("Alpha Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//Test removing all carriage returns
+	originalString = "\nThis\nThat"
+	expectedOutput = "ThisThat"
+
+	result = Alpha(originalString, false)
+	if result != expectedOutput {
+		t.Fatal("Alpha Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//Test removing fancy quotes and microsoft symbols
+	originalString = "“This is a quote with tick`s…”☺"
+	expectedOutput = "Thisisaquotewithticks"
+
+	result = Alpha(originalString, false)
+	if result != expectedOutput {
+		t.Fatal("Alpha Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//
+	//==================================================================================================================
+	//
+
+	//Test removing spaces and punctuation - preserve the case of the letters
+	originalString = "Test This String-!123"
+	expectedOutput = "Test This String"
+
+	result = Alpha(originalString, true)
+	if result != expectedOutput {
+		t.Fatal("Alpha Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//Test removing all symbols
+	originalString = `~!@#$%^&*()-_Symbols=+[{]};:'"<>,./?`
+	expectedOutput = "Symbols"
+
+	result = Alpha(originalString, true)
+	if result != expectedOutput {
+		t.Fatal("Alpha Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//Test removing all carriage returns
+	originalString = "\nThis\nThat"
+	expectedOutput = `
+This
+That`
+
+	result = Alpha(originalString, true)
+	if result != expectedOutput {
+		t.Fatal("Alpha Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//Test removing fancy quotes and microsoft symbols
+	originalString = "“This is a quote with tick`s…”☺"
+	expectedOutput = "This is a quote with ticks"
+
+	result = Alpha(originalString, true)
 	if result != expectedOutput {
 		t.Fatal("Alpha Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
@@ -22,14 +92,85 @@ func TestAlpha(t *testing.T) {
 //TestAlphaNumeric tests the alphanumeric sanitize method
 func TestAlphaNumeric(t *testing.T) {
 	var originalString = "Test This String-!123"
-	var expectedOutput = "Test This String123"
+	var expectedOutput = "TestThisString123"
 
-	result := AlphaNumeric(originalString)
+	result := AlphaNumeric(originalString, false)
 
 	if result != expectedOutput {
 		t.Fatal("AlphaNumeric Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
+
+	//Test removing all symbols
+	originalString = `~!@#$%^&*()-_Symbols=+[{]};:'"<>,./?`
+	expectedOutput = "Symbols"
+
+	result = AlphaNumeric(originalString, false)
+	if result != expectedOutput {
+		t.Fatal("Alpha Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//Test removing all carriage returns
+	originalString = "\nThis1\nThat2"
+	expectedOutput = "This1That2"
+
+	result = AlphaNumeric(originalString, false)
+	if result != expectedOutput {
+		t.Fatal("Alpha Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//Test removing fancy quotes and microsoft symbols
+	originalString = "“This is a quote with tick`s…”☺342"
+	expectedOutput = "Thisisaquotewithticks342"
+
+	result = AlphaNumeric(originalString, false)
+	if result != expectedOutput {
+		t.Fatal("Alpha Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//
+	//==================================================================================================================
+	//
+
+	//Test removing spaces and punctuation - preserve the case of the letters
+	originalString = "Test This String-! 123"
+	expectedOutput = "Test This String 123"
+
+	result = AlphaNumeric(originalString, true)
+	if result != expectedOutput {
+		t.Fatal("Alpha Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//Test removing all symbols
+	originalString = `~!@#$%^&*()-_Symbols 123=+[{]};:'"<>,./?`
+	expectedOutput = "Symbols 123"
+
+	result = AlphaNumeric(originalString, true)
+	if result != expectedOutput {
+		t.Fatal("Alpha Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//Test removing all carriage returns
+	originalString = "\nThis1\nThat2"
+	expectedOutput = `
+This1
+That2`
+
+	result = AlphaNumeric(originalString, true)
+	if result != expectedOutput {
+		t.Fatal("Alpha Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//Test removing fancy quotes and microsoft symbols
+	originalString = "“This is a quote with tick`s…”☺ 123"
+	expectedOutput = "This is a quote with ticks 123"
+
+	result = AlphaNumeric(originalString, true)
+	if result != expectedOutput {
+		t.Fatal("Alpha Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
 }
+
+//======================================================================================================================
 
 //TestDecimal tests the decimal sanitize method
 func TestDecimal(t *testing.T) {
