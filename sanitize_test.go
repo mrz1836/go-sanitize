@@ -10,13 +10,20 @@ import (
 //TestAlpha tests the alpha sanitize method
 func TestAlpha(t *testing.T) {
 
+	var (
+		expectedOutput string
+		methodName     string
+		originalString string
+	)
+
 	//Test removing spaces and punctuation - preserve the case of the letters
-	var originalString = "Test This String-!123"
-	var expectedOutput = "TestThisString"
+	originalString = "Test This String-!123"
+	expectedOutput = "TestThisString"
+	methodName = "Alpha"
 
 	result := Alpha(originalString, false)
 	if result != expectedOutput {
-		t.Fatal("Alpha Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
 	//Test removing all symbols
@@ -25,7 +32,7 @@ func TestAlpha(t *testing.T) {
 
 	result = Alpha(originalString, false)
 	if result != expectedOutput {
-		t.Fatal("Alpha Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
 	//Test removing all carriage returns
@@ -34,7 +41,7 @@ func TestAlpha(t *testing.T) {
 
 	result = Alpha(originalString, false)
 	if result != expectedOutput {
-		t.Fatal("Alpha Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
 	//Test removing fancy quotes and microsoft symbols
@@ -43,7 +50,7 @@ func TestAlpha(t *testing.T) {
 
 	result = Alpha(originalString, false)
 	if result != expectedOutput {
-		t.Fatal("Alpha Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
 	//
@@ -56,7 +63,7 @@ func TestAlpha(t *testing.T) {
 
 	result = Alpha(originalString, true)
 	if result != expectedOutput {
-		t.Fatal("Alpha Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
 	//Test removing all symbols
@@ -65,7 +72,7 @@ func TestAlpha(t *testing.T) {
 
 	result = Alpha(originalString, true)
 	if result != expectedOutput {
-		t.Fatal("Alpha Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
 	//Test removing all carriage returns
@@ -76,7 +83,7 @@ That`
 
 	result = Alpha(originalString, true)
 	if result != expectedOutput {
-		t.Fatal("Alpha Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
 	//Test removing fancy quotes and microsoft symbols
@@ -85,19 +92,26 @@ That`
 
 	result = Alpha(originalString, true)
 	if result != expectedOutput {
-		t.Fatal("Alpha Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 }
 
-//TestAlphaNumeric tests the alphanumeric sanitize method
+//TestAlphaNumeric tests the alpha numeric sanitize method
 func TestAlphaNumeric(t *testing.T) {
-	var originalString = "Test This String-!123"
-	var expectedOutput = "TestThisString123"
+	var (
+		expectedOutput string
+		methodName     string
+		originalString string
+	)
+
+	//Test the base string with mixed characters
+	originalString = "Test This String-!123"
+	expectedOutput = "TestThisString123"
+	methodName = "AlphaNumeric"
 
 	result := AlphaNumeric(originalString, false)
-
 	if result != expectedOutput {
-		t.Fatal("AlphaNumeric Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
 	//Test removing all symbols
@@ -106,7 +120,7 @@ func TestAlphaNumeric(t *testing.T) {
 
 	result = AlphaNumeric(originalString, false)
 	if result != expectedOutput {
-		t.Fatal("Alpha Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
 	//Test removing all carriage returns
@@ -115,7 +129,7 @@ func TestAlphaNumeric(t *testing.T) {
 
 	result = AlphaNumeric(originalString, false)
 	if result != expectedOutput {
-		t.Fatal("Alpha Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
 	//Test removing fancy quotes and microsoft symbols
@@ -124,7 +138,7 @@ func TestAlphaNumeric(t *testing.T) {
 
 	result = AlphaNumeric(originalString, false)
 	if result != expectedOutput {
-		t.Fatal("Alpha Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
 	//
@@ -137,7 +151,7 @@ func TestAlphaNumeric(t *testing.T) {
 
 	result = AlphaNumeric(originalString, true)
 	if result != expectedOutput {
-		t.Fatal("Alpha Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
 	//Test removing all symbols
@@ -146,7 +160,7 @@ func TestAlphaNumeric(t *testing.T) {
 
 	result = AlphaNumeric(originalString, true)
 	if result != expectedOutput {
-		t.Fatal("Alpha Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
 	//Test removing all carriage returns
@@ -157,7 +171,7 @@ That2`
 
 	result = AlphaNumeric(originalString, true)
 	if result != expectedOutput {
-		t.Fatal("Alpha Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
 	//Test removing fancy quotes and microsoft symbols
@@ -166,47 +180,141 @@ That2`
 
 	result = AlphaNumeric(originalString, true)
 	if result != expectedOutput {
-		t.Fatal("Alpha Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 }
 
-//======================================================================================================================
-
 //TestDecimal tests the decimal sanitize method
 func TestDecimal(t *testing.T) {
-	var originalString = "String1.23"
-	var expectedOutput = "1.23"
+
+	var (
+		expectedOutput string
+		methodName     string
+		originalString string
+	)
+
+	//Combined with letters
+	originalString = "String1.23"
+	expectedOutput = "1.23"
+	methodName = "Decimal"
 
 	result := Decimal(originalString)
-
 	if result != expectedOutput {
-		t.Fatal("Decimal Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//Remove all symbols, spaces, words
+	originalString = "  $-1.034234  Price"
+	expectedOutput = "-1.034234"
+
+	result = Decimal(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//More additional symbols, line returns
+	originalString = "/n<<  $-1.034234  >>/n"
+	expectedOutput = "-1.034234"
+
+	result = Decimal(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 }
 
 //TestDomain tests the domain sanitize method
 func TestDomain(t *testing.T) {
-	var originalString = "http://www.I am a domain.com"
-	var expectedOutput = "iamadomain.com"
+	var (
+		expectedOutput string
+		methodName     string
+		originalString string
+	)
 
-	result := Domain(originalString)
+	//Start with an invalid domain name
+	originalString = "http://www.I am a domain.com"
+	expectedOutput = "Iamadomain.com"
+	methodName = "Domain"
 
-	if result != expectedOutput {
-		t.Fatal("Domain Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	result, err := Domain(originalString, true, false)
+	if err == nil {
+		t.Fatal(methodName, "method should have failed here. Expected:", expectedOutput, "original string:", originalString, "returned: ", result, err)
 	}
+
+	//Another invalid domain name
+	originalString = "!I_am a domain.com"
+	expectedOutput = ""
+
+	result, err = Domain(originalString, true, false)
+	if err == nil {
+		t.Fatal(methodName, "method did not function properly. Expected:", expectedOutput, "original string:", originalString, "returned: ", result, err)
+	}
+
+	//Another invalid domain name
+	originalString = ""
+	expectedOutput = ""
+
+	result, err = Domain(originalString, true, false)
+	if result != expectedOutput {
+		t.Fatal(methodName, "method did not function properly. Expected:", expectedOutput, "original string:", originalString, "returned: ", result, err)
+	}
+
+	//A valid url (preserve the case)
+	originalString = "http://IAmDomain.com"
+	expectedOutput = "IAmDomain.com"
+
+	result, err = Domain(originalString, true, false)
+	if result != expectedOutput {
+		t.Fatal(methodName, "method did not function properly. Expected:", expectedOutput, "original string:", originalString, "returned: ", result, err)
+	}
+
+	//A valid url - lowercase
+	originalString = "http://IAmDomain.com"
+	expectedOutput = "iamdomain.com"
+
+	result, err = Domain(originalString, false, false)
+	if result != expectedOutput {
+		t.Fatal(methodName, "method did not function properly. Expected:", expectedOutput, "original string:", originalString, "returned: ", result, err)
+	}
+
+	//A valid url - lowercase
+	originalString = "https://IAmDomain.com/?this=that#plusThis"
+	expectedOutput = "iamdomain.com"
+
+	result, err = Domain(originalString, false, false)
+	if result != expectedOutput {
+		t.Fatal(methodName, "method did not function properly. Expected:", expectedOutput, "original string:", originalString, "returned: ", result, err)
+	}
+
+	//A valid url - lowercase
+	originalString = "http://www.IAmDomain.com/?this=that#plusThis"
+	expectedOutput = "iamdomain.com"
+
+	result, err = Domain(originalString, false, true)
+	if result != expectedOutput {
+		t.Fatal(methodName, "method did not function properly. Expected:", expectedOutput, "original string:", originalString, "returned: ", result, err)
+	}
+
+	//A valid url - lowercase, remove WWW
+	originalString = "IAmDomain.com/?this=that#plusThis"
+	expectedOutput = "iamdomain.com"
+
+	result, err = Domain(originalString, false, true)
+	if result != expectedOutput {
+		t.Fatal(methodName, "method did not function properly. Expected:", expectedOutput, "original string:", originalString, "returned: ", result, err)
+	}
+
+	//A valid url - lowercase, leave WWW
+	originalString = "www.IAmDomain.com/?this=that#plusThis"
+	expectedOutput = "www.iamdomain.com"
+
+	result, err = Domain(originalString, false, false)
+	if result != expectedOutput {
+		t.Fatal(methodName, "method did not function properly. Expected:", expectedOutput, "original string:", originalString, "returned: ", result, err)
+	}
+
 }
 
-//TestDriversLicense tests the drivers license sanitize method
-func TestDriversLicense(t *testing.T) {
-	var originalString = "F-1234-5678-!-9"
-	var expectedOutput = "F123456789"
-
-	result := DriversLicense(originalString)
-
-	if result != expectedOutput {
-		t.Fatal("Drivers License Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
-	}
-}
+//======================================================================================================================
 
 //TestEmail tests the email sanitize method
 func TestEmail(t *testing.T) {

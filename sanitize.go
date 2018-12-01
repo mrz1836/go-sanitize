@@ -4,7 +4,9 @@ Package gosanitize implements a simple library of various sanitation methods for
 package gosanitize
 
 import (
+	"fmt"
 	"net"
+	"net/url"
 	"regexp"
 	"strings"
 	"unicode"
@@ -13,26 +15,24 @@ import (
 // Set all the regular expressions
 var (
 	alphaNumericRegExp           = regexp.MustCompile(`[^a-zA-Z0-9]`)   //Alpha numeric
-	alphaNumericWithSpacesRegExp = regexp.MustCompile(`[^a-zA-Z0-9\s]`) //Alpha numeric with spaces
-	alphaRegExp                  = regexp.MustCompile(`[^a-zA-Z]`)      //Alpha only, no spaces
-	alphaWithSpacesRegExp        = regexp.MustCompile(`[^a-zA-Z\s]`)    //Alpha with spaces
-
-	decimalRegExp        = regexp.MustCompile(`[^0-9.-]`)
-	domainRegExp         = regexp.MustCompile(`[^a-zA-Z0-9-.]`)
-	driversLicenseRegExp = regexp.MustCompile(`[^a-zA-Z0-9]`)
-	emailRegExp          = regexp.MustCompile(`[^a-zA-Z0-9-_.@]`)
-	htmlOpenRegExp       = regexp.MustCompile(`(?i)<[^>]*>`)
-	nameFormalRegExp     = regexp.MustCompile(`[^a-zA-Z0-9-',.\s]`)
-	numericRegExp        = regexp.MustCompile(`[^0-9]`)
-	punctuationRegExp    = regexp.MustCompile(`[^a-zA-Z0-9-'"#&!?,.\s]+`)
-	scriptRegExp         = regexp.MustCompile(`(?i)<(script|iframe|embed|object)[^>]*>.*</(script|iframe|embed|object)>`) //`(?i)<(script|iframe|embed|object)[^>]*>.*</(script|iframe|embed|object)>`
-	seoRegExp            = regexp.MustCompile(`[^a-zA-Z0-9-_]`)
-	singleLineRegExp     = regexp.MustCompile(`\r?\n`)
-	socialNumberRegExp   = regexp.MustCompile(`[^0-9-]`)
-	timeRegExp           = regexp.MustCompile(`[^0-9:]`)
-	unicodeRegExp        = regexp.MustCompile(`[[^:unicode]]`) //`[[^:unicode:]]`
-	uriRegExp            = regexp.MustCompile(`[^a-zA-Z0-9-_/?&=%]`)
-	urlRegExp            = regexp.MustCompile(`[^a-zA-Z0-9-_/:.?&=#%]`)
+	alphaNumericWithSpacesRegExp = regexp.MustCompile(`[^a-zA-Z0-9\s]`) //Alpha numeric (with spaces)
+	alphaRegExp                  = regexp.MustCompile(`[^a-zA-Z]`)      //Alpha characters
+	alphaWithSpacesRegExp        = regexp.MustCompile(`[^a-zA-Z\s]`)    //Alpha characters (with spaces)
+	decimalRegExp                = regexp.MustCompile(`[^0-9.-]`)       //Decimals (positive and negative)
+	domainRegExp                 = regexp.MustCompile(`[^a-zA-Z0-9-.]`) //Domain accepted characters
+	emailRegExp                  = regexp.MustCompile(`[^a-zA-Z0-9-_.@]`)
+	htmlOpenRegExp               = regexp.MustCompile(`(?i)<[^>]*>`)
+	nameFormalRegExp             = regexp.MustCompile(`[^a-zA-Z0-9-',.\s]`)
+	numericRegExp                = regexp.MustCompile(`[^0-9]`)
+	punctuationRegExp            = regexp.MustCompile(`[^a-zA-Z0-9-'"#&!?,.\s]+`)
+	scriptRegExp                 = regexp.MustCompile(`(?i)<(script|iframe|embed|object)[^>]*>.*</(script|iframe|embed|object)>`) //`(?i)<(script|iframe|embed|object)[^>]*>.*</(script|iframe|embed|object)>`
+	seoRegExp                    = regexp.MustCompile(`[^a-zA-Z0-9-_]`)
+	singleLineRegExp             = regexp.MustCompile(`\r?\n`)
+	socialNumberRegExp           = regexp.MustCompile(`[^0-9-]`)
+	timeRegExp                   = regexp.MustCompile(`[^0-9:]`)
+	unicodeRegExp                = regexp.MustCompile(`[[^:unicode]]`) //`[[^:unicode:]]`
+	uriRegExp                    = regexp.MustCompile(`[^a-zA-Z0-9-_/?&=%]`)
+	urlRegExp                    = regexp.MustCompile(`[^a-zA-Z0-9-_/:.?&=#%]`)
 )
 
 //Alpha returns only alpha characters (flag for spaces)
@@ -47,7 +47,7 @@ func Alpha(original string, spaces bool) string {
 	return string(alphaRegExp.ReplaceAll([]byte(original), []byte("")))
 }
 
-//AlphaNumeric alpha and numeric characters only (flag for spaces)
+//AlphaNumeric returns alpha and numeric characters only (flag for spaces)
 func AlphaNumeric(original string, spaces bool) string {
 
 	//Leave white spaces?
@@ -59,20 +59,47 @@ func AlphaNumeric(original string, spaces bool) string {
 	return string(alphaNumericRegExp.ReplaceAll([]byte(original), []byte("")))
 }
 
-//Decimal floats and decimals
+//Decimal returns decimal values (positive and negative)
 func Decimal(original string) string {
 	return string(decimalRegExp.ReplaceAll([]byte(original), []byte("")))
 }
 
-//Domain only formatting
-func Domain(original string) string {
-	original = strings.Replace(strings.Replace(strings.Replace(original, "https", "", 3), "www.", "", 3), "http", "", 3)
-	return string(domainRegExp.ReplaceAll([]byte(strings.ToLower(original)), []byte("")))
-}
+//Domain returns a proper domain name (example.com - lowercase)
+func Domain(original string, preserveCase bool, removeWww bool) (string, error) {
 
-//DriversLicense only formatting (a-z and 0-9)
-func DriversLicense(original string) string {
-	return string(driversLicenseRegExp.ReplaceAll([]byte(strings.ToUpper(original)), []byte("")))
+	//Try to see if we have a host
+	if len(original) == 0 {
+		return original, fmt.Errorf("domain value is empty")
+	}
+
+	//Missing http?
+	if !strings.Contains(original, "http") {
+		original = "http://" + original
+	}
+
+	//Try to parse the url
+	u, err := url.Parse(original)
+	if err != nil {
+		return original, err
+	}
+
+	//Try to see if we have a host
+	if len(u.Host) == 0 {
+		return original, fmt.Errorf("unable to parse domain: %s", original)
+	}
+
+	//Remove leading www.
+	if removeWww {
+		u.Host = strings.Replace(u.Host, "www.", "", -1)
+	}
+
+	//Keeps the exact case of the original input string
+	if preserveCase {
+		return string(domainRegExp.ReplaceAll([]byte(u.Host), []byte(""))), nil
+	}
+
+	//Generally all domains should be uniform and lowercase
+	return string(domainRegExp.ReplaceAll([]byte(strings.ToLower(u.Host)), []byte(""))), nil
 }
 
 //Email only formatting
