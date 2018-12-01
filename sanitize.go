@@ -102,23 +102,30 @@ func Domain(original string, preserveCase bool, removeWww bool) (string, error) 
 	return string(domainRegExp.ReplaceAll([]byte(strings.ToLower(u.Host)), []byte(""))), nil
 }
 
-//Email only formatting
+//Email returns a sanitized email address
 func Email(original string) string {
-	original = strings.Replace(original, "mailto:", "", 3)
-	return string(emailRegExp.ReplaceAll([]byte(strings.ToLower(original)), []byte("")))
+	return string(emailRegExp.ReplaceAll([]byte(strings.ToLower(strings.Replace(original, "mailto:", "", -1))), []byte("")))
 }
 
-//FirstToUpper overwrites the first letter as an uppercase letter
+//FirstToUpper overwrites the first letter as an uppercase letter and preserves the string
 func FirstToUpper(original string) string {
-	return makeFirstUpperCase(original)
+
+	// Handle empty and 1 character strings
+	if len(original) < 2 {
+		return strings.ToUpper(original)
+	}
+
+	runes := []rune(original)
+	runes[0] = unicode.ToUpper(runes[0])
+	return string(runes)
 }
 
-//HTML removes all basic html tags that we accept
+//HTML returns a string without any <HTML> tags
 func HTML(original string) string {
 	return string(htmlOpenRegExp.ReplaceAll([]byte(original), []byte("")))
 }
 
-//IPAddress format as ip address for both ipv4 and ipv6
+//IPAddress returns an ip address for both ipv4 and ipv6
 func IPAddress(original string) string {
 	ipAddress := net.ParseIP(strings.TrimSpace(original))
 
@@ -201,17 +208,4 @@ func XSS(original string) string {
 
 	//return the clean string
 	return original
-}
-
-//makeFirstUpperCase upper cases the first letter of the string
-func makeFirstUpperCase(s string) string {
-
-	// Handle empty and 1 character strings
-	if len(s) < 2 {
-		return strings.ToUpper(s)
-	}
-
-	runes := []rune(s)
-	runes[0] = unicode.ToUpper(runes[0])
-	return string(runes)
 }

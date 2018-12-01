@@ -316,72 +316,126 @@ func TestDomain(t *testing.T) {
 
 }
 
-//======================================================================================================================
-
 //TestEmail tests the email sanitize method
 func TestEmail(t *testing.T) {
-	var originalString = "mailto:testME@GmAil.com"
-	var expectedOutput = "testme@gmail.com"
+	var (
+		expectedOutput string
+		methodName     string
+		originalString string
+	)
+
+	//Test removing the mailto: and lower case
+	methodName = "Email"
+	originalString = "mailto:testME@GmAil.com"
+	expectedOutput = "testme@gmail.com"
 
 	result := Email(originalString)
 	if result != expectedOutput {
-		t.Fatal("Email Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
+	//Lowercase
 	originalString = "test_ME@GmAil.com"
 	expectedOutput = "test_me@gmail.com"
 
 	result = Email(originalString)
 	if result != expectedOutput {
-		t.Fatal("Email Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
+	//Supports valid email, lowercase
 	originalString = "test-ME@GmAil.com"
 	expectedOutput = "test-me@gmail.com"
 
 	result = Email(originalString)
 	if result != expectedOutput {
-		t.Fatal("Email Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
+	//Valid email, lowercase
 	originalString = "test.ME@GmAil.com"
 	expectedOutput = "test.me@gmail.com"
 
 	result = Email(originalString)
 	if result != expectedOutput {
-		t.Fatal("Email Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	originalString = "test_ME @GmAil.com"
+	//Remove all spaces
+	originalString = " test_ME @GmAil.com "
 	expectedOutput = "test_me@gmail.com"
-	result = Email(originalString)
 
+	result = Email(originalString)
 	if result != expectedOutput {
-		t.Fatal("Email Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
+	//Remove all invalid characters
+	originalString = " <<test_ME @GmAil.com!>> "
+	expectedOutput = "test_me@gmail.com"
+
+	result = Email(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
 }
 
 //TestFirstToUpper tests the first to upper method
 func TestFirstToUpper(t *testing.T) {
-	originalString := "thisworks"
-	expectedOutput := "Thisworks"
+	var (
+		expectedOutput string
+		methodName     string
+		originalString string
+	)
+
+	//Test turning to uppercase
+	originalString = "thisworks"
+	expectedOutput = "Thisworks"
+	methodName = "FirstToUpper"
 
 	result := FirstToUpper(originalString)
-
 	if result != expectedOutput {
-		t.Fatal("FirstToUpper did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
+	//Test keeping it uppercase
 	originalString = "Thisworks"
 	expectedOutput = "Thisworks"
 
 	result = FirstToUpper(originalString)
-
 	if result != expectedOutput {
-		t.Fatal("FirstToUpper did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//Convert first letter to uppercase
+	originalString = "this"
+	expectedOutput = "This"
+
+	result = FirstToUpper(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//Single letter test
+	originalString = "t"
+	expectedOutput = "T"
+
+	result = FirstToUpper(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//Two letter test
+	originalString = "tt"
+	expectedOutput = "Tt"
+
+	result = FirstToUpper(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 }
+
+//======================================================================================================================
 
 //TestHtml tests the html sanitize method
 func TestHtml(t *testing.T) {
