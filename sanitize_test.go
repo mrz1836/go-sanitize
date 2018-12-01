@@ -444,7 +444,62 @@ func TestFirstToUpper(t *testing.T) {
 	}
 }
 
-//TestHTML tests the html sanitize method
+//TestFormalName tests the formal name method
+func TestFormalName(t *testing.T) {
+	var (
+		expectedOutput string
+		methodName     string
+		originalString string
+	)
+
+	//Test a valid name
+	originalString = "Mark Mc'Cuban-Host"
+	expectedOutput = "Mark Mc'Cuban-Host"
+	methodName = "FormalName"
+
+	result := FormalName(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//Test a valid name
+	originalString = "Mark Mc'Cuban-Host the SR."
+	expectedOutput = "Mark Mc'Cuban-Host the SR."
+
+	result = FormalName(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//Test a valid name
+	originalString = "Mark Mc'Cuban-Host the Second."
+	expectedOutput = "Mark Mc'Cuban-Host the Second."
+
+	result = FormalName(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//Test another valid name
+	originalString = "Johnny Apple.Seed, Martin"
+	expectedOutput = "Johnny Apple.Seed, Martin"
+
+	result = FormalName(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//Test invalid characters
+	originalString = "Does #Not Work!"
+	expectedOutput = "Does Not Work"
+
+	result = FormalName(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+}
+
+//TestHTML tests the HTML sanitize method
 func TestHTML(t *testing.T) {
 	var (
 		expectedOutput string
@@ -467,34 +522,6 @@ func TestHTML(t *testing.T) {
 	expectedOutput = "This works?"
 
 	result = HTML(originalString)
-	if result != expectedOutput {
-		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
-	}
-}
-
-//TestXML tests the html sanitize method
-func TestXML(t *testing.T) {
-	var (
-		expectedOutput string
-		methodName     string
-		originalString string
-	)
-
-	//Test basic HTML removal
-	methodName = "XML"
-	originalString = `<?xml version="1.0" encoding="UTF-8"?><note>Something</note>`
-	expectedOutput = "Something"
-
-	result := XML(originalString)
-	if result != expectedOutput {
-		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
-	}
-
-	//Advanced XML removal
-	originalString = `<body>This works?</body><title>Something</title>`
-	expectedOutput = "This works?Something"
-
-	result = XML(originalString)
 	if result != expectedOutput {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
@@ -600,101 +627,187 @@ func TestIPAddress(t *testing.T) {
 	}
 }
 
-//======================================================================================================================
-
-//TestFormalName tests the name formal method
-func TestFormalName(t *testing.T) {
-	var originalString = "Mark Mc'Cuban-Host"
-	var expectedOutput = "Mark Mc'Cuban-Host"
-
-	result := FormalName(originalString)
-	if result != expectedOutput {
-		t.Fatal("Numeric Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
-	}
-
-	originalString = "Johnny Apple.Seed, Martin"
-	expectedOutput = "Johnny Apple.Seed, Martin"
-
-	result = FormalName(originalString)
-	if result != expectedOutput {
-		t.Fatal("Numeric Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
-	}
-
-	originalString = "Does #Not Work!"
-	expectedOutput = "Does Not Work"
-
-	result = FormalName(originalString)
-	if result != expectedOutput {
-		t.Fatal("Numeric Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
-	}
-}
-
 //TestNumeric tests the numeric sanitize method
 func TestNumeric(t *testing.T) {
-	var originalString = "Test This String-!1234"
-	var expectedOutput = "1234"
+	var (
+		expectedOutput string
+		methodName     string
+		originalString string
+	)
+
+	//Remove everything and leave just numbers
+	originalString = "Test This String-!1234"
+	expectedOutput = "1234"
+	methodName = "Numeric"
 
 	result := Numeric(originalString)
 	if result != expectedOutput {
-		t.Fatal("Numeric Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//Remove everything and leave just numbers
+	originalString = " $1.00 Price!"
+	expectedOutput = "100"
+
+	result = Numeric(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 }
 
-//TestPunctuation tests the name formal method
+//TestPunctuation tests the punctuation method
 func TestPunctuation(t *testing.T) {
-	var originalString = "Mark Mc'Cuban-Host"
-	var expectedOutput = "Mark Mc'Cuban-Host"
+	var (
+		expectedOutput string
+		methodName     string
+		originalString string
+	)
+
+	//Keep standard punctuation
+	originalString = "Mark Mc'Cuban-Host"
+	expectedOutput = "Mark Mc'Cuban-Host"
+	methodName = "Punctuation"
 
 	result := Punctuation(originalString)
 	if result != expectedOutput {
-		t.Fatal("Numeric Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
+	//Keep periods and commas
 	originalString = "Johnny Apple.Seed, Martin"
 	expectedOutput = "Johnny Apple.Seed, Martin"
 
 	result = Punctuation(originalString)
 	if result != expectedOutput {
-		t.Fatal("Numeric Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
+	//Keep hashes and exclamation
 	originalString = "Does #Not Work!"
 	expectedOutput = "Does #Not Work!"
 
 	result = Punctuation(originalString)
 	if result != expectedOutput {
-		t.Fatal("Numeric Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
+	//Keep question marks
+	originalString = "Does #Not Work!?"
+	expectedOutput = "Does #Not Work!?"
+
+	result = Punctuation(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//Keep ampersands
+	originalString = "Does #Not Work! & this"
+	expectedOutput = "Does #Not Work! & this"
+
+	result = Punctuation(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//Keep quotes
+	originalString = `[@"Does" 'this' work?@]this`
+	expectedOutput = `"Does" 'this' work?this`
+
+	result = Punctuation(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//Remove invalid characters
 	originalString = "Does, 123^* Not & Work!?"
 	expectedOutput = "Does, 123 Not & Work!?"
 
 	result = Punctuation(originalString)
 	if result != expectedOutput {
-		t.Fatal("Numeric Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 }
 
-//TestSeo tests the seo sanitize method
-func TestSeo(t *testing.T) {
-	var originalString = "Test This String!"
-	var expectedOutput = "TestThisString"
+//TestScripts tests the script removal
+func TestScripts(t *testing.T) {
+	var (
+		expectedOutput string
+		methodName     string
+		originalString string
+	)
 
-	result := Seo(originalString)
+	//Test removing a script
+	originalString = "this <script>$('#something').hide()</script>"
+	expectedOutput = "this "
+	methodName = "Scripts"
+
+	result := Scripts(originalString)
 	if result != expectedOutput {
-		t.Fatal("SEO Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//Remove JS script
+	originalString = "this <script type='text/javascript'>$('#something').hide()</script>"
+	expectedOutput = "this "
+
+	result = Scripts(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//Remove JS script
+	originalString = `this <script type="text/javascript" class="something">$('#something').hide();</script>`
+	expectedOutput = "this "
+
+	result = Scripts(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//Remove iframe
+	originalString = `this <iframe width="50" class="something"></iframe>`
+	expectedOutput = "this "
+
+	result = Scripts(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//Remove embed tag
+	originalString = `this <embed width="50" class="something"></embed>`
+	expectedOutput = "this "
+
+	result = Scripts(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//Remove object
+	originalString = `this <object width="50" class="something"></object>`
+	expectedOutput = "this "
+
+	result = Scripts(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 }
 
 //TestSingleLine test the single line sanitize method
 func TestSingleLine(t *testing.T) {
-	var originalString = `Mark
+	var (
+		expectedOutput string
+		methodName     string
+		originalString string
+	)
+
+	methodName = "SingleLine"
+	originalString = `Mark
 Mc'Cuban-Host`
-	var expectedOutput = "Mark Mc'Cuban-Host"
+	expectedOutput = "Mark Mc'Cuban-Host"
 
 	result := SingleLine(originalString)
 	if result != expectedOutput {
-		t.Fatal("Numeric Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
 	originalString = `Mark
@@ -704,23 +817,81 @@ something else`
 
 	result = SingleLine(originalString)
 	if result != expectedOutput {
-		t.Fatal("Numeric Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 }
 
-//TestTime tests the numeric sanitize method
+//TestTime tests the time sanitize method
 func TestTime(t *testing.T) {
-	var originalString = "t00:00d -EST"
-	var expectedOutput = "00:00"
+	var (
+		expectedOutput string
+		methodName     string
+		originalString string
+	)
+
+	//Just the timestamp, no timezone
+	originalString = "t00:00d -EST"
+	expectedOutput = "00:00"
+	methodName = "Time"
 
 	result := Time(originalString)
 	if result != expectedOutput {
-		t.Fatal("Time Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//Just the timestamp, no other characters
+	originalString = "t00:00:00d -EST"
+	expectedOutput = "00:00:00"
+
+	result = Time(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//Just the timestamp, remove everything else
+	originalString = "SOMETHING t00:00:00d -EST DAY"
+	expectedOutput = "00:00:00"
+
+	result = Time(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 }
 
-//TestUri tests the uri sanitize method
-func TestUri(t *testing.T) {
+//todo: TestUnicode
+
+//TestXML tests the XML sanitize method
+func TestXML(t *testing.T) {
+	var (
+		expectedOutput string
+		methodName     string
+		originalString string
+	)
+
+	//Test basic HTML removal
+	methodName = "XML"
+	originalString = `<?xml version="1.0" encoding="UTF-8"?><note>Something</note>`
+	expectedOutput = "Something"
+
+	result := XML(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//Advanced XML removal
+	originalString = `<body>This works?</body><title>Something</title>`
+	expectedOutput = "This works?Something"
+
+	result = XML(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+}
+
+//======================================================================================================================
+
+//TestURI tests the URI sanitize method
+func TestURI(t *testing.T) {
 	var originalString = "Test?=weee! &this=that"
 	var expectedOutput = "Test?=weee&this=that"
 
@@ -738,8 +909,8 @@ func TestUri(t *testing.T) {
 	}
 }
 
-//TestUrl tests the url sanitize method
-func TestUrl(t *testing.T) {
+//TestURL tests the URL sanitize method
+func TestURL(t *testing.T) {
 	var originalString = "Test?=weee! &this=that#works"
 	var expectedOutput = "Test?=weee&this=that#works"
 
@@ -757,8 +928,8 @@ func TestUrl(t *testing.T) {
 	}
 }
 
-//TestXss tests the xss sanitize method
-func TestXss(t *testing.T) {
+//TestXSS tests the XSS sanitize method
+func TestXSS(t *testing.T) {
 	originalString := "<script>alert('test');</script>"
 	expectedOutput := ">alert('test');</"
 
@@ -781,56 +952,5 @@ func TestXss(t *testing.T) {
 	result = XSS(originalString)
 	if result != expectedOutput {
 		t.Fatal("XSS Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
-	}
-}
-
-//TestScripts tests the script removal
-func TestScripts(t *testing.T) {
-	var originalString = "this <script>$('#something').hide()</script>"
-	var expectedOutput = "this "
-
-	result := Scripts(originalString)
-	if result != expectedOutput {
-		t.Fatal("Scripts Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
-	}
-
-	originalString = "this <script type='text/javascript'>$('#something').hide()</script>"
-	expectedOutput = "this "
-
-	result = Scripts(originalString)
-	if result != expectedOutput {
-		t.Fatal("Scripts Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
-	}
-
-	originalString = `this <script type="text/javascript" class="something">$('#something').hide();</script>`
-	expectedOutput = "this "
-
-	result = Scripts(originalString)
-	if result != expectedOutput {
-		t.Fatal("Scripts Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
-	}
-
-	originalString = `this <iframe width="50" class="something"></iframe>`
-	expectedOutput = "this "
-
-	result = Scripts(originalString)
-	if result != expectedOutput {
-		t.Fatal("Scripts Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
-	}
-
-	originalString = `this <embed width="50" class="something"></embed>`
-	expectedOutput = "this "
-
-	result = Scripts(originalString)
-	if result != expectedOutput {
-		t.Fatal("Scripts Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
-	}
-
-	originalString = `this <object width="50" class="something"></object>`
-	expectedOutput = "this "
-
-	result = Scripts(originalString)
-	if result != expectedOutput {
-		t.Fatal("Scripts Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 }

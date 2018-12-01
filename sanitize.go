@@ -14,24 +14,24 @@ import (
 
 // Set all the regular expressions
 var (
-	alphaNumericRegExp           = regexp.MustCompile(`[^a-zA-Z0-9]`)      //Alpha numeric
-	alphaNumericWithSpacesRegExp = regexp.MustCompile(`[^a-zA-Z0-9\s]`)    //Alpha numeric (with spaces)
-	alphaRegExp                  = regexp.MustCompile(`[^a-zA-Z]`)         //Alpha characters
-	alphaWithSpacesRegExp        = regexp.MustCompile(`[^a-zA-Z\s]`)       //Alpha characters (with spaces)
-	decimalRegExp                = regexp.MustCompile(`[^0-9.-]`)          //Decimals (positive and negative)
-	domainRegExp                 = regexp.MustCompile(`[^a-zA-Z0-9-.]`)    //Domain accepted characters
-	emailRegExp                  = regexp.MustCompile(`[^a-zA-Z0-9-_.@+]`) //Email address characters
-	htmlRegExp                   = regexp.MustCompile(`(?i)<[^>]*>`)       //HTML/XML tags or any alligator open/close tags
-	nameFormalRegExp             = regexp.MustCompile(`[^a-zA-Z0-9-',.\s]`)
-	numericRegExp                = regexp.MustCompile(`[^0-9]`)
-	punctuationRegExp            = regexp.MustCompile(`[^a-zA-Z0-9-'"#&!?,.\s]+`)
-	scriptRegExp                 = regexp.MustCompile(`(?i)<(script|iframe|embed|object)[^>]*>.*</(script|iframe|embed|object)>`) //`(?i)<(script|iframe|embed|object)[^>]*>.*</(script|iframe|embed|object)>`
-	seoRegExp                    = regexp.MustCompile(`[^a-zA-Z0-9-_]`)
-	singleLineRegExp             = regexp.MustCompile(`\r?\n`)
-	timeRegExp                   = regexp.MustCompile(`[^0-9:]`)
-	unicodeRegExp                = regexp.MustCompile(`[[^:unicode]]`) //`[[^:unicode:]]`
-	uriRegExp                    = regexp.MustCompile(`[^a-zA-Z0-9-_/?&=%]`)
-	urlRegExp                    = regexp.MustCompile(`[^a-zA-Z0-9-_/:.?&=#%]`)
+	alphaNumericRegExp           = regexp.MustCompile(`[^a-zA-Z0-9]`)             //Alpha numeric
+	alphaNumericWithSpacesRegExp = regexp.MustCompile(`[^a-zA-Z0-9\s]`)           //Alpha numeric (with spaces)
+	alphaRegExp                  = regexp.MustCompile(`[^a-zA-Z]`)                //Alpha characters
+	alphaWithSpacesRegExp        = regexp.MustCompile(`[^a-zA-Z\s]`)              //Alpha characters (with spaces)
+	decimalRegExp                = regexp.MustCompile(`[^0-9.-]`)                 //Decimals (positive and negative)
+	domainRegExp                 = regexp.MustCompile(`[^a-zA-Z0-9-.]`)           //Domain accepted characters
+	emailRegExp                  = regexp.MustCompile(`[^a-zA-Z0-9-_.@+]`)        //Email address characters
+	formalNameRegExp             = regexp.MustCompile(`[^a-zA-Z0-9-',.\s]`)       //Characters recognized in surnames and proper names
+	htmlRegExp                   = regexp.MustCompile(`(?i)<[^>]*>`)              //HTML/XML tags or any alligator open/close tags
+	numericRegExp                = regexp.MustCompile(`[^0-9]`)                   //Numbers only
+	punctuationRegExp            = regexp.MustCompile(`[^a-zA-Z0-9-'"#&!?,.\s]+`) //Standard accepted punctuation characters
+	scriptRegExp                 = regexp.MustCompile(`(?i)<(script|iframe|embed|object)[^>]*>.*</(script|iframe|embed|object)>`)
+	//seoRegExp                    = regexp.MustCompile(`[^a-zA-Z0-9-_]`)
+	singleLineRegExp = regexp.MustCompile(`\r?\n`)
+	timeRegExp       = regexp.MustCompile(`[^0-9:]`)
+	unicodeRegExp    = regexp.MustCompile(`[[^:unicode]]`)
+	uriRegExp        = regexp.MustCompile(`[^a-zA-Z0-9-_/?&=%]`)
+	urlRegExp        = regexp.MustCompile(`[^a-zA-Z0-9-_/:.?&=#%]`)
 )
 
 //Alpha returns only alpha characters (flag for spaces)
@@ -119,14 +119,14 @@ func FirstToUpper(original string) string {
 	return string(runes)
 }
 
+//FormalName returns a formal name or surname (for First, Middle and Last)
+func FormalName(original string) string {
+	return string(formalNameRegExp.ReplaceAll([]byte(original), []byte("")))
+}
+
 //HTML returns a string without any <HTML> tags
 func HTML(original string) string {
 	return string(htmlRegExp.ReplaceAll([]byte(original), []byte("")))
-}
-
-//XML returns a string without any <XML> tags - alias of HTML
-func XML(original string) string {
-	return HTML(original)
 }
 
 //IPAddress returns an ip address for both ipv4 and ipv6
@@ -138,11 +138,6 @@ func IPAddress(original string) string {
 	}
 
 	return ipAddress.String()
-}
-
-//FormalName returns a formal name or surname (for First, Middle and Last)
-func FormalName(original string) string {
-	return string(nameFormalRegExp.ReplaceAll([]byte(original), []byte("")))
 }
 
 //Numeric returns numbers only
@@ -158,11 +153,6 @@ func Punctuation(original string) string {
 //Scripts removes all scripts, iframes and embeds tags
 func Scripts(original string) string {
 	return string(scriptRegExp.ReplaceAll([]byte(original), []byte("")))
-}
-
-//Seo returns a URL Friendly string
-func Seo(original string) string {
-	return string(seoRegExp.ReplaceAll([]byte(original), []byte("")))
 }
 
 //SingleLine returns a single line string
@@ -190,7 +180,12 @@ func URL(original string) string {
 	return string(urlRegExp.ReplaceAll([]byte(original), []byte("")))
 }
 
-//XSS removes all XSS attack strings
+//XML returns a string without any <XML> tags - alias of HTML
+func XML(original string) string {
+	return HTML(original)
+}
+
+//XSS removes all XSS attack strings or script strings
 func XSS(original string) string {
 	original = strings.Replace(original, "<script", "", -1)
 	original = strings.Replace(original, "script>", "", -1)
