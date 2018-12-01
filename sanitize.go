@@ -21,14 +21,13 @@ var (
 	decimalRegExp                = regexp.MustCompile(`[^0-9.-]`)          //Decimals (positive and negative)
 	domainRegExp                 = regexp.MustCompile(`[^a-zA-Z0-9-.]`)    //Domain accepted characters
 	emailRegExp                  = regexp.MustCompile(`[^a-zA-Z0-9-_.@+]`) //Email address characters
-	htmlOpenRegExp               = regexp.MustCompile(`(?i)<[^>]*>`)       //HTML tags or any alligator open/close tags
+	htmlRegExp                   = regexp.MustCompile(`(?i)<[^>]*>`)       //HTML/XML tags or any alligator open/close tags
 	nameFormalRegExp             = regexp.MustCompile(`[^a-zA-Z0-9-',.\s]`)
 	numericRegExp                = regexp.MustCompile(`[^0-9]`)
 	punctuationRegExp            = regexp.MustCompile(`[^a-zA-Z0-9-'"#&!?,.\s]+`)
 	scriptRegExp                 = regexp.MustCompile(`(?i)<(script|iframe|embed|object)[^>]*>.*</(script|iframe|embed|object)>`) //`(?i)<(script|iframe|embed|object)[^>]*>.*</(script|iframe|embed|object)>`
 	seoRegExp                    = regexp.MustCompile(`[^a-zA-Z0-9-_]`)
 	singleLineRegExp             = regexp.MustCompile(`\r?\n`)
-	socialNumberRegExp           = regexp.MustCompile(`[^0-9-]`)
 	timeRegExp                   = regexp.MustCompile(`[^0-9:]`)
 	unicodeRegExp                = regexp.MustCompile(`[[^:unicode]]`) //`[[^:unicode:]]`
 	uriRegExp                    = regexp.MustCompile(`[^a-zA-Z0-9-_/?&=%]`)
@@ -122,7 +121,7 @@ func FirstToUpper(original string) string {
 
 //HTML returns a string without any <HTML> tags
 func HTML(original string) string {
-	return string(htmlOpenRegExp.ReplaceAll([]byte(original), []byte("")))
+	return string(htmlRegExp.ReplaceAll([]byte(original), []byte("")))
 }
 
 //XML returns a string without any <XML> tags - alias of HTML
@@ -141,42 +140,37 @@ func IPAddress(original string) string {
 	return ipAddress.String()
 }
 
-//FormalName is (for First, Middle and Last)
+//FormalName returns a formal name or surname (for First, Middle and Last)
 func FormalName(original string) string {
 	return string(nameFormalRegExp.ReplaceAll([]byte(original), []byte("")))
 }
 
-//Numeric numbers only
+//Numeric returns numbers only
 func Numeric(original string) string {
 	return string(numericRegExp.ReplaceAll([]byte(original), []byte("")))
 }
 
-//Punctuation used for generic sentences
+//Punctuation returns a string with basic punctuation
 func Punctuation(original string) string {
 	return string(punctuationRegExp.ReplaceAll([]byte(original), []byte("")))
 }
 
-//Scripts removes all script / iframes / embeds tags
+//Scripts removes all scripts, iframes and embeds tags
 func Scripts(original string) string {
 	return string(scriptRegExp.ReplaceAll([]byte(original), []byte("")))
 }
 
-//Seo returns URL Friendly
+//Seo returns a URL Friendly string
 func Seo(original string) string {
 	return string(seoRegExp.ReplaceAll([]byte(original), []byte("")))
 }
 
-//SocialSecurityNumber formats social - xxx-xx-xxxx
-func SocialSecurityNumber(original string) string {
-	return string(socialNumberRegExp.ReplaceAll([]byte(original), []byte("")))
-}
-
-//SingleLine used for forcing to a single line
+//SingleLine returns a single line string
 func SingleLine(original string) string {
 	return singleLineRegExp.ReplaceAllString(original, " ")
 }
 
-//Time only (0-9 :)
+//Time returns just the time xx:xx string
 func Time(original string) string {
 	return string(timeRegExp.ReplaceAll([]byte(original), []byte("")))
 }
@@ -186,19 +180,18 @@ func Unicode(original string) string {
 	return string(unicodeRegExp.ReplaceAll([]byte(original), []byte("")))
 }
 
-//URI allowed URI characters
+//URI returns allowed URI characters
 func URI(original string) string {
 	return string(uriRegExp.ReplaceAll([]byte(original), []byte("")))
 }
 
-//URL format as URL
+//URL returns a formatted url
 func URL(original string) string {
 	return string(urlRegExp.ReplaceAll([]byte(original), []byte("")))
 }
 
-//XSS remove XSS attack strings
+//XSS removes all XSS attack strings
 func XSS(original string) string {
-	//Remove all XSS attacks
 	original = strings.Replace(original, "<script", "", -1)
 	original = strings.Replace(original, "script>", "", -1)
 	original = strings.Replace(original, "eval(", "", -1)
@@ -209,8 +202,6 @@ func XSS(original string) string {
 	original = strings.Replace(original, "&#62;", "", -1)
 	original = strings.Replace(original, "&#60;", "", -1)
 	original = strings.Replace(original, "&lt;", "", -1)
-	original = strings.Replace(original, "&lt;", "", -1)
-
-	//return the clean string
+	original = strings.Replace(original, "&rt;", "", -1)
 	return original
 }

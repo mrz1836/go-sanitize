@@ -608,7 +608,6 @@ func TestFormalName(t *testing.T) {
 	var expectedOutput = "Mark Mc'Cuban-Host"
 
 	result := FormalName(originalString)
-
 	if result != expectedOutput {
 		t.Fatal("Numeric Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
@@ -617,7 +616,6 @@ func TestFormalName(t *testing.T) {
 	expectedOutput = "Johnny Apple.Seed, Martin"
 
 	result = FormalName(originalString)
-
 	if result != expectedOutput {
 		t.Fatal("Numeric Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
@@ -626,7 +624,6 @@ func TestFormalName(t *testing.T) {
 	expectedOutput = "Does Not Work"
 
 	result = FormalName(originalString)
-
 	if result != expectedOutput {
 		t.Fatal("Numeric Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
@@ -638,7 +635,6 @@ func TestNumeric(t *testing.T) {
 	var expectedOutput = "1234"
 
 	result := Numeric(originalString)
-
 	if result != expectedOutput {
 		t.Fatal("Numeric Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
@@ -650,7 +646,6 @@ func TestPunctuation(t *testing.T) {
 	var expectedOutput = "Mark Mc'Cuban-Host"
 
 	result := Punctuation(originalString)
-
 	if result != expectedOutput {
 		t.Fatal("Numeric Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
@@ -659,7 +654,6 @@ func TestPunctuation(t *testing.T) {
 	expectedOutput = "Johnny Apple.Seed, Martin"
 
 	result = Punctuation(originalString)
-
 	if result != expectedOutput {
 		t.Fatal("Numeric Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
@@ -668,7 +662,6 @@ func TestPunctuation(t *testing.T) {
 	expectedOutput = "Does #Not Work!"
 
 	result = Punctuation(originalString)
-
 	if result != expectedOutput {
 		t.Fatal("Numeric Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
@@ -677,7 +670,6 @@ func TestPunctuation(t *testing.T) {
 	expectedOutput = "Does, 123 Not & Work!?"
 
 	result = Punctuation(originalString)
-
 	if result != expectedOutput {
 		t.Fatal("Numeric Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
@@ -689,7 +681,6 @@ func TestSeo(t *testing.T) {
 	var expectedOutput = "TestThisString"
 
 	result := Seo(originalString)
-
 	if result != expectedOutput {
 		t.Fatal("SEO Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
@@ -702,7 +693,6 @@ Mc'Cuban-Host`
 	var expectedOutput = "Mark Mc'Cuban-Host"
 
 	result := SingleLine(originalString)
-
 	if result != expectedOutput {
 		t.Fatal("Numeric Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
@@ -713,7 +703,6 @@ something else`
 	expectedOutput = "Mark Mc'Cuban-Host something else"
 
 	result = SingleLine(originalString)
-
 	if result != expectedOutput {
 		t.Fatal("Numeric Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
@@ -725,7 +714,6 @@ func TestTime(t *testing.T) {
 	var expectedOutput = "00:00"
 
 	result := Time(originalString)
-
 	if result != expectedOutput {
 		t.Fatal("Time Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
@@ -737,7 +725,6 @@ func TestUri(t *testing.T) {
 	var expectedOutput = "Test?=weee&this=that"
 
 	result := URI(originalString)
-
 	if result != expectedOutput {
 		t.Fatal("URI Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
@@ -746,7 +733,6 @@ func TestUri(t *testing.T) {
 	expectedOutput = "Test?=weee&this=/that/"
 
 	result = URI(originalString)
-
 	if result != expectedOutput {
 		t.Fatal("URI Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
@@ -758,7 +744,6 @@ func TestUrl(t *testing.T) {
 	var expectedOutput = "Test?=weee&this=that#works"
 
 	result := URL(originalString)
-
 	if result != expectedOutput {
 		t.Fatal("URL Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
@@ -767,7 +752,6 @@ func TestUrl(t *testing.T) {
 	expectedOutput = "Test?=weee&this=that#works/wee/"
 
 	result = URL(originalString)
-
 	if result != expectedOutput {
 		t.Fatal("URL Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
@@ -779,7 +763,6 @@ func TestXss(t *testing.T) {
 	expectedOutput := ">alert('test');</"
 
 	result := XSS(originalString)
-
 	if result != expectedOutput {
 		t.Fatal("XSS Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
@@ -788,7 +771,6 @@ func TestXss(t *testing.T) {
 	expectedOutput = "scriptalert('test');/script"
 
 	result = XSS(originalString)
-
 	if result != expectedOutput {
 		t.Fatal("XSS Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
@@ -797,30 +779,8 @@ func TestXss(t *testing.T) {
 	expectedOutput = "alert('test');"
 
 	result = XSS(originalString)
-
 	if result != expectedOutput {
 		t.Fatal("XSS Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
-	}
-}
-
-//TestSocialSecurityNumber tests the social security number sanitize method
-func TestSocialSecurityNumber(t *testing.T) {
-	originalString := "A123-12-1234"
-	expectedOutput := "123-12-1234"
-
-	result := SocialSecurityNumber(originalString)
-
-	if result != expectedOutput {
-		t.Fatal("Social Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
-	}
-
-	originalString = "A_12s3-1d2-!12f34 "
-	expectedOutput = "123-12-1234"
-
-	result = SocialSecurityNumber(originalString)
-
-	if result != expectedOutput {
-		t.Fatal("Social Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 }
 
@@ -830,7 +790,6 @@ func TestScripts(t *testing.T) {
 	var expectedOutput = "this "
 
 	result := Scripts(originalString)
-
 	if result != expectedOutput {
 		t.Fatal("Scripts Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
@@ -839,7 +798,6 @@ func TestScripts(t *testing.T) {
 	expectedOutput = "this "
 
 	result = Scripts(originalString)
-
 	if result != expectedOutput {
 		t.Fatal("Scripts Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
@@ -848,7 +806,6 @@ func TestScripts(t *testing.T) {
 	expectedOutput = "this "
 
 	result = Scripts(originalString)
-
 	if result != expectedOutput {
 		t.Fatal("Scripts Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
@@ -857,7 +814,6 @@ func TestScripts(t *testing.T) {
 	expectedOutput = "this "
 
 	result = Scripts(originalString)
-
 	if result != expectedOutput {
 		t.Fatal("Scripts Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
@@ -866,7 +822,6 @@ func TestScripts(t *testing.T) {
 	expectedOutput = "this "
 
 	result = Scripts(originalString)
-
 	if result != expectedOutput {
 		t.Fatal("Scripts Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
@@ -875,7 +830,6 @@ func TestScripts(t *testing.T) {
 	expectedOutput = "this "
 
 	result = Scripts(originalString)
-
 	if result != expectedOutput {
 		t.Fatal("Scripts Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
