@@ -69,7 +69,7 @@ func Domain(original string, preserveCase bool, removeWww bool) (string, error) 
 
 	//Try to see if we have a host
 	if len(original) == 0 {
-		return original, fmt.Errorf("domain value is empty")
+		return original, nil
 	}
 
 	//Missing http?

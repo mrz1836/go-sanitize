@@ -256,6 +256,8 @@ func TestDomain(t *testing.T) {
 	result, err = Domain(originalString, true, false)
 	if result != expectedOutput {
 		t.Fatal(methodName, "method did not function properly. Expected:", expectedOutput, "original string:", originalString, "returned: ", result, err)
+	} else if err != nil {
+		t.Fatal(methodName, "method did not function properly. Expected:", expectedOutput, "original string:", originalString, "returned: ", result, err)
 	}
 
 	//A valid url (preserve the case)
@@ -322,7 +324,6 @@ func TestEmail(t *testing.T) {
 	var expectedOutput = "testme@gmail.com"
 
 	result := Email(originalString)
-
 	if result != expectedOutput {
 		t.Fatal("Email Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
@@ -331,7 +332,6 @@ func TestEmail(t *testing.T) {
 	expectedOutput = "test_me@gmail.com"
 
 	result = Email(originalString)
-
 	if result != expectedOutput {
 		t.Fatal("Email Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
@@ -340,7 +340,6 @@ func TestEmail(t *testing.T) {
 	expectedOutput = "test-me@gmail.com"
 
 	result = Email(originalString)
-
 	if result != expectedOutput {
 		t.Fatal("Email Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
@@ -349,14 +348,12 @@ func TestEmail(t *testing.T) {
 	expectedOutput = "test.me@gmail.com"
 
 	result = Email(originalString)
-
 	if result != expectedOutput {
 		t.Fatal("Email Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
 	originalString = "test_ME @GmAil.com"
 	expectedOutput = "test_me@gmail.com"
-
 	result = Email(originalString)
 
 	if result != expectedOutput {
