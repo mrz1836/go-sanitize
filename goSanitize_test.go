@@ -1,7 +1,7 @@
 /*
-Package sanitize is a custom library of various sanitation methods to transform data
+Package goSanitize is a custom library of various sanitation methods to transform data
 */
-package sanitize
+package goSanitize
 
 import (
 	"testing"
@@ -142,19 +142,19 @@ func TestHtml(t *testing.T) {
 	originalString := "<b>This works?</b>"
 	expectedOutput := "This works?"
 
-	result := Html(originalString)
+	result := HTML(originalString)
 
 	if result != expectedOutput {
-		t.Fatal("Html Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+		t.Fatal("HTML Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
 	originalString = "<b>This works?</b><i></i></br><html></html>"
 	expectedOutput = "This works?"
 
-	result = Html(originalString)
+	result = HTML(originalString)
 
 	if result != expectedOutput {
-		t.Fatal("Html Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+		t.Fatal("HTML Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 }
 
@@ -163,28 +163,28 @@ func TestIpAddress(t *testing.T) {
 	var originalString = "192.168.3.6"
 	var expectedOutput = "192.168.3.6"
 
-	result := IpAddress(originalString)
+	result := IPAddress(originalString)
 
 	if result != expectedOutput {
-		t.Fatal("IpAddress Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+		t.Fatal("IPAddress Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
 	originalString = "fail"
 	expectedOutput = ""
 
-	result = IpAddress(originalString)
+	result = IPAddress(originalString)
 
 	if result != expectedOutput {
-		t.Fatal("IpAddress Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+		t.Fatal("IPAddress Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
 	originalString = "2602:306:bceb:1bd0:44ef:fedb:4f8f:da4f"
 	expectedOutput = "2602:306:bceb:1bd0:44ef:fedb:4f8f:da4f"
 
-	result = IpAddress(originalString)
+	result = IPAddress(originalString)
 
 	if result != expectedOutput {
-		t.Fatal("IpAddress Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+		t.Fatal("IPAddress Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 }
 
@@ -322,7 +322,7 @@ func TestUri(t *testing.T) {
 	var originalString = "Test?=weee! &this=that"
 	var expectedOutput = "Test?=weee&this=that"
 
-	result := Uri(originalString)
+	result := URI(originalString)
 
 	if result != expectedOutput {
 		t.Fatal("URI Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
@@ -331,7 +331,7 @@ func TestUri(t *testing.T) {
 	originalString = "Test?=weee! &this=/that/"
 	expectedOutput = "Test?=weee&this=/that/"
 
-	result = Uri(originalString)
+	result = URI(originalString)
 
 	if result != expectedOutput {
 		t.Fatal("URI Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
@@ -343,7 +343,7 @@ func TestUrl(t *testing.T) {
 	var originalString = "Test?=weee! &this=that#works"
 	var expectedOutput = "Test?=weee&this=that#works"
 
-	result := Url(originalString)
+	result := URL(originalString)
 
 	if result != expectedOutput {
 		t.Fatal("URL Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
@@ -352,7 +352,7 @@ func TestUrl(t *testing.T) {
 	originalString = "Test?=weee! &this=that#works/wee/"
 	expectedOutput = "Test?=weee&this=that#works/wee/"
 
-	result = Url(originalString)
+	result = URL(originalString)
 
 	if result != expectedOutput {
 		t.Fatal("URL Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
@@ -364,7 +364,7 @@ func TestXss(t *testing.T) {
 	originalString := "<script>alert('test');</script>"
 	expectedOutput := ">alert('test');</"
 
-	result := Xss(originalString)
+	result := XSS(originalString)
 
 	if result != expectedOutput {
 		t.Fatal("XSS Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
@@ -373,7 +373,7 @@ func TestXss(t *testing.T) {
 	originalString = "&lt;script&lt;alert('test');&lt;/script&lt;"
 	expectedOutput = "scriptalert('test');/script"
 
-	result = Xss(originalString)
+	result = XSS(originalString)
 
 	if result != expectedOutput {
 		t.Fatal("XSS Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
@@ -382,7 +382,7 @@ func TestXss(t *testing.T) {
 	originalString = "javascript:alert('test');"
 	expectedOutput = "alert('test');"
 
-	result = Xss(originalString)
+	result = XSS(originalString)
 
 	if result != expectedOutput {
 		t.Fatal("XSS Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")

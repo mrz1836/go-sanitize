@@ -1,7 +1,7 @@
 /*
-Package sanitize is a custom library of various sanitation methods to transform data
+Package goSanitize implements a simple library of various sanitation methods for data transformation.
 */
-package sanitize
+package goSanitize
 
 import (
 	"net"
@@ -10,9 +10,8 @@ import (
 	"unicode"
 )
 
-//Set all the regular expressions
+// Set all the regular expressions
 var (
-	addressRegExp        = regexp.MustCompile(`[[^:unicode]]`) //`[[^:unicode:]]`
 	alphaNumericRegExp   = regexp.MustCompile(`[^a-zA-Z0-9\s]`)
 	alphaRegExp          = regexp.MustCompile(`[^a-zA-Z\s]`)
 	decimalRegExp        = regexp.MustCompile(`[^0-9.-]`)
@@ -28,13 +27,14 @@ var (
 	singleLineRegExp   = regexp.MustCompile(`\r?\n`)
 	socialNumberRegExp = regexp.MustCompile(`[^0-9-]`)
 	timeRegExp         = regexp.MustCompile(`[^0-9:]`)
+	unicodeRegExp        = regexp.MustCompile(`[[^:unicode]]`) //`[[^:unicode:]]`
 	uriRegExp          = regexp.MustCompile(`[^a-zA-Z0-9-_/?&=%]`)
 	urlRegExp          = regexp.MustCompile(`[^a-zA-Z0-9-_/:.?&=#%]`)
 )
 
-//Address street address characters only
-func Address(original string) string {
-	bytes := addressRegExp.ReplaceAll([]byte(original), []byte(""))
+//Unicode returns unicode characters only
+func Unicode(original string) string {
+	bytes := unicodeRegExp.ReplaceAll([]byte(original), []byte(""))
 	return string(bytes)
 }
 
@@ -81,14 +81,14 @@ func FirstToUpper(original string) string {
 	return makeFirstUpperCase(original)
 }
 
-//Html removes all basic html tags that we accept
-func Html(original string) string {
+//HTML removes all basic html tags that we accept
+func HTML(original string) string {
 	bytes := htmlOpenRegExp.ReplaceAll([]byte(original), []byte(""))
 	return string(bytes)
 }
 
-//IpAddress format as ip address for both ipv4 and ipv6
-func IpAddress(original string) string {
+//IPAddress format as ip address for both ipv4 and ipv6
+func IPAddress(original string) string {
 	ipAddress := net.ParseIP(strings.TrimSpace(original))
 
 	if ipAddress == nil {
@@ -148,20 +148,20 @@ func Time(original string) string {
 	return string(bytes)
 }
 
-//Uri allowed URI characters
-func Uri(original string) string {
+//URI allowed URI characters
+func URI(original string) string {
 	bytes := uriRegExp.ReplaceAll([]byte(original), []byte(""))
 	return string(bytes)
 }
 
-//Url format as URL
-func Url(original string) string {
+//URL format as URL
+func URL(original string) string {
 	bytes := urlRegExp.ReplaceAll([]byte(original), []byte(""))
 	return string(bytes)
 }
 
-//Xss remove XSS attack strings
-func Xss(original string) string {
+//XSS remove XSS attack strings
+func XSS(original string) string {
 	//Remove all XSS attacks
 	original = strings.Replace(original, "<script", "", -1)
 	original = strings.Replace(original, "script>", "", -1)
