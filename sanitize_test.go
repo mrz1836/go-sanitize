@@ -378,6 +378,15 @@ func TestEmail(t *testing.T) {
 	if result != expectedOutput {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
+
+	//Allowed plus signs
+	originalString = " test_ME+2@GmAil.com "
+	expectedOutput = "test_me+2@gmail.com"
+
+	result = Email(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
 }
 
 //TestFirstToUpper tests the first to upper method
@@ -435,65 +444,170 @@ func TestFirstToUpper(t *testing.T) {
 	}
 }
 
-//======================================================================================================================
+//TestHTML tests the html sanitize method
+func TestHTML(t *testing.T) {
+	var (
+		expectedOutput string
+		methodName     string
+		originalString string
+	)
 
-//TestHtml tests the html sanitize method
-func TestHtml(t *testing.T) {
-	originalString := "<b>This works?</b>"
-	expectedOutput := "This works?"
+	//Test basic HTML removal
+	methodName = "HTML"
+	originalString = "<b>This works?</b>"
+	expectedOutput = "This works?"
 
 	result := HTML(originalString)
-
 	if result != expectedOutput {
-		t.Fatal("HTML Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	originalString = "<b>This works?</b><i></i></br><html></html>"
+	//Advanced HTML removal
+	originalString = "<html><b>This works?</b><i></i></br></html>"
 	expectedOutput = "This works?"
 
 	result = HTML(originalString)
-
 	if result != expectedOutput {
-		t.Fatal("HTML Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 }
 
-//TestIpAddress tests the ip address sanitize method
-func TestIpAddress(t *testing.T) {
-	var originalString = "192.168.3.6"
-	var expectedOutput = "192.168.3.6"
+//TestXML tests the html sanitize method
+func TestXML(t *testing.T) {
+	var (
+		expectedOutput string
+		methodName     string
+		originalString string
+	)
 
-	result := IPAddress(originalString)
+	//Test basic HTML removal
+	methodName = "XML"
+	originalString = `<?xml version="1.0" encoding="UTF-8"?><note>Something</note>`
+	expectedOutput = "Something"
 
+	result := XML(originalString)
 	if result != expectedOutput {
-		t.Fatal("IPAddress Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
+	//Advanced XML removal
+	originalString = `<body>This works?</body><title>Something</title>`
+	expectedOutput = "This works?Something"
+
+	result = XML(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+}
+
+//TestIPAddress tests the ip address sanitize method
+func TestIPAddress(t *testing.T) {
+	var (
+		expectedOutput string
+		methodName     string
+		originalString string
+	)
+
+	//Basic IPV4 check
+	originalString = "192.168.3.6"
+	expectedOutput = "192.168.3.6"
+	methodName = "IPAddress"
+
+	result := IPAddress(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//Basic IPV4 check (gateway mask)
+	originalString = "255.255.255.255"
+	expectedOutput = "255.255.255.255"
+
+	result = IPAddress(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//Invalid IPV4 out of range
+	originalString = "304.255.255.255"
+	expectedOutput = ""
+
+	result = IPAddress(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//Invalid ip address
 	originalString = "fail"
 	expectedOutput = ""
 
 	result = IPAddress(originalString)
-
 	if result != expectedOutput {
-		t.Fatal("IPAddress Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
+	//Invalid ip address
+	originalString = "192-123-122-123"
+	expectedOutput = ""
+
+	result = IPAddress(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//Valid IPV6
 	originalString = "2602:306:bceb:1bd0:44ef:fedb:4f8f:da4f"
 	expectedOutput = "2602:306:bceb:1bd0:44ef:fedb:4f8f:da4f"
 
 	result = IPAddress(originalString)
-
 	if result != expectedOutput {
-		t.Fatal("IPAddress Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//Valid formatted IPV6
+	originalString = "2602:306:bceb:1bd0:44ef:2:2:2"
+	expectedOutput = "2602:306:bceb:1bd0:44ef:2:2:2"
+
+	result = IPAddress(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//Valid formatted IPV6
+	originalString = "2:2:2:2:2:2:2:2"
+	expectedOutput = "2:2:2:2:2:2:2:2"
+
+	result = IPAddress(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//Invalid IPv4
+	originalString = "192.2"
+	expectedOutput = ""
+
+	result = IPAddress(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//Invalid IPV4
+	originalString = "192.2! "
+	expectedOutput = ""
+
+	result = IPAddress(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 }
 
-//TestNameFormal tests the name formal method
-func TestNameFormal(t *testing.T) {
+//======================================================================================================================
+
+//TestFormalName tests the name formal method
+func TestFormalName(t *testing.T) {
 	var originalString = "Mark Mc'Cuban-Host"
 	var expectedOutput = "Mark Mc'Cuban-Host"
 
-	result := NameFormal(originalString)
+	result := FormalName(originalString)
 
 	if result != expectedOutput {
 		t.Fatal("Numeric Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
@@ -502,7 +616,7 @@ func TestNameFormal(t *testing.T) {
 	originalString = "Johnny Apple.Seed, Martin"
 	expectedOutput = "Johnny Apple.Seed, Martin"
 
-	result = NameFormal(originalString)
+	result = FormalName(originalString)
 
 	if result != expectedOutput {
 		t.Fatal("Numeric Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
@@ -511,7 +625,7 @@ func TestNameFormal(t *testing.T) {
 	originalString = "Does #Not Work!"
 	expectedOutput = "Does Not Work"
 
-	result = NameFormal(originalString)
+	result = FormalName(originalString)
 
 	if result != expectedOutput {
 		t.Fatal("Numeric Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")

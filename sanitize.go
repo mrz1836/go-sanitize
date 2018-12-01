@@ -14,14 +14,14 @@ import (
 
 // Set all the regular expressions
 var (
-	alphaNumericRegExp           = regexp.MustCompile(`[^a-zA-Z0-9]`)   //Alpha numeric
-	alphaNumericWithSpacesRegExp = regexp.MustCompile(`[^a-zA-Z0-9\s]`) //Alpha numeric (with spaces)
-	alphaRegExp                  = regexp.MustCompile(`[^a-zA-Z]`)      //Alpha characters
-	alphaWithSpacesRegExp        = regexp.MustCompile(`[^a-zA-Z\s]`)    //Alpha characters (with spaces)
-	decimalRegExp                = regexp.MustCompile(`[^0-9.-]`)       //Decimals (positive and negative)
-	domainRegExp                 = regexp.MustCompile(`[^a-zA-Z0-9-.]`) //Domain accepted characters
-	emailRegExp                  = regexp.MustCompile(`[^a-zA-Z0-9-_.@]`)
-	htmlOpenRegExp               = regexp.MustCompile(`(?i)<[^>]*>`)
+	alphaNumericRegExp           = regexp.MustCompile(`[^a-zA-Z0-9]`)      //Alpha numeric
+	alphaNumericWithSpacesRegExp = regexp.MustCompile(`[^a-zA-Z0-9\s]`)    //Alpha numeric (with spaces)
+	alphaRegExp                  = regexp.MustCompile(`[^a-zA-Z]`)         //Alpha characters
+	alphaWithSpacesRegExp        = regexp.MustCompile(`[^a-zA-Z\s]`)       //Alpha characters (with spaces)
+	decimalRegExp                = regexp.MustCompile(`[^0-9.-]`)          //Decimals (positive and negative)
+	domainRegExp                 = regexp.MustCompile(`[^a-zA-Z0-9-.]`)    //Domain accepted characters
+	emailRegExp                  = regexp.MustCompile(`[^a-zA-Z0-9-_.@+]`) //Email address characters
+	htmlOpenRegExp               = regexp.MustCompile(`(?i)<[^>]*>`)       //HTML tags or any alligator open/close tags
 	nameFormalRegExp             = regexp.MustCompile(`[^a-zA-Z0-9-',.\s]`)
 	numericRegExp                = regexp.MustCompile(`[^0-9]`)
 	punctuationRegExp            = regexp.MustCompile(`[^a-zA-Z0-9-'"#&!?,.\s]+`)
@@ -125,6 +125,11 @@ func HTML(original string) string {
 	return string(htmlOpenRegExp.ReplaceAll([]byte(original), []byte("")))
 }
 
+//XML returns a string without any <XML> tags - alias of HTML
+func XML(original string) string {
+	return HTML(original)
+}
+
 //IPAddress returns an ip address for both ipv4 and ipv6
 func IPAddress(original string) string {
 	ipAddress := net.ParseIP(strings.TrimSpace(original))
@@ -136,8 +141,8 @@ func IPAddress(original string) string {
 	return ipAddress.String()
 }
 
-//NameFormal is (for First, Middle and Last)
-func NameFormal(original string) string {
+//FormalName is (for First, Middle and Last)
+func FormalName(original string) string {
 	return string(nameFormalRegExp.ReplaceAll([]byte(original), []byte("")))
 }
 
