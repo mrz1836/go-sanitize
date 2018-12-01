@@ -7,7 +7,7 @@
 $ go get -u github.com/mrz1836/go-sanitize
 ```
 
-# This package adheres to *go-lint* specifications
+### This package adheres to *go-lint* specifications
 The package [golint](https://github.com/golang/lint) differs from [gofmt](https://golang.org/cmd/gofmt/).
 The package [gofmt](https://golang.org/cmd/gofmt/) formats Go source code, whereas [golint](https://github.com/golang/lint) prints out style mistakes.
 
@@ -20,7 +20,7 @@ $ cd ~/../go-sanitize
 $ golint
 ```
 
-# This package adheres to *go-vet* specifications
+### This package adheres to *go-vet* specifications
 [Vet](https://golang.org/cmd/vet/) examines Go source code and reports suspicious constructs, such as Printf calls whose arguments
 do not align with the format string. [Vet](https://golang.org/cmd/vet/) uses heuristics that do not guarantee all reports are genuine problems,
 but it can find errors not caught by the compilers.
