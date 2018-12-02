@@ -1,5 +1,8 @@
 *go-sanitize* implements a simple library of sanitation methods for data transformation.
 
+## Info
+![MIT](https://img.shields.io/apm/l/:package.svg)
+
 ## Installation
 
 *go-sanitize* requires a [supported release of Go](https://golang.org/doc/devel/release.html#policy).
