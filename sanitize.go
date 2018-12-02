@@ -38,7 +38,7 @@ var (
 	urlRegExp                    = regexp.MustCompile(`[^a-zA-Z0-9-_/:.?&=#%]`)                                                   //URL allowed characters
 )
 
-//Alpha returns only alpha characters. Set spaces to true if you want to allow space characters. Valid characters are a-z and A-Z.
+//Alpha returns only alpha characters. Set the parameter spaces to true if you want to allow space characters. Valid characters are a-z and A-Z.
 //	log.Println(Alpha("My String!",false)) //MyString
 //	log.Println(Alpha("My String!",true))  //My String
 func Alpha(original string, spaces bool) string {
@@ -52,7 +52,9 @@ func Alpha(original string, spaces bool) string {
 	return string(alphaRegExp.ReplaceAll([]byte(original), []byte("")))
 }
 
-//AlphaNumeric returns alpha and numeric characters only (flag for spaces)
+//AlphaNumeric returns only alphanumeric characters. Set the parameter spaces to true if you want to allow space characters. Valid characters are a-z, A-Z and 0-9.
+//	log.Println(AlphaNumeric("My String 2!",false)) //MyString2
+//	log.Println(AlphaNumeric("My String 2!",true))  //My String 2
 func AlphaNumeric(original string, spaces bool) string {
 
 	//Leave white spaces?
