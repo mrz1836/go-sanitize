@@ -14,24 +14,23 @@ import (
 
 // Set all the regular expressions
 var (
-	alphaNumericRegExp           = regexp.MustCompile(`[^a-zA-Z0-9]`)             //Alpha numeric
-	alphaNumericWithSpacesRegExp = regexp.MustCompile(`[^a-zA-Z0-9\s]`)           //Alpha numeric (with spaces)
-	alphaRegExp                  = regexp.MustCompile(`[^a-zA-Z]`)                //Alpha characters
-	alphaWithSpacesRegExp        = regexp.MustCompile(`[^a-zA-Z\s]`)              //Alpha characters (with spaces)
-	decimalRegExp                = regexp.MustCompile(`[^0-9.-]`)                 //Decimals (positive and negative)
-	domainRegExp                 = regexp.MustCompile(`[^a-zA-Z0-9-.]`)           //Domain accepted characters
-	emailRegExp                  = regexp.MustCompile(`[^a-zA-Z0-9-_.@+]`)        //Email address characters
-	formalNameRegExp             = regexp.MustCompile(`[^a-zA-Z0-9-',.\s]`)       //Characters recognized in surnames and proper names
-	htmlRegExp                   = regexp.MustCompile(`(?i)<[^>]*>`)              //HTML/XML tags or any alligator open/close tags
-	numericRegExp                = regexp.MustCompile(`[^0-9]`)                   //Numbers only
-	punctuationRegExp            = regexp.MustCompile(`[^a-zA-Z0-9-'"#&!?,.\s]+`) //Standard accepted punctuation characters
-	scriptRegExp                 = regexp.MustCompile(`(?i)<(script|iframe|embed|object)[^>]*>.*</(script|iframe|embed|object)>`)
-	//seoRegExp                    = regexp.MustCompile(`[^a-zA-Z0-9-_]`)
-	singleLineRegExp = regexp.MustCompile(`\r?\n`)
-	timeRegExp       = regexp.MustCompile(`[^0-9:]`)
-	unicodeRegExp    = regexp.MustCompile(`[[^:unicode]]`)
-	uriRegExp        = regexp.MustCompile(`[^a-zA-Z0-9-_/?&=%]`)
-	urlRegExp        = regexp.MustCompile(`[^a-zA-Z0-9-_/:.?&=#%]`)
+	alphaNumericRegExp           = regexp.MustCompile(`[^a-zA-Z0-9]`)       //Alpha numeric
+	alphaNumericWithSpacesRegExp = regexp.MustCompile(`[^a-zA-Z0-9\s]`)     //Alpha numeric (with spaces)
+	alphaRegExp                  = regexp.MustCompile(`[^a-zA-Z]`)          //Alpha characters
+	alphaWithSpacesRegExp        = regexp.MustCompile(`[^a-zA-Z\s]`)        //Alpha characters (with spaces)
+	decimalRegExp                = regexp.MustCompile(`[^0-9.-]`)           //Decimals (positive and negative)
+	domainRegExp                 = regexp.MustCompile(`[^a-zA-Z0-9-.]`)     //Domain accepted characters
+	emailRegExp                  = regexp.MustCompile(`[^a-zA-Z0-9-_.@+]`)  //Email address characters
+	formalNameRegExp             = regexp.MustCompile(`[^a-zA-Z0-9-',.\s]`) //Characters recognized in surnames and proper names
+	htmlRegExp                   = regexp.MustCompile(`(?i)<[^>]*>`)        //HTML/XML tags or any alligator open/close tags
+	numericRegExp                = regexp.MustCompile(`[^0-9]`)             //Numbers only
+	pathNameRegExp               = regexp.MustCompile(`[^a-zA-Z0-9-_]`)
+	punctuationRegExp            = regexp.MustCompile(`[^a-zA-Z0-9-'"#&!?,.\s]+`)                                                 //Standard accepted punctuation characters
+	scriptRegExp                 = regexp.MustCompile(`(?i)<(script|iframe|embed|object)[^>]*>.*</(script|iframe|embed|object)>`) //Scripts and embeds
+	singleLineRegExp             = regexp.MustCompile(`\r?\n`)                                                                    //Carriage returns for single line transition
+	timeRegExp                   = regexp.MustCompile(`[^0-9:]`)                                                                  //Time allowed characters
+	uriRegExp                    = regexp.MustCompile(`[^a-zA-Z0-9-_/?&=#%]`)
+	urlRegExp                    = regexp.MustCompile(`[^a-zA-Z0-9-_/:.?&=#%]`)
 )
 
 //Alpha returns only alpha characters (flag for spaces)
@@ -145,6 +144,11 @@ func Numeric(original string) string {
 	return string(numericRegExp.ReplaceAll([]byte(original), []byte("")))
 }
 
+//PathName returns a formatted path name (/This_Path-Name/)
+func PathName(original string) string {
+	return string(pathNameRegExp.ReplaceAll([]byte(original), []byte("")))
+}
+
 //Punctuation returns a string with basic punctuation
 func Punctuation(original string) string {
 	return string(punctuationRegExp.ReplaceAll([]byte(original), []byte("")))
@@ -163,11 +167,6 @@ func SingleLine(original string) string {
 //Time returns just the time xx:xx string
 func Time(original string) string {
 	return string(timeRegExp.ReplaceAll([]byte(original), []byte("")))
-}
-
-//Unicode returns unicode characters only
-func Unicode(original string) string {
-	return string(unicodeRegExp.ReplaceAll([]byte(original), []byte("")))
 }
 
 //URI returns allowed URI characters

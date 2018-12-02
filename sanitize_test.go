@@ -655,6 +655,43 @@ func TestNumeric(t *testing.T) {
 	}
 }
 
+//TestPathName tests the path name sanitize method
+func TestPathName(t *testing.T) {
+	var (
+		expectedOutput string
+		methodName     string
+		originalString string
+	)
+
+	//Invalid path name
+	originalString = "My BadPath (10)"
+	expectedOutput = "MyBadPath10"
+	methodName = "PathName"
+
+	result := PathName(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//Invalid characters
+	originalString = "My BadPath (10)[]()!$"
+	expectedOutput = "MyBadPath10"
+
+	result = PathName(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//Valid Path
+	originalString = "My_Folder-Path-123_TEST"
+	expectedOutput = "My_Folder-Path-123_TEST"
+
+	result = PathName(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+}
+
 //TestPunctuation tests the punctuation method
 func TestPunctuation(t *testing.T) {
 	var (
@@ -858,8 +895,6 @@ func TestTime(t *testing.T) {
 	}
 }
 
-//todo: TestUnicode
-
 //TestXML tests the XML sanitize method
 func TestXML(t *testing.T) {
 	var (
@@ -888,69 +923,158 @@ func TestXML(t *testing.T) {
 	}
 }
 
-//======================================================================================================================
-
-//TestURI tests the URI sanitize method
-func TestURI(t *testing.T) {
-	var originalString = "Test?=weee! &this=that"
-	var expectedOutput = "Test?=weee&this=that"
-
-	result := URI(originalString)
-	if result != expectedOutput {
-		t.Fatal("URI Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
-	}
-
-	originalString = "Test?=weee! &this=/that/"
-	expectedOutput = "Test?=weee&this=/that/"
-
-	result = URI(originalString)
-	if result != expectedOutput {
-		t.Fatal("URI Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
-	}
-}
-
-//TestURL tests the URL sanitize method
-func TestURL(t *testing.T) {
-	var originalString = "Test?=weee! &this=that#works"
-	var expectedOutput = "Test?=weee&this=that#works"
-
-	result := URL(originalString)
-	if result != expectedOutput {
-		t.Fatal("URL Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
-	}
-
-	originalString = "Test?=weee! &this=that#works/wee/"
-	expectedOutput = "Test?=weee&this=that#works/wee/"
-
-	result = URL(originalString)
-	if result != expectedOutput {
-		t.Fatal("URL Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
-	}
-}
-
 //TestXSS tests the XSS sanitize method
 func TestXSS(t *testing.T) {
-	originalString := "<script>alert('test');</script>"
-	expectedOutput := ">alert('test');</"
+	var (
+		expectedOutput string
+		methodName     string
+		originalString string
+	)
+
+	//Remove the script tags
+	originalString = "<script>alert('test');</script>"
+	expectedOutput = ">alert('test');</"
+	methodName = "XSS"
 
 	result := XSS(originalString)
 	if result != expectedOutput {
-		t.Fatal("XSS Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
+	//Remove the lt and rt characters
 	originalString = "&lt;script&lt;alert('test');&lt;/script&lt;"
 	expectedOutput = "scriptalert('test');/script"
 
 	result = XSS(originalString)
 	if result != expectedOutput {
-		t.Fatal("XSS Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
+	//Remove javascript:
 	originalString = "javascript:alert('test');"
 	expectedOutput = "alert('test');"
 
 	result = XSS(originalString)
 	if result != expectedOutput {
-		t.Fatal("XSS Regex did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//Remove eval
+	originalString = "eval('test');"
+	expectedOutput = "'test');"
+
+	result = XSS(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//Remove js
+	originalString = "javascript&#58;('test');"
+	expectedOutput = "('test');"
+
+	result = XSS(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//Remove char code
+	originalString = "fromCharCode('test');"
+	expectedOutput = "('test');"
+
+	result = XSS(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//Remove char code, 60 and 62
+	originalString = "&#60;&#62;fromCharCode('test');&#62;&#60;"
+	expectedOutput = "('test');"
+
+	result = XSS(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+}
+
+//TestURI tests the URI sanitize method
+func TestURI(t *testing.T) {
+	var (
+		expectedOutput string
+		methodName     string
+		originalString string
+	)
+
+	//Test remove spaces
+	originalString = "Test?=weee! &this=that"
+	expectedOutput = "Test?=weee&this=that"
+	methodName = "URI"
+
+	result := URI(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//Test removing invalid symbols
+	originalString = "Test?=weee! &this=/that/!()*^"
+	expectedOutput = "Test?=weee&this=/that/"
+
+	result = URI(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//Test valid url
+	originalString = "/This/Works/?woot=123&this#page10%"
+	expectedOutput = "/This/Works/?woot=123&this#page10%"
+
+	result = URI(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+}
+
+//TestURL tests the URL sanitize method
+func TestURL(t *testing.T) {
+	var (
+		expectedOutput string
+		methodName     string
+		originalString string
+	)
+
+	//Invalid url, remove spaces
+	originalString = "Test?=weee! &this=that#works"
+	expectedOutput = "Test?=weee&this=that#works"
+	methodName = "URL"
+
+	result := URL(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//Invalid characters
+	originalString = "/this/test?dfsf$"
+	expectedOutput = "/this/test?dfsf"
+
+	result = URL(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//Invalid characters
+	originalString = "https://domain.com/this/test?dfsf$!@()[]{}'<>"
+	expectedOutput = "https://domain.com/this/test?dfsf"
+
+	result = URL(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//Valid url
+	originalString = "https://domain.com/this/test?this=value&another=123%#page"
+	expectedOutput = "https://domain.com/this/test?this=value&another=123%#page"
+
+	result = URL(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 }
