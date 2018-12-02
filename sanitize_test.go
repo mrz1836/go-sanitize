@@ -648,9 +648,27 @@ func TestIPAddress(t *testing.T) {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Invalid IPV4
+	//Invalid IPV4 - bad character and too short
 	originalString = "192.2! "
 	expectedOutput = ""
+
+	result = IPAddress(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//Invalid string characters
+	originalString = "IP: 192.168.0.1 "
+	expectedOutput = ""
+
+	result = IPAddress(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//Remove space characters
+	originalString = " 192.168.0.1 "
+	expectedOutput = "192.168.0.1"
 
 	result = IPAddress(originalString)
 	if result != expectedOutput {

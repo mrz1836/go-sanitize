@@ -23,6 +23,7 @@ var (
 	emailRegExp                  = regexp.MustCompile(`[^a-zA-Z0-9-_.@+]`)                                                        //Email address characters
 	formalNameRegExp             = regexp.MustCompile(`[^a-zA-Z0-9-',.\s]`)                                                       //Characters recognized in surnames and proper names
 	htmlRegExp                   = regexp.MustCompile(`(?i)<[^>]*>`)                                                              //HTML/XML tags or any alligator open/close tags
+	ipAddressRegExp              = regexp.MustCompile(`[^a-zA-Z0-9:.]`)                                                           //IPV4 and IPV6 characters only
 	numericRegExp                = regexp.MustCompile(`[^0-9]`)                                                                   //Numbers only
 	pathNameRegExp               = regexp.MustCompile(`[^a-zA-Z0-9-_]`)                                                           //Path name (file name, seo)
 	punctuationRegExp            = regexp.MustCompile(`[^a-zA-Z0-9-'"#&!?,.\s]+`)                                                 //Standard accepted punctuation characters
@@ -140,8 +141,8 @@ func HTML(original string) string {
 
 //IPAddress returns an ip address for both ipv4 and ipv6
 func IPAddress(original string) string {
-	ipAddress := net.ParseIP(strings.TrimSpace(original))
-
+	//Parse the IP - Remove any invalid characters first
+	ipAddress := net.ParseIP(string(ipAddressRegExp.ReplaceAll([]byte(original), []byte(""))))
 	if ipAddress == nil {
 		return ""
 	}
