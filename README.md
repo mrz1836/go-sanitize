@@ -46,5 +46,5 @@ $ go vet -v
 ```
 myIPAddress := "IP: 192.168.0.1"                //Raw, unknown user generated data
 sanitizedIPAddress := IPAddress(myIPAddress)    //Run the sanitize method for IP Address
-log.Println(myIPAddress)                        //Displays: 192.168.0.1
+log.Println(sanitizedIPAddress)                 //Displays: 192.168.0.1
 ```
