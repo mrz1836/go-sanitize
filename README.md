@@ -1,4 +1,5 @@
-**go-sanitize** implements a simple library of sanitation methods for data transformation.
+# go-sanitize
+Implements a simple library of sanitation methods for data transformation.
 
 |   |   |   |   |   |   |   |
 |-|-|-|-|-|-|-|
