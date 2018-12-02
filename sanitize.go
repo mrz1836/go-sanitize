@@ -39,9 +39,9 @@ var (
 )
 
 //	Alpha returns only alpha characters (flag for spaces)
-//		Test1
-//		Test2
-//		Test3
+//		input := "My String!"           //Input string
+//		sanitized := Alpha(input,false)	//Run
+//		log.Println(sanitized) 			//MyString
 func Alpha(original string, spaces bool) string {
 
 	//Leave white spaces?
