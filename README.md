@@ -1,13 +1,13 @@
-*go-sanitize* implements a simple library of sanitation methods for data transformation.
+**go-sanitize** implements a simple library of sanitation methods for data transformation.
 
-## Info
-![MIT](https://img.shields.io/github/license/mrz1836/go-sanitize.svg?logo=appveyor&longCache=true&style=flat)
+|   |   |   |   |   |   |   |
+|---|---|---|---|---|---|---|
+| ![MIT](https://img.shields.io/github/license/mrz1836/go-sanitize.svg?style=flat)  |  ![Code Size](https://img.shields.io/github/languages/code-size/mrz1836/go-sanitize.svg?style=flat) |   ![Report](https://goreportcard.com/badge/github.com/mrz1836/go-sanitize) |  ![Issues](https://img.shields.io/github/issues/mrz1836/go-sanitize.svg?style=flat) | [![Coverage](https://codecov.io/gh/mrz1836/go-sanitize/branch/master/graph/badge.svg)](https://codecov.io/gh/mrz1836/go-sanitize) | [![GoDoc](https://godoc.org/github.com/mrz1836/go-sanitize?status.svg)](https://godoc.org/github.com/mrz1836/go-sanitize) | [![Donate](https://img.shields.io/badge/donate-bitcoin-brightgreen.svg)](https://mrz1818.com?af=go-sanitize) |
 
-[![GoDoc](https://godoc.org/github.com/mrz1836/go-sanitize?status.svg)](https://godoc.org/github.com/mrz1836/go-sanitize)
 
 ## Installation
 
-*go-sanitize* requires a [supported release of Go](https://golang.org/doc/devel/release.html#policy).
+**go-sanitize** requires a [supported release of Go](https://golang.org/doc/devel/release.html#policy).
 ```
 $ go get -u github.com/mrz1836/go-sanitize
 ```
