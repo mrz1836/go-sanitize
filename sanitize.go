@@ -12,19 +12,19 @@ import (
 	"unicode"
 )
 
-// Set all the regular expressions
+//Set all the regular expressions
 var (
-	alphaNumericRegExp           = regexp.MustCompile(`[^a-zA-Z0-9]`)       //Alpha numeric
-	alphaNumericWithSpacesRegExp = regexp.MustCompile(`[^a-zA-Z0-9\s]`)     //Alpha numeric (with spaces)
-	alphaRegExp                  = regexp.MustCompile(`[^a-zA-Z]`)          //Alpha characters
-	alphaWithSpacesRegExp        = regexp.MustCompile(`[^a-zA-Z\s]`)        //Alpha characters (with spaces)
-	decimalRegExp                = regexp.MustCompile(`[^0-9.-]`)           //Decimals (positive and negative)
-	domainRegExp                 = regexp.MustCompile(`[^a-zA-Z0-9-.]`)     //Domain accepted characters
-	emailRegExp                  = regexp.MustCompile(`[^a-zA-Z0-9-_.@+]`)  //Email address characters
-	formalNameRegExp             = regexp.MustCompile(`[^a-zA-Z0-9-',.\s]`) //Characters recognized in surnames and proper names
-	htmlRegExp                   = regexp.MustCompile(`(?i)<[^>]*>`)        //HTML/XML tags or any alligator open/close tags
-	numericRegExp                = regexp.MustCompile(`[^0-9]`)             //Numbers only
-	pathNameRegExp               = regexp.MustCompile(`[^a-zA-Z0-9-_]`)
+	alphaNumericRegExp           = regexp.MustCompile(`[^a-zA-Z0-9]`)                                                             //Alpha numeric
+	alphaNumericWithSpacesRegExp = regexp.MustCompile(`[^a-zA-Z0-9\s]`)                                                           //Alpha numeric (with spaces)
+	alphaRegExp                  = regexp.MustCompile(`[^a-zA-Z]`)                                                                //Alpha characters
+	alphaWithSpacesRegExp        = regexp.MustCompile(`[^a-zA-Z\s]`)                                                              //Alpha characters (with spaces)
+	decimalRegExp                = regexp.MustCompile(`[^0-9.-]`)                                                                 //Decimals (positive and negative)
+	domainRegExp                 = regexp.MustCompile(`[^a-zA-Z0-9-.]`)                                                           //Domain accepted characters
+	emailRegExp                  = regexp.MustCompile(`[^a-zA-Z0-9-_.@+]`)                                                        //Email address characters
+	formalNameRegExp             = regexp.MustCompile(`[^a-zA-Z0-9-',.\s]`)                                                       //Characters recognized in surnames and proper names
+	htmlRegExp                   = regexp.MustCompile(`(?i)<[^>]*>`)                                                              //HTML/XML tags or any alligator open/close tags
+	numericRegExp                = regexp.MustCompile(`[^0-9]`)                                                                   //Numbers only
+	pathNameRegExp               = regexp.MustCompile(`[^a-zA-Z0-9-_]`)                                                           //Path name (file name, seo)
 	punctuationRegExp            = regexp.MustCompile(`[^a-zA-Z0-9-'"#&!?,.\s]+`)                                                 //Standard accepted punctuation characters
 	scriptRegExp                 = regexp.MustCompile(`(?i)<(script|iframe|embed|object)[^>]*>.*</(script|iframe|embed|object)>`) //Scripts and embeds
 	singleLineRegExp             = regexp.MustCompile(`\r?\n`)                                                                    //Carriage returns for single line transition
@@ -55,6 +55,16 @@ func AlphaNumeric(original string, spaces bool) string {
 
 	//No spaces
 	return string(alphaNumericRegExp.ReplaceAll([]byte(original), []byte("")))
+}
+
+//Custom uses a custom regex and returns the sanitized version
+func Custom(original string, regExp string) string {
+
+	//Try to compile (it will panic if its wrong!)
+	compiledRegExp := regexp.MustCompile(regExp)
+
+	//Return the processed string
+	return string(compiledRegExp.ReplaceAll([]byte(original), []byte("")))
 }
 
 //Decimal returns decimal values (positive and negative)

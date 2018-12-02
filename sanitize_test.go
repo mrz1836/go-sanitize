@@ -184,6 +184,37 @@ That2`
 	}
 }
 
+//TestCustom tests the custom sanitize method
+func TestCustom(t *testing.T) {
+	var (
+		expectedOutput string
+		methodName     string
+		originalString string
+		regString      string
+	)
+
+	//Test custom Alpha Numeric
+	originalString = "ThisWorks123!"
+	expectedOutput = "ThisWorks123"
+	methodName = "Custom"
+	regString = `[^a-zA-Z0-9]`
+
+	result := Custom(originalString, regString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//Test custom Decimal
+	originalString = "ThisWorks1.23!"
+	expectedOutput = "1.23"
+	regString = `[^0-9.-]`
+
+	result = Custom(originalString, regString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+}
+
 //TestDecimal tests the decimal sanitize method
 func TestDecimal(t *testing.T) {
 
