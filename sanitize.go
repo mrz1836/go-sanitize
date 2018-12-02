@@ -29,8 +29,8 @@ var (
 	scriptRegExp                 = regexp.MustCompile(`(?i)<(script|iframe|embed|object)[^>]*>.*</(script|iframe|embed|object)>`) //Scripts and embeds
 	singleLineRegExp             = regexp.MustCompile(`\r?\n`)                                                                    //Carriage returns for single line transition
 	timeRegExp                   = regexp.MustCompile(`[^0-9:]`)                                                                  //Time allowed characters
-	uriRegExp                    = regexp.MustCompile(`[^a-zA-Z0-9-_/?&=#%]`)
-	urlRegExp                    = regexp.MustCompile(`[^a-zA-Z0-9-_/:.?&=#%]`)
+	uriRegExp                    = regexp.MustCompile(`[^a-zA-Z0-9-_/?&=#%]`)                                                     //URI allowed characters
+	urlRegExp                    = regexp.MustCompile(`[^a-zA-Z0-9-_/:.?&=#%]`)                                                   //URL allowed characters
 )
 
 //Alpha returns only alpha characters (flag for spaces)

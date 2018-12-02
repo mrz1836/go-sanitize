@@ -24,7 +24,7 @@ The package [golint](https://github.com/golang/lint) differs from [gofmt](https:
 The package [vet](https://golang.org/cmd/vet/) is concerned with correctness, whereas [golint](https://github.com/golang/lint) is concerned with coding style.
 The package [golint](https://github.com/golang/lint) is in use at Google, and it seeks to match the accepted style of the open source [Go project](https://golang.org/).
 
-How to nstall [golint](https://github.com/golang/lint):
+How to install [golint](https://github.com/golang/lint):
 ```
 $ go get -u golang.org/x/lint/golint
 $ cd ~/../go-sanitize
