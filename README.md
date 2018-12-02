@@ -2,7 +2,7 @@
 
 |   |   |   |   |   |   |   |
 |-|-|-|-|-|-|-|
-| ![MIT](https://img.shields.io/github/license/mrz1836/go-sanitize.svg?style=flat)  |  ![Code Size](https://img.shields.io/github/languages/code-size/mrz1836/go-sanitize.svg?style=flat) |   ![Report](https://goreportcard.com/badge/github.com/mrz1836/go-sanitize) |  ![Issues](https://img.shields.io/github/issues/mrz1836/go-sanitize.svg?style=flat) | ![Release](https://img.shields.io/github/release-pre/mrz1836/go-sanitize.svg) | [![GoDoc](https://godoc.org/github.com/mrz1836/go-sanitize?status.svg)](https://godoc.org/github.com/mrz1836/go-sanitize) | [![Donate](https://img.shields.io/badge/donate-bitcoin-brightgreen.svg)](https://mrz1818.com?af=go-sanitize) |
+| ![MIT](https://img.shields.io/github/license/mrz1836/go-sanitize.svg?style=flat)  |  ![Code Size](https://img.shields.io/github/languages/code-size/mrz1836/go-sanitize.svg?style=flat) |   [![Report](https://goreportcard.com/badge/github.com/mrz1836/go-sanitize?style=flat)](https://goreportcard.com/report/github.com/mrz1836/go-sanitize) |  [![Issues](https://img.shields.io/github/issues/mrz1836/go-sanitize.svg?style=flat)](https://github.com/mrz1836/go-sanitize/issues) | [![Release](https://img.shields.io/github/release-pre/mrz1836/go-sanitize.svg?style=flat)](https://github.com/mrz1836/go-sanitize/releases) | [![GoDoc](https://godoc.org/github.com/mrz1836/go-sanitize?status.svg)](https://godoc.org/github.com/mrz1836/go-sanitize) | [![Donate](https://img.shields.io/badge/donate-bitcoin-brightgreen.svg)](https://mrz1818.com?af=go-sanitize) |
 
 
 ## Installation
