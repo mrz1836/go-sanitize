@@ -38,10 +38,10 @@ var (
 	urlRegExp                    = regexp.MustCompile(`[^a-zA-Z0-9-_/:.?&=#%]`)                                                   //URL allowed characters
 )
 
-// Alpha returns only alpha characters (flag for spaces)
-//  // You can embed blocks of code in your godoc, such as this:
-//  //  fmt.Println("Hello")
-//  // To do that, simply add an extra indent to your comment's text.
+//	Alpha returns only alpha characters (flag for spaces)
+//		Test1
+//		Test2
+//		Test3
 func Alpha(original string, spaces bool) string {
 
 	//Leave white spaces?
