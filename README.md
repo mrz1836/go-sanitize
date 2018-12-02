@@ -41,3 +41,10 @@ How to run [vet](https://golang.org/cmd/vet/)
 $ cd ~/../go-sanitize
 $ go vet -v
 ```
+
+### Examples
+```
+myIPAddress := "IP: 192.168.0.1"                //Raw, unknown user generated data
+sanitizedIPAddress := IPAddress(myIPAddress)    //Run the sanitize method for IP Address
+log.Println(myIPAddress)                        //Displays: 192.168.0.1
+```
