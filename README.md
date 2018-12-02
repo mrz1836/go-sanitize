@@ -1,5 +1,5 @@
 # go-sanitize
-Implements a simple library of sanitation methods for data transformation.
+Implements a simple library of sanitation methods for data transformation. This package was inspired by protecting incoming user generated content and ensuring the data will be in the right format.
 
 | | | | | | | |
 |-|-|-|-|-|-|-|
