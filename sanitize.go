@@ -38,9 +38,9 @@ var (
 	urlRegExp                    = regexp.MustCompile(`[^a-zA-Z0-9-_/:.?&=#%]`)                                                   //URL allowed characters
 )
 
-//	Alpha returns only alpha characters. Set spaces to true if you want to allow space characters. Valid characters are a-z and A-Z.
-//		sanitized := Alpha("My String!",false)
-//		log.Println(sanitized) //MyString
+//Alpha returns only alpha characters. Set spaces to true if you want to allow space characters. Valid characters are a-z and A-Z.
+//	log.Println(Alpha("My String!",false)) //MyString
+//	log.Println(Alpha("My String!",true))  //My String
 func Alpha(original string, spaces bool) string {
 
 	//Leave white spaces?
