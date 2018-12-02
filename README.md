@@ -42,7 +42,8 @@ $ cd ~/../go-sanitize
 $ go vet -v
 ```
 
-### Examples
+### Example Code
+Also view [the tests](https://github.com/mrz1836/go-sanitize/blob/master/sanitize_test.go) to see the other implementations.
 ```
 myIPAddress := "IP: 192.168.0.1"                //Raw, unknown user generated data
 sanitizedIPAddress := IPAddress(myIPAddress)    //Run the sanitize method for IP Address
