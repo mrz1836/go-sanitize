@@ -1,5 +1,9 @@
 /*
 Package gosanitize implements a simple library of various sanitation methods for data transformation.
+
+If you have any suggestions or comments, please feel free to open an issue on this project's GitHub page.
+
+Author: MrZ
 */
 package gosanitize
 
@@ -34,7 +38,10 @@ var (
 	urlRegExp                    = regexp.MustCompile(`[^a-zA-Z0-9-_/:.?&=#%]`)                                                   //URL allowed characters
 )
 
-//Alpha returns only alpha characters (flag for spaces)
+// Alpha returns only alpha characters (flag for spaces)
+//  // You can embed blocks of code in your godoc, such as this:
+//  //  fmt.Println("Hello")
+//  // To do that, simply add an extra indent to your comment's text.
 func Alpha(original string, spaces bool) string {
 
 	//Leave white spaces?

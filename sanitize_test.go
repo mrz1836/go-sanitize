@@ -1,5 +1,9 @@
 /*
-Package gosanitize is a custom library of various sanitation methods to transform data
+Package gosanitize implements a simple library of various sanitation methods for data transformation.
+
+If you have any suggestions or comments, please feel free to open an issue on this project's GitHub page.
+
+Author: MrZ
 */
 package gosanitize
 
@@ -26,7 +30,7 @@ func TestAlpha(t *testing.T) {
 		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Test removing all symbols
+	//Test removing various symbols
 	originalString = `~!@#$%^&*()-_Symbols=+[{]};:'"<>,./?`
 	expectedOutput = "Symbols"
 
@@ -45,7 +49,7 @@ func TestAlpha(t *testing.T) {
 	}
 
 	//Test removing fancy quotes and microsoft symbols
-	originalString = "“This is a quote with tick`s…”☺"
+	originalString = "“This is a quote with tick`s … ” ☺ "
 	expectedOutput = "Thisisaquotewithticks"
 
 	result = Alpha(originalString, false)
@@ -66,7 +70,7 @@ func TestAlpha(t *testing.T) {
 		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Test removing all symbols
+	//Test removing various symbols
 	originalString = `~!@#$%^&*()-_Symbols=+[{]};:'"<>,./?`
 	expectedOutput = "Symbols"
 
@@ -87,7 +91,7 @@ That`
 	}
 
 	//Test removing fancy quotes and microsoft symbols
-	originalString = "“This is a quote with tick`s…”☺"
+	originalString = "“This is a quote with tick`s … ” ☺ "
 	expectedOutput = "This is a quote with ticks"
 
 	result = Alpha(originalString, true)
@@ -114,7 +118,7 @@ func TestAlphaNumeric(t *testing.T) {
 		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Test removing all symbols
+	//Test removing various symbols
 	originalString = `~!@#$%^&*()-_Symbols=+[{]};:'"<>,./?`
 	expectedOutput = "Symbols"
 
@@ -133,7 +137,7 @@ func TestAlphaNumeric(t *testing.T) {
 	}
 
 	//Test removing fancy quotes and microsoft symbols
-	originalString = "“This is a quote with tick`s…”☺342"
+	originalString = "“This is a quote with tick`s … ” ☺ 342"
 	expectedOutput = "Thisisaquotewithticks342"
 
 	result = AlphaNumeric(originalString, false)
@@ -154,7 +158,7 @@ func TestAlphaNumeric(t *testing.T) {
 		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Test removing all symbols
+	//Test removing various symbols
 	originalString = `~!@#$%^&*()-_Symbols 123=+[{]};:'"<>,./?`
 	expectedOutput = "Symbols 123"
 
@@ -213,6 +217,11 @@ func TestCustom(t *testing.T) {
 	if result != expectedOutput {
 		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
+
+	//Test invalid regString
+	//
+	// will panic()
+	//
 }
 
 //TestDecimal tests the decimal sanitize method
