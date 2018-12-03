@@ -13,20 +13,20 @@ Implements a simple library of sanitation methods for data transformation. This 
 $ go get -u github.com/mrz1836/go-sanitize
 ```
 
-### Go Docs
+### Documentation
 You can view the generated [documentation here](https://godoc.org/github.com/mrz1836/go-sanitize).
 
-### Go Tests & Examples
+### Run Tests & Testable Examples
 All built-in unit tests and examples run using [Travis CI](https://travis-ci.com/mrz1836/go-sanitize) are passing using [Go version 1.11.x](https://golang.org/).
 ```bash
-$ cd ~/../go-sanitize
+$ cd ../go-sanitize
 $ go test ./... -v
 ```
 
-### Go Benchmarks
+### Benchmarks
 Run the generic Go benchmarks:
 ```bash
-$ cd ~/../go-sanitize
+$ cd ../go-sanitize
 $ go test -bench=.
 ```
 
@@ -41,7 +41,7 @@ The package [golint](https://github.com/golang/lint) is in use at Google, and it
 How to install [golint](https://github.com/golang/lint):
 ```bash
 $ go get -u golang.org/x/lint/golint
-$ cd ~/../go-sanitize
+$ cd ../go-sanitize
 $ golint
 ```
 
@@ -52,7 +52,7 @@ but it can find errors not caught by the compilers.
 
 How to run [vet](https://golang.org/cmd/vet/)
 ```bash
-$ cd ~/../go-sanitize
+$ cd ../go-sanitize
 $ go vet -v
 ```
 
