@@ -461,6 +461,24 @@ func BenchmarkDomain(b *testing.B) {
 	}
 }
 
+//ExampleDomain example with using domain regex
+func ExampleDomain() {
+	fmt.Println(Domain("https://www.Example.COM/?param=value", false, false))
+	// Output: www.example.com
+}
+
+//ExampleDomain_preserveCase example with using domain regex
+func ExampleDomain_preserveCase() {
+	fmt.Println(Domain("https://www.Example.COM/?param=value", true, false))
+	// Output: www.Example.COM
+}
+
+//ExampleDomain_removeWww example with using domain regex
+func ExampleDomain_removeWww() {
+	fmt.Println(Domain("https://www.Example.COM/?param=value", false, true))
+	// Output: example.com
+}
+
 //BenchmarkDomainPreserveCase benchmarks the Domain method
 func BenchmarkDomainPreserveCase(b *testing.B) {
 	testString := "https://Example.COM/?param=value"

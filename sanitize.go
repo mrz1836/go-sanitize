@@ -78,13 +78,6 @@ func Decimal(original string) string {
 }
 
 //Domain returns a proper hostname / domain name. Preserve case is to flag keeping the case versus forcing to lowercase. Use the removeWww flag to strip the www sub-domain. This method returns an error if parse critically fails.
-//  //Don't preserve case, leave www
-//  fmt.Println("Result:", Domain("https://www.Example.com/?param=value", false, false))
-//  Result: www.example.com, <nil>
-//
-//  //Preserve case, remove www
-//  fmt.Println("Result:", Domain("https://www.Example.com/?param=value", true, true))
-//  Result: Example.com, <nil>
 func Domain(original string, preserveCase bool, removeWww bool) (string, error) {
 
 	//Try to see if we have a host

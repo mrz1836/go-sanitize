@@ -56,8 +56,9 @@ $ cd ~/../go-sanitize
 $ go vet -v
 ```
 
-### Example Code
-The example code is located at [/examples](https://github.com/mrz1836/go-sanitize/blob/master/examples/examples.go). Also view the [unit tests](https://github.com/mrz1836/go-sanitize/blob/master/sanitize_test.go) and [benchmarks](https://github.com/mrz1836/go-sanitize/blob/master/sanitize_test.go) to see the other implementations.
+### Example Code in Action
+The testable example methods are located in the [main test file](https://github.com/mrz1836/go-sanitize/blob/master/sanitize_test.go).
+Also view the [unit tests](https://github.com/mrz1836/go-sanitize/blob/master/sanitize_test.go) and [benchmarks](https://github.com/mrz1836/go-sanitize/blob/master/sanitize_test.go) to see the other implementations.
 ```golang
 package main
 
@@ -68,9 +69,9 @@ import (
 
 func main() {
 
-	//Run and display
+	//Execute and print
 	fmt.Println("Result:", gosanitize.IPAddress(" 192.168.0.1 "))
 
-	// 192.168.0.1
+	// Output: 192.168.0.1
 }
 ```
