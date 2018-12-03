@@ -58,7 +58,7 @@ $ go vet -v
 
 ### Example Code
 The example code is located at [/examples](https://github.com/mrz1836/go-sanitize/blob/master/examples/examples.go). Also view the [unit tests](https://github.com/mrz1836/go-sanitize/blob/master/sanitize_test.go) and [benchmarks](https://github.com/mrz1836/go-sanitize/blob/master/sanitize_test.go) to see the other implementations.
-```
+```go
 package main
 
 import (
