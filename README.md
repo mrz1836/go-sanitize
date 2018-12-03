@@ -16,7 +16,7 @@ $ go get -u github.com/mrz1836/go-sanitize
 ### Documentation
 You can view the generated [documentation here](https://godoc.org/github.com/mrz1836/go-sanitize).
 
-### Run Tests & Testable Examples
+### Examples & Tests
 All built-in unit tests and examples run using [Travis CI](https://travis-ci.com/mrz1836/go-sanitize) are passing using [Go version 1.11.x](https://golang.org/).
 ```bash
 $ cd ../go-sanitize
@@ -33,7 +33,7 @@ $ go test -bench=.
 ### Adheres to *effective go* standards
 View the [effective go](https://golang.org/doc/effective_go.html) standards documentation.
 
-### Adheres to *go-lint* specifications
+### Adheres to *golint* specifications
 The package [golint](https://github.com/golang/lint) differs from [gofmt](https://golang.org/cmd/gofmt/). The package [gofmt](https://golang.org/cmd/gofmt/) formats Go source code, whereas [golint](https://github.com/golang/lint) prints out style mistakes. The package [golint](https://github.com/golang/lint) differs from [vet](https://golang.org/cmd/vet/).
 The package [vet](https://golang.org/cmd/vet/) is concerned with correctness, whereas [golint](https://github.com/golang/lint) is concerned with coding style.
 The package [golint](https://github.com/golang/lint) is in use at Google, and it seeks to match the accepted style of the open source [Go project](https://golang.org/).
@@ -45,7 +45,7 @@ $ cd ../go-sanitize
 $ golint
 ```
 
-### Adheres to *go-vet* specifications
+### Adheres to *go vet* specifications
 [Vet](https://golang.org/cmd/vet/) examines Go source code and reports suspicious constructs, such as Printf calls whose arguments
 do not align with the format string. [Vet](https://golang.org/cmd/vet/) uses heuristics that do not guarantee all reports are genuine problems,
 but it can find errors not caught by the compilers.
