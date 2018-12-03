@@ -1,11 +1,11 @@
 /*
-Package example shows how to use the go-sanitize package.
+Package examples shows how to use the go-sanitize package.
 
 If you have any suggestions or comments, please feel free to open an issue on this project's GitHub page.
 
 Author: MrZ
 */
-package example
+package examples
 
 import (
 	"fmt"
