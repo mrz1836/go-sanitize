@@ -109,9 +109,8 @@ func BenchmarkAlphaNoSpaces(b *testing.B) {
 	}
 }
 
-// This is how godoc parsed ExampleExamples_output() that was shown above.
-func ExampleAlpha_with_case() {
-	//no spaces
+//ExampleAlpha_noSpaces example with no spaces
+func ExampleAlpha_noSpaces() {
 	fmt.Println(Alpha("Example String!", false))
 	// Output: Example String!
 }
