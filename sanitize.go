@@ -39,10 +39,12 @@ var (
 )
 
 //Alpha returns only alpha characters. Set the parameter spaces to true if you want to allow space characters. Valid characters are a-z and A-Z.
-//	log.Println("Result:", Alpha("Example String!",false)) //no spaces
+//  //no spaces
+//	log.Println("Result:", Alpha("Example String!", false))
 //	Result: ExampleString
 //
-//	log.Println("Result:", Alpha("Example String!",true)) //with spaces
+//  //with spaces
+//	log.Println("Result:", Alpha("Example String!", true))
 //	Result: Example String
 func Alpha(original string, spaces bool) string {
 
@@ -56,10 +58,12 @@ func Alpha(original string, spaces bool) string {
 }
 
 //AlphaNumeric returns only alphanumeric characters. Set the parameter spaces to true if you want to allow space characters. Valid characters are a-z, A-Z and 0-9.
-//  log.Println("Result:", AlphaNumeric("Example String 2!",false)) //no spaces
+//  //no spaces
+//  log.Println("Result:", AlphaNumeric("Example String 2!", false))
 //  Result: ExampleString2
 //
-//  log.Println("Result:", AlphaNumeric("Example String 2!",true))  //with spaces
+//  //with spaces
+//  log.Println("Result:", AlphaNumeric("Example String 2!", true))
 //  Result: Example String 2
 func AlphaNumeric(original string, spaces bool) string {
 
@@ -73,7 +77,8 @@ func AlphaNumeric(original string, spaces bool) string {
 }
 
 //Custom uses a custom regex string and returns the sanitized result. This is used for any additional regex that this package does not contain.
-//  log.Println("Result:", Custom("Example String 2!",`[^a-zA-Z]`)) //Alpha only example
+//  //Alpha only example
+//  log.Println("Result:", Custom("Example String 2!", `[^a-zA-Z]`))
 //  Result: ExampleString
 func Custom(original string, regExp string) string {
 
@@ -85,16 +90,25 @@ func Custom(original string, regExp string) string {
 }
 
 //Decimal returns sanitized decimal/float values in either positive or negative.
-//  log.Println("Result:", Decimal("Lat: 23.65555"))   //Positive
+//  //Positive
+//  log.Println("Result:", Decimal("Lat: 23.65555"))
 //  Result: 23.65555
 //
-//  log.Println("Result:", Decimal("Long: -86.9012"))  //Negative
+//  //Negative
+//  log.Println("Result:", Decimal("Long: -86.9012"))
 //  Result: -86.9012
 func Decimal(original string) string {
 	return string(decimalRegExp.ReplaceAll([]byte(original), []byte("")))
 }
 
-//Domain returns a proper domain name (example.com - lowercase)
+//Domain returns a proper hostname / domain name. Preserve case is to flag keeping the case versus forcing to lowercase. Use the removeWww flag to strip the www sub-domain. This method returns an error if parse critically fails.
+//  //Don't preserve case, leave www
+//  log.Println("Result:", Domain("https://www.Example.com/?param=value", false, false))
+//  Result: www.example.com, <nil>
+//
+//  //Preserve case, remove www
+//  log.Println("Result:", Domain("https://www.Example.com/?param=value", true, true))
+//  Result: Example.com, <nil>
 func Domain(original string, preserveCase bool, removeWww bool) (string, error) {
 
 	//Try to see if we have a host
@@ -132,8 +146,22 @@ func Domain(original string, preserveCase bool, removeWww bool) (string, error) 
 	return string(domainRegExp.ReplaceAll([]byte(strings.ToLower(u.Host)), []byte(""))), nil
 }
 
-//Email returns a sanitized email address
-func Email(original string) string {
+//Email returns a sanitized email address string. Email addresses are forced to lowercase and removes any mail-to prefixes.
+//  //Don't preserve case (standard)
+//  log.Println("Result:", Email("mailto: Name@Example.COM", false))
+//  Result: name@example.com
+//
+//  //Preserve case (non-standard)
+//  log.Println("Result:", Email("mailto: Name@Example.COM", true))
+//  Result: Name@Example.COM
+func Email(original string, preserveCase bool) string {
+
+	//Leave the email address in it's original case
+	if preserveCase {
+		return string(emailRegExp.ReplaceAll([]byte(strings.Replace(original, "mailto:", "", -1)), []byte("")))
+	}
+
+	//Standard is forced to lowercase
 	return string(emailRegExp.ReplaceAll([]byte(strings.ToLower(strings.Replace(original, "mailto:", "", -1))), []byte("")))
 }
 

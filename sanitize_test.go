@@ -369,7 +369,7 @@ func TestEmail(t *testing.T) {
 	originalString = "mailto:testME@GmAil.com"
 	expectedOutput = "testme@gmail.com"
 
-	result := Email(originalString)
+	result := Email(originalString, false)
 	if result != expectedOutput {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
@@ -378,7 +378,7 @@ func TestEmail(t *testing.T) {
 	originalString = "test_ME@GmAil.com"
 	expectedOutput = "test_me@gmail.com"
 
-	result = Email(originalString)
+	result = Email(originalString, false)
 	if result != expectedOutput {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
@@ -387,7 +387,7 @@ func TestEmail(t *testing.T) {
 	originalString = "test-ME@GmAil.com"
 	expectedOutput = "test-me@gmail.com"
 
-	result = Email(originalString)
+	result = Email(originalString, false)
 	if result != expectedOutput {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
@@ -396,7 +396,7 @@ func TestEmail(t *testing.T) {
 	originalString = "test.ME@GmAil.com"
 	expectedOutput = "test.me@gmail.com"
 
-	result = Email(originalString)
+	result = Email(originalString, false)
 	if result != expectedOutput {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
@@ -405,7 +405,7 @@ func TestEmail(t *testing.T) {
 	originalString = " test_ME @GmAil.com "
 	expectedOutput = "test_me@gmail.com"
 
-	result = Email(originalString)
+	result = Email(originalString, false)
 	if result != expectedOutput {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
@@ -414,7 +414,7 @@ func TestEmail(t *testing.T) {
 	originalString = " <<test_ME @GmAil.com!>> "
 	expectedOutput = "test_me@gmail.com"
 
-	result = Email(originalString)
+	result = Email(originalString, false)
 	if result != expectedOutput {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
@@ -423,7 +423,16 @@ func TestEmail(t *testing.T) {
 	originalString = " test_ME+2@GmAil.com "
 	expectedOutput = "test_me+2@gmail.com"
 
-	result = Email(originalString)
+	result = Email(originalString, false)
+	if result != expectedOutput {
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//Allowed plus signs (preserve case)
+	originalString = " test_ME+2@GmAil.com "
+	expectedOutput = "test_ME+2@GmAil.com"
+
+	result = Email(originalString, true)
 	if result != expectedOutput {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
