@@ -8,6 +8,7 @@ Author: MrZ
 package gosanitize
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -106,6 +107,12 @@ func BenchmarkAlphaNoSpaces(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		_ = Alpha(testString, false)
 	}
+}
+
+// This is how godoc parsed ExampleExamples_output() that was shown above.
+func ExampleAlpha_output() {
+	fmt.Println("Hello")
+	// Output: Hello
 }
 
 //BenchmarkAlphaWithSpaces benchmarks the Alpha method
