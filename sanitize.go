@@ -39,8 +39,8 @@ var (
 )
 
 //Alpha returns only alpha characters. Set the parameter spaces to true if you want to allow space characters. Valid characters are a-z and A-Z.
-//	log.Println(Alpha("My String!",false)) //MyString
-//	log.Println(Alpha("My String!",true))  //My String
+//	log.Println(Alpha("Example String!",false)) //ExampleString
+//	log.Println(Alpha("Example String!",true))  //Example String
 func Alpha(original string, spaces bool) string {
 
 	//Leave white spaces?
@@ -53,8 +53,8 @@ func Alpha(original string, spaces bool) string {
 }
 
 //AlphaNumeric returns only alphanumeric characters. Set the parameter spaces to true if you want to allow space characters. Valid characters are a-z, A-Z and 0-9.
-//	log.Println(AlphaNumeric("My String 2!",false)) //MyString2
-//	log.Println(AlphaNumeric("My String 2!",true))  //My String 2
+//	log.Println(AlphaNumeric("Example String 2!",false)) //ExampleString2
+//	log.Println(AlphaNumeric("Example String 2!",true))  //Example String 2
 func AlphaNumeric(original string, spaces bool) string {
 
 	//Leave white spaces?
@@ -67,8 +67,8 @@ func AlphaNumeric(original string, spaces bool) string {
 }
 
 //Custom uses a custom regex string and returns the sanitized result. This is used for any additional regex that this package does not contain.
-//	log.Println(Custom("My String 2!",`[^a-zA-Z]`)) 	//MyString
-//	log.Println(Custom("My String 2!",`[^a-zA-Z0-9]`))  //MyString2
+//	log.Println(Custom("Example String 2!",`[^a-zA-Z]`)) 	 //ExampleString
+//	log.Println(Custom("Example String 2!",`[^a-zA-Z0-9]`))  //ExampleString2
 func Custom(original string, regExp string) string {
 
 	//Try to compile (it will panic if its wrong!)
@@ -79,8 +79,8 @@ func Custom(original string, regExp string) string {
 }
 
 //Decimal returns sanitized decimal/float values in either positive or negative.
-//	log.Println(Decimal("Lat: 23.65555"))        //23.655552
-//	log.Println(Decimal("Long: -86.9012",true))  //-86.9012
+//	log.Println(Decimal("Lat: 23.65555"))   //23.655552
+//	log.Println(Decimal("Long: -86.9012"))  //-86.9012
 func Decimal(original string) string {
 	return string(decimalRegExp.ReplaceAll([]byte(original), []byte("")))
 }
