@@ -59,7 +59,6 @@ func Alpha(original string, spaces bool) string {
 //  log.Println("Result:", AlphaNumeric("Example String 2!",false)) //no spaces
 //  Result: ExampleString2
 //
-//
 //  log.Println("Result:", AlphaNumeric("Example String 2!",true))  //with spaces
 //  Result: Example String 2
 func AlphaNumeric(original string, spaces bool) string {
