@@ -109,18 +109,24 @@ func BenchmarkAlphaNoSpaces(b *testing.B) {
 	}
 }
 
-//ExampleAlpha_noSpaces example with no spaces
-func ExampleAlpha_noSpaces() {
-	fmt.Println(Alpha("Example String!", false))
-	// Output: Example String!
-}
-
 //BenchmarkAlphaWithSpaces benchmarks the Alpha method
 func BenchmarkAlphaWithSpaces(b *testing.B) {
 	testString := "This is the test string."
 	for i := 0; i < b.N; i++ {
 		_ = Alpha(testString, true)
 	}
+}
+
+//ExampleAlpha_noSpaces example with no spaces
+func ExampleAlpha_noSpaces() {
+	fmt.Println(Alpha("Example String!", false))
+	// Output: ExampleString
+}
+
+//ExampleAlpha_withSpaces example with no spaces
+func ExampleAlpha_withSpaces() {
+	fmt.Println(Alpha("Example String!", true))
+	// Output: Example String
 }
 
 //TestAlphaNumeric tests the alpha numeric sanitize method

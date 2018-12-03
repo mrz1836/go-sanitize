@@ -39,12 +39,6 @@ var (
 )
 
 //Alpha returns only alpha characters. Set the parameter spaces to true if you want to allow space characters. Valid characters are a-z and A-Z.
-//
-//  Result: ExampleString
-//
-//  //with spaces
-//  fmt.Println("Result:", Alpha("Example String!", true))
-//  Result: Example String
 func Alpha(original string, spaces bool) string {
 
 	//Leave white spaces?
