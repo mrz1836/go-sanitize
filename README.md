@@ -17,10 +17,14 @@ $ go get -u github.com/mrz1836/go-sanitize
 You can view the generated [documentation here](https://godoc.org/github.com/mrz1836/go-sanitize).
 
 ### Go Tests
-All unit tests are passing on [Go v1.11.2](https://golang.org/)
+All built-in unit tests are passing using [Go v1.11.2](https://golang.org/)
+```
+$ cd ~/../go-sanitize
+$ go test ./... -v
+```
 
 ### Go Benchmarks
-Run the Go benchmarks:
+Run the generic Go benchmarks:
 ```
 $ cd ~/../go-sanitize
 $ go test -bench=.
