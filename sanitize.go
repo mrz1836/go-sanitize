@@ -273,7 +273,7 @@ func URI(original string) string {
 
 //URL returns a formatted url friendly string.
 //  //Standard example
-//  fmt.Println("Result:", URI("https://example.com/This-Works/Yes?param=^true^"))
+//  fmt.Println("Result:", URL("https://example.com/This-Works/Yes?param=^true^"))
 //  Result: https://example.com/This-Works/Yes?param=true
 func URL(original string) string {
 	return string(urlRegExp.ReplaceAll([]byte(original), []byte("")))
@@ -289,7 +289,7 @@ func XML(original string) string {
 
 //XSS removes known XSS attack strings or script strings.
 //  //Standard example
-//  fmt.Println("Result:", XML("<script>Example</script>"))
+//  fmt.Println("Result:", XSS("<script>Example</script>"))
 //  Result: >Example</
 func XSS(original string) string {
 	original = strings.Replace(original, "<script", "", -1)
