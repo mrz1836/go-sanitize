@@ -65,6 +65,7 @@ func AlphaNumeric(original string, spaces bool) string {
 }
 
 //Custom uses a custom regex string and returns the sanitized result. This is used for any additional regex that this package does not contain.
+//  View examples: sanitize_test.go
 func Custom(original string, regExp string) string {
 
 	//Try to compile (it will panic if its wrong!)
@@ -75,11 +76,13 @@ func Custom(original string, regExp string) string {
 }
 
 //Decimal returns sanitized decimal/float values in either positive or negative.
+//  View examples: sanitize_test.go
 func Decimal(original string) string {
 	return string(decimalRegExp.ReplaceAll([]byte(original), []byte("")))
 }
 
 //Domain returns a proper hostname / domain name. Preserve case is to flag keeping the case versus forcing to lowercase. Use the removeWww flag to strip the www sub-domain. This method returns an error if parse critically fails.
+//  View examples: sanitize_test.go
 func Domain(original string, preserveCase bool, removeWww bool) (string, error) {
 
 	//Try to see if we have a host
@@ -118,6 +121,7 @@ func Domain(original string, preserveCase bool, removeWww bool) (string, error) 
 }
 
 //Email returns a sanitized email address string. Email addresses are forced to lowercase and removes any mail-to prefixes.
+//  View examples: sanitize_test.go
 func Email(original string, preserveCase bool) string {
 
 	//Leave the email address in it's original case
@@ -130,6 +134,7 @@ func Email(original string, preserveCase bool) string {
 }
 
 //FirstToUpper overwrites the first letter as an uppercase letter and preserves the rest of the string.
+//  View examples: sanitize_test.go
 func FirstToUpper(original string) string {
 
 	// Handle empty and 1 character strings
@@ -143,16 +148,19 @@ func FirstToUpper(original string) string {
 }
 
 //FormalName returns a formal name or surname (for First, Middle and Last)
+//  View examples: sanitize_test.go
 func FormalName(original string) string {
 	return string(formalNameRegExp.ReplaceAll([]byte(original), []byte("")))
 }
 
 //HTML returns a string without any <HTML> tags.
+//  View examples: sanitize_test.go
 func HTML(original string) string {
 	return string(htmlRegExp.ReplaceAll([]byte(original), []byte("")))
 }
 
 //IPAddress returns an ip address for both ipv4 and ipv6 formats.
+//  View examples: sanitize_test.go
 func IPAddress(original string) string {
 	//Parse the IP - Remove any invalid characters first
 	ipAddress := net.ParseIP(string(ipAddressRegExp.ReplaceAll([]byte(original), []byte(""))))
@@ -164,51 +172,61 @@ func IPAddress(original string) string {
 }
 
 //Numeric returns numbers only.
+//  View examples: sanitize_test.go
 func Numeric(original string) string {
 	return string(numericRegExp.ReplaceAll([]byte(original), []byte("")))
 }
 
 //PathName returns a formatted path compliant name.
+//  View examples: sanitize_test.go
 func PathName(original string) string {
 	return string(pathNameRegExp.ReplaceAll([]byte(original), []byte("")))
 }
 
 //Punctuation returns a string with basic punctuation preserved.
+//  View examples: sanitize_test.go
 func Punctuation(original string) string {
 	return string(punctuationRegExp.ReplaceAll([]byte(original), []byte("")))
 }
 
 //Scripts removes all scripts, iframes and embeds tags from string.
+//  View examples: sanitize_test.go
 func Scripts(original string) string {
 	return string(scriptRegExp.ReplaceAll([]byte(original), []byte("")))
 }
 
 //SingleLine returns a single line string, removes all carriage returns.
+//  View examples: sanitize_test.go
 func SingleLine(original string) string {
 	return singleLineRegExp.ReplaceAllString(original, " ")
 }
 
 //Time returns just the time part of the string.
+//  View examples: sanitize_test.go
 func Time(original string) string {
 	return string(timeRegExp.ReplaceAll([]byte(original), []byte("")))
 }
 
 //URI returns allowed URI characters only.
+//  View examples: sanitize_test.go
 func URI(original string) string {
 	return string(uriRegExp.ReplaceAll([]byte(original), []byte("")))
 }
 
 //URL returns a formatted url friendly string.
+//  View examples: sanitize_test.go
 func URL(original string) string {
 	return string(urlRegExp.ReplaceAll([]byte(original), []byte("")))
 }
 
 //XML returns a string without any <XML> tags - alias of HTML.
+//  View examples: sanitize_test.go
 func XML(original string) string {
 	return HTML(original)
 }
 
 //XSS removes known XSS attack strings or script strings.
+//  View examples: sanitize_test.go
 func XSS(original string) string {
 	original = strings.Replace(original, "<script", "", -1)
 	original = strings.Replace(original, "script>", "", -1)
