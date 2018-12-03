@@ -9,7 +9,7 @@ Implements a simple library of sanitation methods for data transformation. This 
 ## Installation
 
 **go-sanitize** requires a [supported release of Go](https://golang.org/doc/devel/release.html#policy).
-```
+```bash
 $ go get -u github.com/mrz1836/go-sanitize
 ```
 
@@ -18,14 +18,14 @@ You can view the generated [documentation here](https://godoc.org/github.com/mrz
 
 ### Go Tests
 All built-in unit tests are passing using [Go v1.11.2](https://golang.org/)
-```
+```bash
 $ cd ~/../go-sanitize
 $ go test ./... -v
 ```
 
 ### Go Benchmarks
 Run the generic Go benchmarks:
-```
+```bash
 $ cd ~/../go-sanitize
 $ go test -bench=.
 ```
@@ -39,7 +39,7 @@ The package [vet](https://golang.org/cmd/vet/) is concerned with correctness, wh
 The package [golint](https://github.com/golang/lint) is in use at Google, and it seeks to match the accepted style of the open source [Go project](https://golang.org/).
 
 How to install [golint](https://github.com/golang/lint):
-```
+```bash
 $ go get -u golang.org/x/lint/golint
 $ cd ~/../go-sanitize
 $ golint
@@ -51,14 +51,14 @@ do not align with the format string. [Vet](https://golang.org/cmd/vet/) uses heu
 but it can find errors not caught by the compilers.
 
 How to run [vet](https://golang.org/cmd/vet/)
-```
+```bash
 $ cd ~/../go-sanitize
 $ go vet -v
 ```
 
 ### Example Code
 The example code is located at [/examples](https://github.com/mrz1836/go-sanitize/blob/master/examples/examples.go). Also view the [unit tests](https://github.com/mrz1836/go-sanitize/blob/master/sanitize_test.go) and [benchmarks](https://github.com/mrz1836/go-sanitize/blob/master/sanitize_test.go) to see the other implementations.
-```go
+```golang
 package main
 
 import (
