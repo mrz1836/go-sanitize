@@ -1,5 +1,5 @@
 # go-sanitize
-Implements a simple library of sanitation methods for data transformation. This package was inspired by protecting incoming user generated content and ensuring the data will be in the right format.
+Implements a simple library of sanitation methods for data transformation. This package was inspired by processing and protecting incoming user generated content while ensuring the data will be in the correct format. This project follows Go best practices and you can view the standards and specifications at the [end of this readme](https://github.com/mrz1836/go-sanitize#adheres-to-effective-go-standards).
 
 | | | | | | | |
 |-|-|-|-|-|-|-|
