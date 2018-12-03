@@ -92,11 +92,27 @@ That`
 
 	//Test removing fancy quotes and microsoft symbols
 	originalString = "“This is a quote with tick`s … ” ☺ "
-	expectedOutput = "This is a quote with ticks"
+	expectedOutput = "This is a quote with ticks    "
 
 	result = Alpha(originalString, true)
 	if result != expectedOutput {
 		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+}
+
+//BenchmarkAlphaNoSpaces benchmarks the Alpha method
+func BenchmarkAlphaNoSpaces(b *testing.B) {
+	testString := "This is the test string."
+	for i := 0; i < b.N; i++ {
+		_ = Alpha(testString, false)
+	}
+}
+
+//BenchmarkAlphaWithSpaces benchmarks the Alpha method
+func BenchmarkAlphaWithSpaces(b *testing.B) {
+	testString := "This is the test string."
+	for i := 0; i < b.N; i++ {
+		_ = Alpha(testString, true)
 	}
 }
 
@@ -188,6 +204,22 @@ That2`
 	}
 }
 
+//BenchmarkAlphaNumericNoSpaces benchmarks the AlphaNumeric method
+func BenchmarkAlphaNumericNoSpaces(b *testing.B) {
+	testString := "This is the test string 12345."
+	for i := 0; i < b.N; i++ {
+		_ = AlphaNumeric(testString, false)
+	}
+}
+
+//BenchmarkAlphaNumericWithSpaces benchmarks the AlphaNumeric method
+func BenchmarkAlphaNumericWithSpaces(b *testing.B) {
+	testString := "This is the test string 12345."
+	for i := 0; i < b.N; i++ {
+		_ = AlphaNumeric(testString, true)
+	}
+}
+
 //TestCustom tests the custom sanitize method
 func TestCustom(t *testing.T) {
 	var (
@@ -222,6 +254,14 @@ func TestCustom(t *testing.T) {
 	//
 	// will panic()
 	//
+}
+
+//BenchmarkCustom benchmarks the Custom method
+func BenchmarkCustom(b *testing.B) {
+	testString := "This is the test string 12345."
+	for i := 0; i < b.N; i++ {
+		_ = Custom(testString, `[^a-zA-Z0-9]`)
+	}
 }
 
 //TestDecimal tests the decimal sanitize method
@@ -259,6 +299,14 @@ func TestDecimal(t *testing.T) {
 	result = Decimal(originalString)
 	if result != expectedOutput {
 		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+}
+
+//BenchmarkDecimal benchmarks the Decimal method
+func BenchmarkDecimal(b *testing.B) {
+	testString := "String: -123.12345"
+	for i := 0; i < b.N; i++ {
+		_ = Decimal(testString)
 	}
 }
 
@@ -356,6 +404,30 @@ func TestDomain(t *testing.T) {
 
 }
 
+//BenchmarkDomain benchmarks the Domain method
+func BenchmarkDomain(b *testing.B) {
+	testString := "https://Example.COM/?param=value"
+	for i := 0; i < b.N; i++ {
+		_, _ = Domain(testString, false, false)
+	}
+}
+
+//BenchmarkDomainPreserveCase benchmarks the Domain method
+func BenchmarkDomainPreserveCase(b *testing.B) {
+	testString := "https://Example.COM/?param=value"
+	for i := 0; i < b.N; i++ {
+		_, _ = Domain(testString, true, false)
+	}
+}
+
+//BenchmarkDomainRemoveWww benchmarks the Domain method
+func BenchmarkDomainRemoveWww(b *testing.B) {
+	testString := "https://Example.COM/?param=value"
+	for i := 0; i < b.N; i++ {
+		_, _ = Domain(testString, false, true)
+	}
+}
+
 //TestEmail tests the email sanitize method
 func TestEmail(t *testing.T) {
 	var (
@@ -438,6 +510,22 @@ func TestEmail(t *testing.T) {
 	}
 }
 
+//BenchmarkEmail benchmarks the Email method
+func BenchmarkEmail(b *testing.B) {
+	testString := "mailto:Person@Example.COM "
+	for i := 0; i < b.N; i++ {
+		_ = Email(testString, false)
+	}
+}
+
+//BenchmarkEmailPreserveCase benchmarks the Email method
+func BenchmarkEmailPreserveCase(b *testing.B) {
+	testString := "mailto:Person@Example.COM "
+	for i := 0; i < b.N; i++ {
+		_ = Email(testString, true)
+	}
+}
+
 //TestFirstToUpper tests the first to upper method
 func TestFirstToUpper(t *testing.T) {
 	var (
@@ -490,6 +578,14 @@ func TestFirstToUpper(t *testing.T) {
 	result = FirstToUpper(originalString)
 	if result != expectedOutput {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+}
+
+//BenchmarkFirstToUpper benchmarks the FirstToUpper method
+func BenchmarkFirstToUpper(b *testing.B) {
+	testString := "make this upper"
+	for i := 0; i < b.N; i++ {
+		_ = FirstToUpper(testString)
 	}
 }
 
@@ -548,6 +644,14 @@ func TestFormalName(t *testing.T) {
 	}
 }
 
+//BenchmarkFormalName benchmarks the FormalName method
+func BenchmarkFormalName(b *testing.B) {
+	testString := "John McDonald Jr."
+	for i := 0; i < b.N; i++ {
+		_ = FormalName(testString)
+	}
+}
+
 //TestHTML tests the HTML sanitize method
 func TestHTML(t *testing.T) {
 	var (
@@ -573,6 +677,14 @@ func TestHTML(t *testing.T) {
 	result = HTML(originalString)
 	if result != expectedOutput {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+}
+
+//BenchmarkHTML benchmarks the HTML method
+func BenchmarkHTML(b *testing.B) {
+	testString := "<html><b>Test This!</b></html>"
+	for i := 0; i < b.N; i++ {
+		_ = FormalName(testString)
 	}
 }
 
@@ -694,6 +806,14 @@ func TestIPAddress(t *testing.T) {
 	}
 }
 
+//BenchmarkIPAddress benchmarks the IPAddress method
+func BenchmarkIPAddress(b *testing.B) {
+	testString := " 192.168.0.1 "
+	for i := 0; i < b.N; i++ {
+		_ = IPAddress(testString)
+	}
+}
+
 //TestNumeric tests the numeric sanitize method
 func TestNumeric(t *testing.T) {
 	var (
@@ -719,6 +839,14 @@ func TestNumeric(t *testing.T) {
 	result = Numeric(originalString)
 	if result != expectedOutput {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+}
+
+//BenchmarkNumeric benchmarks the numeric method
+func BenchmarkNumeric(b *testing.B) {
+	testString := " 192.168.0.1 "
+	for i := 0; i < b.N; i++ {
+		_ = Numeric(testString)
 	}
 }
 
@@ -756,6 +884,14 @@ func TestPathName(t *testing.T) {
 	result = PathName(originalString)
 	if result != expectedOutput {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+}
+
+//BenchmarkPathName benchmarks the PathName method
+func BenchmarkPathName(b *testing.B) {
+	testString := "/This-Path-Name_Works-/"
+	for i := 0; i < b.N; i++ {
+		_ = PathName(testString)
 	}
 }
 
@@ -832,6 +968,14 @@ func TestPunctuation(t *testing.T) {
 	}
 }
 
+//BenchmarkPunctuation benchmarks the Punctuation method
+func BenchmarkPunctuation(b *testing.B) {
+	testString := "Does this work? The're doing it?"
+	for i := 0; i < b.N; i++ {
+		_ = Punctuation(testString)
+	}
+}
+
 //TestScripts tests the script removal
 func TestScripts(t *testing.T) {
 	var (
@@ -896,6 +1040,14 @@ func TestScripts(t *testing.T) {
 	}
 }
 
+//BenchmarkScripts benchmarks the Scripts method
+func BenchmarkScripts(b *testing.B) {
+	testString := "<script>$(){ var remove='me'; }</script>"
+	for i := 0; i < b.N; i++ {
+		_ = Scripts(testString)
+	}
+}
+
 //TestSingleLine test the single line sanitize method
 func TestSingleLine(t *testing.T) {
 	var (
@@ -922,6 +1074,16 @@ something else`
 	result = SingleLine(originalString)
 	if result != expectedOutput {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+}
+
+//BenchmarkSingleLine benchmarks the SingleLine method
+func BenchmarkSingleLine(b *testing.B) {
+	testString := `This line
+That Line
+Another Line`
+	for i := 0; i < b.N; i++ {
+		_ = SingleLine(testString)
 	}
 }
 
@@ -962,6 +1124,113 @@ func TestTime(t *testing.T) {
 	}
 }
 
+//BenchmarkTime benchmarks the Time method
+func BenchmarkTime(b *testing.B) {
+	testString := "Time is 05:10:23"
+	for i := 0; i < b.N; i++ {
+		_ = Time(testString)
+	}
+}
+
+//TestURI tests the URI sanitize method
+func TestURI(t *testing.T) {
+	var (
+		expectedOutput string
+		methodName     string
+		originalString string
+	)
+
+	//Test remove spaces
+	originalString = "Test?=weee! &this=that"
+	expectedOutput = "Test?=weee&this=that"
+	methodName = "URI"
+
+	result := URI(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//Test removing invalid symbols
+	originalString = "Test?=weee! &this=/that/!()*^"
+	expectedOutput = "Test?=weee&this=/that/"
+
+	result = URI(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//Test valid url
+	originalString = "/This/Works/?woot=123&this#page10%"
+	expectedOutput = "/This/Works/?woot=123&this#page10%"
+
+	result = URI(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+}
+
+//BenchmarkURI benchmarks the URI method
+func BenchmarkURI(b *testing.B) {
+	testString := "/Test/This/Url/?param=value"
+	for i := 0; i < b.N; i++ {
+		_ = XSS(testString)
+	}
+}
+
+//TestURL tests the URL sanitize method
+func TestURL(t *testing.T) {
+	var (
+		expectedOutput string
+		methodName     string
+		originalString string
+	)
+
+	//Invalid url, remove spaces
+	originalString = "Test?=weee! &this=that#works"
+	expectedOutput = "Test?=weee&this=that#works"
+	methodName = "URL"
+
+	result := URL(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//Invalid characters
+	originalString = "/this/test?dfsf$"
+	expectedOutput = "/this/test?dfsf"
+
+	result = URL(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//Invalid characters
+	originalString = "https://domain.com/this/test?dfsf$!@()[]{}'<>"
+	expectedOutput = "https://domain.com/this/test?dfsf"
+
+	result = URL(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//Valid url
+	originalString = "https://domain.com/this/test?this=value&another=123%#page"
+	expectedOutput = "https://domain.com/this/test?this=value&another=123%#page"
+
+	result = URL(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+}
+
+//BenchmarkURL benchmarks the URL method
+func BenchmarkURL(b *testing.B) {
+	testString := "/Test/This/Url/?param=value"
+	for i := 0; i < b.N; i++ {
+		_ = XSS(testString)
+	}
+}
+
 //TestXML tests the XML sanitize method
 func TestXML(t *testing.T) {
 	var (
@@ -987,6 +1256,14 @@ func TestXML(t *testing.T) {
 	result = XML(originalString)
 	if result != expectedOutput {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+}
+
+//BenchmarkXML benchmarks the XML method
+func BenchmarkXML(b *testing.B) {
+	testString := "<xml>Test This!</xml>"
+	for i := 0; i < b.N; i++ {
+		_ = XML(testString)
 	}
 }
 
@@ -1063,85 +1340,10 @@ func TestXSS(t *testing.T) {
 	}
 }
 
-//TestURI tests the URI sanitize method
-func TestURI(t *testing.T) {
-	var (
-		expectedOutput string
-		methodName     string
-		originalString string
-	)
-
-	//Test remove spaces
-	originalString = "Test?=weee! &this=that"
-	expectedOutput = "Test?=weee&this=that"
-	methodName = "URI"
-
-	result := URI(originalString)
-	if result != expectedOutput {
-		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
-	}
-
-	//Test removing invalid symbols
-	originalString = "Test?=weee! &this=/that/!()*^"
-	expectedOutput = "Test?=weee&this=/that/"
-
-	result = URI(originalString)
-	if result != expectedOutput {
-		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
-	}
-
-	//Test valid url
-	originalString = "/This/Works/?woot=123&this#page10%"
-	expectedOutput = "/This/Works/?woot=123&this#page10%"
-
-	result = URI(originalString)
-	if result != expectedOutput {
-		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
-	}
-}
-
-//TestURL tests the URL sanitize method
-func TestURL(t *testing.T) {
-	var (
-		expectedOutput string
-		methodName     string
-		originalString string
-	)
-
-	//Invalid url, remove spaces
-	originalString = "Test?=weee! &this=that#works"
-	expectedOutput = "Test?=weee&this=that#works"
-	methodName = "URL"
-
-	result := URL(originalString)
-	if result != expectedOutput {
-		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
-	}
-
-	//Invalid characters
-	originalString = "/this/test?dfsf$"
-	expectedOutput = "/this/test?dfsf"
-
-	result = URL(originalString)
-	if result != expectedOutput {
-		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
-	}
-
-	//Invalid characters
-	originalString = "https://domain.com/this/test?dfsf$!@()[]{}'<>"
-	expectedOutput = "https://domain.com/this/test?dfsf"
-
-	result = URL(originalString)
-	if result != expectedOutput {
-		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
-	}
-
-	//Valid url
-	originalString = "https://domain.com/this/test?this=value&another=123%#page"
-	expectedOutput = "https://domain.com/this/test?this=value&another=123%#page"
-
-	result = URL(originalString)
-	if result != expectedOutput {
-		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+//BenchmarkXSS benchmarks the XSS method
+func BenchmarkXSS(b *testing.B) {
+	testString := "<script>Test This!</script>"
+	for i := 0; i < b.N; i++ {
+		_ = XSS(testString)
 	}
 }
