@@ -39,6 +39,7 @@ var (
 )
 
 //Alpha returns only alpha characters. Set the parameter spaces to true if you want to allow space characters. Valid characters are a-z and A-Z.
+// View examples in sanitize_test.go
 func Alpha(original string, spaces bool) string {
 
 	//Leave white spaces?
@@ -162,81 +163,51 @@ func IPAddress(original string) string {
 }
 
 //Numeric returns numbers only.
-//  //Standard example
-//  fmt.Println("Result:", Numeric("$65.00"))
-//  Result: 6500
 func Numeric(original string) string {
 	return string(numericRegExp.ReplaceAll([]byte(original), []byte("")))
 }
 
 //PathName returns a formatted path compliant name.
-//  //Standard example
-//  fmt.Println("Result:", PathName("/This-Path _ Name-2-/"))
-//  Result: This-Path_Name-2-
 func PathName(original string) string {
 	return string(pathNameRegExp.ReplaceAll([]byte(original), []byte("")))
 }
 
 //Punctuation returns a string with basic punctuation preserved.
-//  //Standard example
-//  fmt.Println("Result:", Punctuation("Does ^this^ work?"))
-//  Result: Does this work?
 func Punctuation(original string) string {
 	return string(punctuationRegExp.ReplaceAll([]byte(original), []byte("")))
 }
 
 //Scripts removes all scripts, iframes and embeds tags from string.
-//  //Standard example
-//  fmt.Println("Result:", Scripts("<script>This</script>Works?"))
-//  Result: Works?
 func Scripts(original string) string {
 	return string(scriptRegExp.ReplaceAll([]byte(original), []byte("")))
 }
 
 //SingleLine returns a single line string, removes all carriage returns.
-//  //Standard example
-//  fmt.Println("Result:", SingleLine("\nThis\nLine"))
-//  Result: ThisLine
 func SingleLine(original string) string {
 	return singleLineRegExp.ReplaceAllString(original, " ")
 }
 
 //Time returns just the time part of the string.
-//  //Standard example
-//  fmt.Println("Result:", Time("Time 00:00:22 -PST"))
-//  Result: 00:00:22
 func Time(original string) string {
 	return string(timeRegExp.ReplaceAll([]byte(original), []byte("")))
 }
 
 //URI returns allowed URI characters only.
-//  //Standard example
-//  fmt.Println("Result:", URI("/This-Works/Yes?param=^true^"))
-//  Result: /This-Works/Yes?param=true
 func URI(original string) string {
 	return string(uriRegExp.ReplaceAll([]byte(original), []byte("")))
 }
 
 //URL returns a formatted url friendly string.
-//  //Standard example
-//  fmt.Println("Result:", URL("https://example.com/This-Works/Yes?param=^true^"))
-//  Result: https://example.com/This-Works/Yes?param=true
 func URL(original string) string {
 	return string(urlRegExp.ReplaceAll([]byte(original), []byte("")))
 }
 
 //XML returns a string without any <XML> tags - alias of HTML.
-//  //Standard example
-//  fmt.Println("Result:", XML("<xml>Example</xml>"))
-//  Result: Example
 func XML(original string) string {
 	return HTML(original)
 }
 
 //XSS removes known XSS attack strings or script strings.
-//  //Standard example
-//  fmt.Println("Result:", XSS("<script>Example</script>"))
-//  Result: >Example</
 func XSS(original string) string {
 	original = strings.Replace(original, "<script", "", -1)
 	original = strings.Replace(original, "script>", "", -1)
