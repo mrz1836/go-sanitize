@@ -19,6 +19,13 @@ You can view the generated [documentation here](https://godoc.org/github.com/mrz
 ### Go Tests
 All unit tests are passing on [Go v1.11.2](https://golang.org/)
 
+### Go Benchmarks
+Run the Go benchmarks:
+```
+$ cd ~/../go-sanitize
+$ go test -bench=.
+```
+
 ### Adheres to *effective go* standards
 View the [effective go](https://golang.org/doc/effective_go.html) standards.
 
