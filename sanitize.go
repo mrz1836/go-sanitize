@@ -39,7 +39,7 @@ var (
 )
 
 //Alpha returns only alpha characters. Set the parameter spaces to true if you want to allow space characters. Valid characters are a-z and A-Z.
-// View examples in sanitize_test.go
+//  View examples: sanitize_test.go
 func Alpha(original string, spaces bool) string {
 
 	//Leave white spaces?
@@ -52,6 +52,7 @@ func Alpha(original string, spaces bool) string {
 }
 
 //AlphaNumeric returns only alphanumeric characters. Set the parameter spaces to true if you want to allow space characters. Valid characters are a-z, A-Z and 0-9.
+//  View examples: sanitize_test.go
 func AlphaNumeric(original string, spaces bool) string {
 
 	//Leave white spaces?
