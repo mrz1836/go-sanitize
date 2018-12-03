@@ -66,7 +66,9 @@ func AlphaNumeric(original string, spaces bool) string {
 	return string(alphaNumericRegExp.ReplaceAll([]byte(original), []byte("")))
 }
 
-//Custom uses a custom regex and returns the sanitized version
+//Custom uses a custom regex string and returns the sanitized result. This is used for any additional regex that this package does not contain.
+//	log.Println(Custom("My String 2!",`[^a-zA-Z]`)) 	//MyString
+//	log.Println(Custom("My String 2!",`[^a-zA-Z0-9]`))  //MyString2
 func Custom(original string, regExp string) string {
 
 	//Try to compile (it will panic if its wrong!)
@@ -76,7 +78,9 @@ func Custom(original string, regExp string) string {
 	return string(compiledRegExp.ReplaceAll([]byte(original), []byte("")))
 }
 
-//Decimal returns decimal values (positive and negative)
+//Decimal returns sanitized decimal/float values in either positive or negative.
+//	log.Println(Decimal("Lat: 23.65555"))        //23.655552
+//	log.Println(Decimal("Long: -86.9012",true))  //-86.9012
 func Decimal(original string) string {
 	return string(decimalRegExp.ReplaceAll([]byte(original), []byte("")))
 }
