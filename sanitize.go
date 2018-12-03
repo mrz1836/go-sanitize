@@ -165,7 +165,10 @@ func Email(original string, preserveCase bool) string {
 	return string(emailRegExp.ReplaceAll([]byte(strings.ToLower(strings.Replace(original, "mailto:", "", -1))), []byte("")))
 }
 
-//FirstToUpper overwrites the first letter as an uppercase letter and preserves the string
+//FirstToUpper overwrites the first letter as an uppercase letter and preserves the rest of the string.
+//  //Standard example
+//  fmt.Println("Result:", FirstToUpper("example string!"))
+//  Result: Example string!
 func FirstToUpper(original string) string {
 
 	// Handle empty and 1 character strings
@@ -179,16 +182,29 @@ func FirstToUpper(original string) string {
 }
 
 //FormalName returns a formal name or surname (for First, Middle and Last)
+//  //Standard example
+//  fmt.Println("Result:", FormalName("Jack #2 Jones!"))
+//  Result: Jack 2 Jones
 func FormalName(original string) string {
 	return string(formalNameRegExp.ReplaceAll([]byte(original), []byte("")))
 }
 
-//HTML returns a string without any <HTML> tags
+//HTML returns a string without any <HTML> tags.
+//  //Standard example
+//  fmt.Println("Result:", HTML("<html>Example</html>"))
+//  Result: Example
 func HTML(original string) string {
 	return string(htmlRegExp.ReplaceAll([]byte(original), []byte("")))
 }
 
-//IPAddress returns an ip address for both ipv4 and ipv6
+//IPAddress returns an ip address for both ipv4 and ipv6 formats.
+//  //IPV4
+//  fmt.Println("Result:", IPAddress("192.168.0.1"))
+//  Result: 192.168.0.1
+//
+//  //IPV6
+//  fmt.Println("Result:", IPAddress("2602:305:bceb:1bd0:44ef:fedb:4f8f:da4f "))
+//  Result: 2602:305:bceb:1bd0:44ef:fedb:4f8f:da4f
 func IPAddress(original string) string {
 	//Parse the IP - Remove any invalid characters first
 	ipAddress := net.ParseIP(string(ipAddressRegExp.ReplaceAll([]byte(original), []byte(""))))
@@ -199,52 +215,82 @@ func IPAddress(original string) string {
 	return ipAddress.String()
 }
 
-//Numeric returns numbers only
+//Numeric returns numbers only.
+//  //Standard example
+//  fmt.Println("Result:", Numeric("$65.00"))
+//  Result: 6500
 func Numeric(original string) string {
 	return string(numericRegExp.ReplaceAll([]byte(original), []byte("")))
 }
 
-//PathName returns a formatted path name (/This_Path-Name/)
+//PathName returns a formatted path compliant name.
+//  //Standard example
+//  fmt.Println("Result:", PathName("/This-Path _ Name-2-/"))
+//  Result: This-Path_Name-2-
 func PathName(original string) string {
 	return string(pathNameRegExp.ReplaceAll([]byte(original), []byte("")))
 }
 
-//Punctuation returns a string with basic punctuation
+//Punctuation returns a string with basic punctuation preserved.
+//  //Standard example
+//  fmt.Println("Result:", Punctuation("Does ^this^ work?"))
+//  Result: Does this work?
 func Punctuation(original string) string {
 	return string(punctuationRegExp.ReplaceAll([]byte(original), []byte("")))
 }
 
-//Scripts removes all scripts, iframes and embeds tags
+//Scripts removes all scripts, iframes and embeds tags from string.
+//  //Standard example
+//  fmt.Println("Result:", Scripts("<script>This</script>Works?"))
+//  Result: Works?
 func Scripts(original string) string {
 	return string(scriptRegExp.ReplaceAll([]byte(original), []byte("")))
 }
 
-//SingleLine returns a single line string
+//SingleLine returns a single line string, removes all carriage returns.
+//  //Standard example
+//  fmt.Println("Result:", SingleLine("\nThis\nLine"))
+//  Result: ThisLine
 func SingleLine(original string) string {
 	return singleLineRegExp.ReplaceAllString(original, " ")
 }
 
-//Time returns just the time xx:xx string
+//Time returns just the time part of the string.
+//  //Standard example
+//  fmt.Println("Result:", Time("Time 00:00:22 -PST"))
+//  Result: 00:00:22
 func Time(original string) string {
 	return string(timeRegExp.ReplaceAll([]byte(original), []byte("")))
 }
 
-//URI returns allowed URI characters
+//URI returns allowed URI characters only.
+//  //Standard example
+//  fmt.Println("Result:", URI("/This-Works/Yes?param=^true^"))
+//  Result: /This-Works/Yes?param=true
 func URI(original string) string {
 	return string(uriRegExp.ReplaceAll([]byte(original), []byte("")))
 }
 
-//URL returns a formatted url
+//URL returns a formatted url friendly string.
+//  //Standard example
+//  fmt.Println("Result:", URI("https://example.com/This-Works/Yes?param=^true^"))
+//  Result: https://example.com/This-Works/Yes?param=true
 func URL(original string) string {
 	return string(urlRegExp.ReplaceAll([]byte(original), []byte("")))
 }
 
-//XML returns a string without any <XML> tags - alias of HTML
+//XML returns a string without any <XML> tags - alias of HTML.
+//  //Standard example
+//  fmt.Println("Result:", XML("<xml>Example</xml>"))
+//  Result: Example
 func XML(original string) string {
 	return HTML(original)
 }
 
-//XSS removes all XSS attack strings or script strings
+//XSS removes known XSS attack strings or script strings.
+//  //Standard example
+//  fmt.Println("Result:", XML("<script>Example</script>"))
+//  Result: >Example</
 func XSS(original string) string {
 	original = strings.Replace(original, "<script", "", -1)
 	original = strings.Replace(original, "script>", "", -1)

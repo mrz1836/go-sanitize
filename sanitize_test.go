@@ -743,8 +743,8 @@ func TestIPAddress(t *testing.T) {
 	}
 
 	//Valid IPV6
-	originalString = "2602:306:bceb:1bd0:44ef:fedb:4f8f:da4f"
-	expectedOutput = "2602:306:bceb:1bd0:44ef:fedb:4f8f:da4f"
+	originalString = "2602:305:bceb:1bd0:44ef:fedb:4f8f:da4f"
+	expectedOutput = "2602:305:bceb:1bd0:44ef:fedb:4f8f:da4f"
 
 	result = IPAddress(originalString)
 	if result != expectedOutput {
@@ -752,8 +752,8 @@ func TestIPAddress(t *testing.T) {
 	}
 
 	//Valid formatted IPV6
-	originalString = "2602:306:bceb:1bd0:44ef:2:2:2"
-	expectedOutput = "2602:306:bceb:1bd0:44ef:2:2:2"
+	originalString = "2602:305:bceb:1bd0:44ef:2:2:2"
+	expectedOutput = "2602:305:bceb:1bd0:44ef:2:2:2"
 
 	result = IPAddress(originalString)
 	if result != expectedOutput {
