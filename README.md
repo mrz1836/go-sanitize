@@ -31,7 +31,7 @@ $ go test -bench=.
 ```
 
 ### Adheres to *effective go* standards
-View the [effective go](https://golang.org/doc/effective_go.html) standards.
+View the [effective go](https://golang.org/doc/effective_go.html) standards documentation.
 
 ### Adheres to *go-lint* specifications
 The package [golint](https://github.com/golang/lint) differs from [gofmt](https://golang.org/cmd/gofmt/). The package [gofmt](https://golang.org/cmd/gofmt/) formats Go source code, whereas [golint](https://github.com/golang/lint) prints out style mistakes. The package [golint](https://github.com/golang/lint) differs from [vet](https://golang.org/cmd/vet/).
@@ -70,7 +70,7 @@ import (
 func main() {
 
 	//Execute and print
-	fmt.Println("Result:", gosanitize.IPAddress(" 192.168.0.1 "))
+	fmt.Println(gosanitize.IPAddress(" 192.168.0.1 "))
 
 	// Output: 192.168.0.1
 }
