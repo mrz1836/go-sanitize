@@ -46,9 +46,20 @@ $ go vet -v
 ```
 
 ### Example Code
-Also view [the tests](https://github.com/mrz1836/go-sanitize/blob/master/sanitize_test.go) to see the other implementations.
+The example code is located at [/example](https://github.com/mrz1836/go-sanitize/blob/master/example/example.go). Also view the [unit tests](https://github.com/mrz1836/go-sanitize/blob/master/sanitize_test.go) to see the other implementations.
 ```
-myIPAddress := "IP: 192.168.0.1"                //Raw, unknown user generated data
-sanitizedIPAddress := IPAddress(myIPAddress)    //Run the sanitize method for IP Address
-log.Println(sanitizedIPAddress)                 //Displays: 192.168.0.1
+package main
+
+import (
+	"fmt"
+	"github.com/mrz1836/go-sanitize"
+)
+
+func main() {
+
+	//Run and display
+	fmt.Println("Result:", gosanitize.IPAddress(" 192.168.0.1 "))
+
+	// 192.168.0.1
+}
 ```
