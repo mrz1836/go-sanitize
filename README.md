@@ -16,7 +16,7 @@ $ go get -u github.com/mrz1836/go-sanitize
 ### Go Docs
 You can view the generated [documentation here](https://godoc.org/github.com/mrz1836/go-sanitize).
 
-### Go Tests
+### Go Tests & Examples
 All built-in unit tests are passing using [Go v1.11.2](https://golang.org/)
 ```bash
 $ cd ~/../go-sanitize

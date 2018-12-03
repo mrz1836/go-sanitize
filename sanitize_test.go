@@ -233,6 +233,18 @@ func BenchmarkAlphaNumericWithSpaces(b *testing.B) {
 	}
 }
 
+//ExampleAlphaNumeric_noSpaces example with no spaces
+func ExampleAlphaNumeric_noSpaces() {
+	fmt.Println(AlphaNumeric("Example String 2!", false))
+	// Output: ExampleString2
+}
+
+//ExampleAlphaNumeric_withSpaces example with no spaces
+func ExampleAlphaNumeric_withSpaces() {
+	fmt.Println(AlphaNumeric("Example String 2!", true))
+	// Output: Example String 2
+}
+
 //TestCustom tests the custom sanitize method
 func TestCustom(t *testing.T) {
 	var (
@@ -275,6 +287,18 @@ func BenchmarkCustom(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		_ = Custom(testString, `[^a-zA-Z0-9]`)
 	}
+}
+
+//ExampleCustom_alpha example with using alpha regex
+func ExampleCustom_alpha() {
+	fmt.Println(Custom("Example String 2!", `[^a-zA-Z]`))
+	// Output: ExampleString
+}
+
+//ExampleCustom_numeric example with using numeric regex
+func ExampleCustom_numeric() {
+	fmt.Println(Custom("Example String 2!", `[^0-9]`))
+	// Output: 2
 }
 
 //TestDecimal tests the decimal sanitize method
@@ -321,6 +345,18 @@ func BenchmarkDecimal(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		_ = Decimal(testString)
 	}
+}
+
+//ExampleDecimal_positive example with using decimal regex
+func ExampleDecimal_positive() {
+	fmt.Println(Decimal("$ 99.99!"))
+	// Output: 99.99
+}
+
+//ExampleDecimal_negative example with using decimal regex
+func ExampleDecimal_negative() {
+	fmt.Println(Decimal("$ -99.99!"))
+	// Output: -99.99
 }
 
 //TestDomain tests the domain sanitize method
