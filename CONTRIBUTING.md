@@ -16,6 +16,3 @@ This project follows [effective Go standards](https://golang.org/doc/effective_g
 - [golint](https://github.com/golang/lint)
 - [vet](https://golang.org/cmd/vet/)
 - [GoReportCard.com](https://goreportcard.com/report/github.com/mrz1836/go-sanitize)
-
-Thanks,
-MrZ
