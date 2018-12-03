@@ -39,8 +39,7 @@ var (
 )
 
 //Alpha returns only alpha characters. Set the parameter spaces to true if you want to allow space characters. Valid characters are a-z and A-Z.
-//  //no spaces
-//  fmt.Println("Result:", Alpha("Example String!", false))
+//
 //  Result: ExampleString
 //
 //  //with spaces
