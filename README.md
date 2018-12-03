@@ -45,7 +45,7 @@ $ cd ~/../go-sanitize
 $ golint
 ```
 
-### This package adheres to *go-vet* specifications
+### Adheres to *go-vet* specifications
 [Vet](https://golang.org/cmd/vet/) examines Go source code and reports suspicious constructs, such as Printf calls whose arguments
 do not align with the format string. [Vet](https://golang.org/cmd/vet/) uses heuristics that do not guarantee all reports are genuine problems,
 but it can find errors not caught by the compilers.
@@ -57,7 +57,7 @@ $ go vet -v
 ```
 
 ### Example Code
-The example code is located at [/example](https://github.com/mrz1836/go-sanitize/blob/master/example/example.go). Also view the [unit tests](https://github.com/mrz1836/go-sanitize/blob/master/sanitize_test.go) to see the other implementations.
+The example code is located at [/examples](https://github.com/mrz1836/go-sanitize/blob/master/examples/examples.go). Also view the [unit tests](https://github.com/mrz1836/go-sanitize/blob/master/sanitize_test.go) and [benchmarks](https://github.com/mrz1836/go-sanitize/blob/master/sanitize_test.go) to see the other implementations.
 ```
 package main
 
