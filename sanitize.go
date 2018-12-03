@@ -56,11 +56,11 @@ func Alpha(original string, spaces bool) string {
 }
 
 //AlphaNumeric returns only alphanumeric characters. Set the parameter spaces to true if you want to allow space characters. Valid characters are a-z, A-Z and 0-9.
-//	log.Println("Result:", AlphaNumeric("Example String 2!",false)) //no spaces
+//  log.Println("Result:", AlphaNumeric("Example String 2!",false)) //no spaces
 //  Result: ExampleString2
 //
 //
-//	log.Println("Result:", AlphaNumeric("Example String 2!",true))  //with spaces
+//  log.Println("Result:", AlphaNumeric("Example String 2!",true))  //with spaces
 //  Result: Example String 2
 func AlphaNumeric(original string, spaces bool) string {
 
@@ -74,8 +74,8 @@ func AlphaNumeric(original string, spaces bool) string {
 }
 
 //Custom uses a custom regex string and returns the sanitized result. This is used for any additional regex that this package does not contain.
-//	log.Println("Result:", Custom("Example String 2!",`[^a-zA-Z]`)) //Alpha only example
-//	Result: ExampleString
+//  log.Println("Result:", Custom("Example String 2!",`[^a-zA-Z]`)) //Alpha only example
+//  Result: ExampleString
 func Custom(original string, regExp string) string {
 
 	//Try to compile (it will panic if its wrong!)
@@ -86,10 +86,10 @@ func Custom(original string, regExp string) string {
 }
 
 //Decimal returns sanitized decimal/float values in either positive or negative.
-//	log.Println("Result:", Decimal("Lat: 23.65555"))   //Positive
+//  log.Println("Result:", Decimal("Lat: 23.65555"))   //Positive
 //  Result: 23.65555
 //
-//	log.Println("Result:", Decimal("Long: -86.9012"))  //Negative
+//  log.Println("Result:", Decimal("Long: -86.9012"))  //Negative
 //  Result: -86.9012
 func Decimal(original string) string {
 	return string(decimalRegExp.ReplaceAll([]byte(original), []byte("")))
