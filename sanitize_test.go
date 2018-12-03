@@ -461,24 +461,6 @@ func BenchmarkDomain(b *testing.B) {
 	}
 }
 
-//ExampleDomain example with using domain regex
-func ExampleDomain() {
-	fmt.Println(Domain("https://www.Example.COM/?param=value", false, false))
-	// Output: www.example.com
-}
-
-//ExampleDomain_preserveCase example with using domain regex
-func ExampleDomain_preserveCase() {
-	fmt.Println(Domain("https://www.Example.COM/?param=value", true, false))
-	// Output: www.Example.COM
-}
-
-//ExampleDomain_removeWww example with using domain regex
-func ExampleDomain_removeWww() {
-	fmt.Println(Domain("https://www.Example.COM/?param=value", false, true))
-	// Output: example.com
-}
-
 //BenchmarkDomainPreserveCase benchmarks the Domain method
 func BenchmarkDomainPreserveCase(b *testing.B) {
 	testString := "https://Example.COM/?param=value"
@@ -493,6 +475,24 @@ func BenchmarkDomainRemoveWww(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		_, _ = Domain(testString, false, true)
 	}
+}
+
+//ExampleDomain example with using domain regex
+func ExampleDomain() {
+	fmt.Println(Domain("https://www.Example.COM/?param=value", false, false))
+	// Output: www.example.com <nil>
+}
+
+//ExampleDomain_preserveCase example with using domain regex
+func ExampleDomain_preserveCase() {
+	fmt.Println(Domain("https://www.Example.COM/?param=value", true, false))
+	// Output: www.Example.COM <nil>
+}
+
+//ExampleDomain_removeWww example with using domain regex
+func ExampleDomain_removeWww() {
+	fmt.Println(Domain("https://www.Example.COM/?param=value", false, true))
+	// Output: example.com <nil>
 }
 
 //TestEmail tests the email sanitize method
@@ -593,6 +593,18 @@ func BenchmarkEmailPreserveCase(b *testing.B) {
 	}
 }
 
+//ExampleEmail example with using email regex
+func ExampleEmail() {
+	fmt.Println(Email("mailto:Person@Example.COM", false))
+	// Output: person@example.com
+}
+
+//ExampleEmail_preserveCase example with using email regex
+func ExampleEmail_preserveCase() {
+	fmt.Println(Email("mailto:Person@Example.COM", true))
+	// Output: Person@Example.COM
+}
+
 //TestFirstToUpper tests the first to upper method
 func TestFirstToUpper(t *testing.T) {
 	var (
@@ -654,6 +666,12 @@ func BenchmarkFirstToUpper(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		_ = FirstToUpper(testString)
 	}
+}
+
+//ExampleFirstToUpper example with using FirstToUpper
+func ExampleFirstToUpper() {
+	fmt.Println(FirstToUpper("this works"))
+	// Output: This works
 }
 
 //TestFormalName tests the formal name method
@@ -719,6 +737,12 @@ func BenchmarkFormalName(b *testing.B) {
 	}
 }
 
+//ExampleFormalName example with using FirstToUpper
+func ExampleFormalName() {
+	fmt.Println(FormalName("John McDonald Jr.!"))
+	// Output: John McDonald Jr.
+}
+
 //TestHTML tests the HTML sanitize method
 func TestHTML(t *testing.T) {
 	var (
@@ -753,6 +777,12 @@ func BenchmarkHTML(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		_ = FormalName(testString)
 	}
+}
+
+//ExampleHTML example with using html regex
+func ExampleHTML() {
+	fmt.Println(HTML("<body>This Works?</body>"))
+	// Output: This Works?
 }
 
 //TestIPAddress tests the ip address sanitize method
@@ -873,12 +903,32 @@ func TestIPAddress(t *testing.T) {
 	}
 }
 
-//BenchmarkIPAddress benchmarks the IPAddress method
-func BenchmarkIPAddress(b *testing.B) {
+//BenchmarkIPAddressV4 benchmarks the IPAddress method
+func BenchmarkIPAddressV4(b *testing.B) {
 	testString := " 192.168.0.1 "
 	for i := 0; i < b.N; i++ {
 		_ = IPAddress(testString)
 	}
+}
+
+//BenchmarkIPAddressV6 benchmarks the IPAddress method
+func BenchmarkIPAddressV6(b *testing.B) {
+	testString := " 2602:305:bceb:1bd0:44ef:fedb:4f8f:da4f "
+	for i := 0; i < b.N; i++ {
+		_ = IPAddress(testString)
+	}
+}
+
+//ExampleIPAddress_ipv4 example with using ip address regex
+func ExampleIPAddress_ipv4() {
+	fmt.Println(IPAddress(" 192.168.0.1 "))
+	// Output: 192.168.0.1
+}
+
+//ExampleIPAddress_ipv6 example with using ip address regex
+func ExampleIPAddress_ipv6() {
+	fmt.Println(IPAddress(" 2602:305:bceb:1bd0:44ef:fedb:4f8f:da4f "))
+	// Output: 2602:305:bceb:1bd0:44ef:fedb:4f8f:da4f
 }
 
 //TestNumeric tests the numeric sanitize method

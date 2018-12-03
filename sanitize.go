@@ -116,13 +116,6 @@ func Domain(original string, preserveCase bool, removeWww bool) (string, error) 
 }
 
 //Email returns a sanitized email address string. Email addresses are forced to lowercase and removes any mail-to prefixes.
-//  //Don't preserve case (standard)
-//  fmt.Println("Result:", Email("mailto: Name@Example.COM", false))
-//  Result: name@example.com
-//
-//  //Preserve case (non-standard)
-//  fmt.Println("Result:", Email("mailto: Name@Example.COM", true))
-//  Result: Name@Example.COM
 func Email(original string, preserveCase bool) string {
 
 	//Leave the email address in it's original case
@@ -135,9 +128,6 @@ func Email(original string, preserveCase bool) string {
 }
 
 //FirstToUpper overwrites the first letter as an uppercase letter and preserves the rest of the string.
-//  //Standard example
-//  fmt.Println("Result:", FirstToUpper("example string!"))
-//  Result: Example string!
 func FirstToUpper(original string) string {
 
 	// Handle empty and 1 character strings
@@ -151,29 +141,16 @@ func FirstToUpper(original string) string {
 }
 
 //FormalName returns a formal name or surname (for First, Middle and Last)
-//  //Standard example
-//  fmt.Println("Result:", FormalName("Jack #2 Jones!"))
-//  Result: Jack 2 Jones
 func FormalName(original string) string {
 	return string(formalNameRegExp.ReplaceAll([]byte(original), []byte("")))
 }
 
 //HTML returns a string without any <HTML> tags.
-//  //Standard example
-//  fmt.Println("Result:", HTML("<html>Example</html>"))
-//  Result: Example
 func HTML(original string) string {
 	return string(htmlRegExp.ReplaceAll([]byte(original), []byte("")))
 }
 
 //IPAddress returns an ip address for both ipv4 and ipv6 formats.
-//  //IPV4
-//  fmt.Println("Result:", IPAddress("192.168.0.1"))
-//  Result: 192.168.0.1
-//
-//  //IPV6
-//  fmt.Println("Result:", IPAddress("2602:305:bceb:1bd0:44ef:fedb:4f8f:da4f "))
-//  Result: 2602:305:bceb:1bd0:44ef:fedb:4f8f:da4f
 func IPAddress(original string) string {
 	//Parse the IP - Remove any invalid characters first
 	ipAddress := net.ParseIP(string(ipAddressRegExp.ReplaceAll([]byte(original), []byte(""))))
