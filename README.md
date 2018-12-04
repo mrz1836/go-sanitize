@@ -10,7 +10,7 @@
 - [Documentation](https://github.com/mrz1836/go-sanitize#documentation)
 - [Examples & Tests](https://github.com/mrz1836/go-sanitize#examples--tests)
 - [Benchmarks](https://github.com/mrz1836/go-sanitize#benchmarks)
-- [Standards](https://github.com/mrz1836/go-sanitize#standards)
+- [Code Standards](https://github.com/mrz1836/go-sanitize#code-standards)
 - [Usage](https://github.com/mrz1836/go-sanitize#usage)
 - [Contributing](https://github.com/mrz1836/go-sanitize#contributing)
 - [License](https://github.com/mrz1836/go-sanitize#license)
@@ -39,37 +39,8 @@ $ cd ../go-sanitize
 $ go test -bench=.
 ```
 
-## Standards
-- [go tests](https://golang.org/pkg/testing/)
-- [go examples](https://golang.org/pkg/testing/#hdr-Examples)
-- [go benchmarks](https://golang.org/pkg/testing/#hdr-Benchmarks)
-- [gofmt](https://golang.org/cmd/gofmt/)
-- [golint](https://github.com/golang/lint)
-- [godoc](https://godoc.org/golang.org/x/tools/cmd/godoc)
-- [vet](https://golang.org/cmd/vet/)
-- [report card](https://goreportcard.com/)
-
-#### *effective go* standards
-View the [effective go](https://golang.org/doc/effective_go.html) standards documentation.
-
-#### *golint* specifications
-The package [golint](https://github.com/golang/lint) differs from [gofmt](https://golang.org/cmd/gofmt/). The package [gofmt](https://golang.org/cmd/gofmt/) formats Go source code, whereas [golint](https://github.com/golang/lint) prints out style mistakes. The package [golint](https://github.com/golang/lint) differs from [vet](https://golang.org/cmd/vet/). The package [vet](https://golang.org/cmd/vet/) is concerned with correctness, whereas [golint](https://github.com/golang/lint) is concerned with coding style. The package [golint](https://github.com/golang/lint) is in use at Google, and it seeks to match the accepted style of the open source [Go project](https://golang.org/).
-
-How to install [golint](https://github.com/golang/lint):
-```bash
-$ go get -u golang.org/x/lint/golint
-$ cd ../go-sanitize
-$ golint
-```
-
-#### *go vet* specifications
-[Vet](https://golang.org/cmd/vet/) examines Go source code and reports suspicious constructs. [Vet](https://golang.org/cmd/vet/) uses heuristics that do not guarantee all reports are genuine problems, but it can find errors not caught by the compilers.
-
-How to run [vet](https://golang.org/cmd/vet/):
-```bash
-$ cd ../go-sanitize
-$ go vet -v
-```
+## Code Standards
+Read more about this Go project's [code standards](https://github.com/mrz1836/go-sanitize/blob/master/CODE_STANDARDS.go).
 
 ## Usage
 - View the [examples](https://github.com/mrz1836/go-sanitize/blob/master/sanitize_test.go)
