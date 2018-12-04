@@ -26,7 +26,7 @@ $ go get -u github.com/mrz1836/go-sanitize
 You can view the generated [documentation here](https://godoc.org/github.com/mrz1836/go-sanitize).
 
 ## Examples & Tests
-All unit tests and [examples](https://github.com/mrz1836/go-sanitize/blob/master/sanitize_test.go) run via [Travis CI](https://travis-ci.com/mrz1836/go-sanitize) and uses [Go version 1.11.x](https://golang.org/). View the [deployment configuration file](https://github.com/mrz1836/go-sanitize/blob/master/.travis.yml).
+All unit tests and [examples](https://github.com/mrz1836/go-sanitize/blob/master/sanitize_test.go) run via [Travis CI](https://travis-ci.com/mrz1836/go-sanitize) and uses [Go version 1.11.x](https://golang.org/doc/go1.11). View the [deployment configuration file](https://github.com/mrz1836/go-sanitize/blob/master/.travis.yml).
 ```bash
 $ cd ../go-sanitize
 $ go test ./... -v
@@ -40,7 +40,7 @@ $ go test -bench=.
 ```
 
 ## Code Standards
-Read more about this Go project's [code standards](https://github.com/mrz1836/go-sanitize/blob/master/CODE_STANDARDS.go).
+Read more about this Go project's [code standards](https://github.com/mrz1836/go-sanitize/blob/master/CODE_STANDARDS.md).
 
 ## Usage
 - View the [examples](https://github.com/mrz1836/go-sanitize/blob/master/sanitize_test.go)
