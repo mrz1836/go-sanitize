@@ -5,6 +5,13 @@
 |-|-|-|-|-|-|-|
 | ![MIT](https://img.shields.io/github/license/mrz1836/go-sanitize.svg?style=flat) | [![Report](https://goreportcard.com/badge/github.com/mrz1836/go-sanitize?style=flat)](https://goreportcard.com/report/github.com/mrz1836/go-sanitize)  |  [![Build Status](https://travis-ci.com/mrz1836/go-sanitize.svg?branch=master)](https://travis-ci.com/mrz1836/go-sanitize)   |  [![Issues](https://img.shields.io/github/issues/mrz1836/go-sanitize.svg?style=flat)](https://github.com/mrz1836/go-sanitize/issues) | [![Release](https://img.shields.io/github/release-pre/mrz1836/go-sanitize.svg?style=flat)](https://github.com/mrz1836/go-sanitize/releases) | [![GoDoc](https://godoc.org/github.com/mrz1836/go-sanitize?status.svg&style=flat)](https://godoc.org/github.com/mrz1836/go-sanitize) | [![Donate](https://img.shields.io/badge/donate-bitcoin-brightgreen.svg)](https://mrz1818.com/?tab=tips&af=go-sanitize) |
 
+- [Installation](https://github.com/mrz1836/go-sanitize#installation)
+- [Documentation](https://github.com/mrz1836/go-sanitize#documentation)
+- [Examples & Tests](https://github.com/mrz1836/go-sanitize#examples--tests)
+- [Benchmarks](https://github.com/mrz1836/go-sanitize#benchmarks)
+- [Standards](https://github.com/mrz1836/go-sanitize#standards)
+- [Example Code](https://github.com/mrz1836/go-sanitize#example-code)
+- [Contributing](https://github.com/mrz1836/go-sanitize/blob/master/CONTRIBUTING.md)
 
 ## Installation
 
