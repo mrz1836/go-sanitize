@@ -1,5 +1,5 @@
 # go-sanitize
-Implements a simple library of sanitation methods for data transformation. This package was inspired by processing and protecting incoming user generated content while ensuring the data will be in the correct format. This project follows Go best practices and you can view the standards and specifications at the [end of this readme](https://github.com/mrz1836/go-sanitize#adheres-to-effective-go-standards).
+Go sanitize implements a simple library of sanitation methods for data sanitation and reduction. This package was inspired by processing and protecting incoming user generated content while ensuring the data will be in the correct format. This project follows Go best practices and you can view the standards and specifications at the [end of this readme](https://github.com/mrz1836/go-sanitize#adheres-to-effective-go-standards).
 
 | | | | | | | |
 |-|-|-|-|-|-|-|
@@ -17,7 +17,7 @@ $ go get -u github.com/mrz1836/go-sanitize
 You can view the generated [documentation here](https://godoc.org/github.com/mrz1836/go-sanitize).
 
 ### Examples & Tests
-All unit tests and examples run via [Travis CI](https://travis-ci.com/mrz1836/go-sanitize) and use [Go version 1.11.x](https://golang.org/). View the deployment [configuration file](https://github.com/mrz1836/go-sanitize/blob/master/.travis.yml).
+All unit tests and examples run via [Travis CI](https://travis-ci.com/mrz1836/go-sanitize) and uses [Go version 1.11.x](https://golang.org/). View the deployment [configuration file](https://github.com/mrz1836/go-sanitize/blob/master/.travis.yml).
 ```bash
 $ cd ../go-sanitize
 $ go test ./... -v
