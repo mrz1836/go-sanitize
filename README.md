@@ -11,8 +11,9 @@
 - [Examples & Tests](https://github.com/mrz1836/go-sanitize#examples--tests)
 - [Benchmarks](https://github.com/mrz1836/go-sanitize#benchmarks)
 - [Standards](https://github.com/mrz1836/go-sanitize#standards)
-- [Quickstart](https://github.com/mrz1836/go-sanitize#quickstart)
-- [Contributing](https://github.com/mrz1836/go-sanitize/blob/master/CONTRIBUTING.md)
+- [Usage](https://github.com/mrz1836/go-sanitize#usage)
+- [Contributing](https://github.com/mrz1836/go-sanitize#contributing)
+- [License](https://github.com/mrz1836/go-sanitize#license)
 
 ## Installation
 
