@@ -1,5 +1,5 @@
 # go-sanitize
-Go sanitize implements a simple library of sanitation methods for data sanitation and reduction. This package was inspired by processing and protecting incoming user generated content while ensuring the data will be in the correct format. This project follows Go best practices and you can view the standards and specifications at the [end of this readme](https://github.com/mrz1836/go-sanitize#adheres-to-effective-go-standards).
+**go-sanitize** implements a simple library of sanitation methods for data sanitation and reduction. This package was inspired by processing and protecting incoming user generated content while ensuring the data will be in the correct format. This project follows Go best practices and you can view the standards and specifications at the [end of this readme](https://github.com/mrz1836/go-sanitize#adheres-to-effective-go-standards).
 
 | | | | | | | |
 |-|-|-|-|-|-|-|
@@ -13,27 +13,37 @@ Go sanitize implements a simple library of sanitation methods for data sanitatio
 $ go get -u github.com/mrz1836/go-sanitize
 ```
 
-### Documentation
+## Documentation
 You can view the generated [documentation here](https://godoc.org/github.com/mrz1836/go-sanitize).
 
-### Examples & Tests
+## Examples & Tests
 All unit tests and examples run via [Travis CI](https://travis-ci.com/mrz1836/go-sanitize) and uses [Go version 1.11.x](https://golang.org/). View the deployment [configuration file](https://github.com/mrz1836/go-sanitize/blob/master/.travis.yml).
 ```bash
 $ cd ../go-sanitize
 $ go test ./... -v
 ```
 
-### Benchmarks
+## Benchmarks
 Run the generic Go benchmarks:
 ```bash
 $ cd ../go-sanitize
 $ go test -bench=.
 ```
 
-### Adheres to *effective go* standards
+## Standards
+- [go tests](https://golang.org/pkg/testing/)
+- [go examples](https://golang.org/pkg/testing/#hdr-Examples)
+- [go benchmarks](https://golang.org/pkg/testing/#hdr-Benchmarks)
+- [gofmt](https://golang.org/cmd/gofmt/)
+- [golint](https://github.com/golang/lint)
+- [godoc](https://godoc.org/golang.org/x/tools/cmd/godoc)
+- [vet](https://golang.org/cmd/vet/)
+- [report card](https://goreportcard.com/)
+
+#### Standards - *effective go* standards
 View the [effective go](https://golang.org/doc/effective_go.html) standards documentation.
 
-### Adheres to *golint* specifications
+#### Standards - *golint* specifications
 The package [golint](https://github.com/golang/lint) differs from [gofmt](https://golang.org/cmd/gofmt/). The package [gofmt](https://golang.org/cmd/gofmt/) formats Go source code, whereas [golint](https://github.com/golang/lint) prints out style mistakes. The package [golint](https://github.com/golang/lint) differs from [vet](https://golang.org/cmd/vet/).
 The package [vet](https://golang.org/cmd/vet/) is concerned with correctness, whereas [golint](https://github.com/golang/lint) is concerned with coding style.
 The package [golint](https://github.com/golang/lint) is in use at Google, and it seeks to match the accepted style of the open source [Go project](https://golang.org/).
@@ -45,7 +55,7 @@ $ cd ../go-sanitize
 $ golint
 ```
 
-### Adheres to *go vet* specifications
+#### Standards - *go vet* specifications
 [Vet](https://golang.org/cmd/vet/) examines Go source code and reports suspicious constructs, such as Printf calls whose arguments
 do not align with the format string. [Vet](https://golang.org/cmd/vet/) uses heuristics that do not guarantee all reports are genuine problems,
 but it can find errors not caught by the compilers.
@@ -56,7 +66,7 @@ $ cd ../go-sanitize
 $ go vet -v
 ```
 
-### Example Code in Action
+## Example Code
 The testable example methods are located in the [main test file](https://github.com/mrz1836/go-sanitize/blob/master/sanitize_test.go).
 Also view the [unit tests](https://github.com/mrz1836/go-sanitize/blob/master/sanitize_test.go) and [benchmarks](https://github.com/mrz1836/go-sanitize/blob/master/sanitize_test.go) to see the other implementations.
 ```golang
