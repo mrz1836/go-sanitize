@@ -70,6 +70,7 @@ func main() {
 View the [contributing guidelines](https://github.com/mrz1836/go-sanitize/blob/master/CONTRIBUTING.md) and follow the [code of conduct](https://github.com/mrz1836/go-sanitize/blob/master/CODE_OF_CONDUCT.md).
 
 Support the development
+
 [![Donate](https://img.shields.io/badge/donate-bitcoin%20cash-brightgreen.svg)](https://mrz1818.com/?tab=tips&af=go-sanitize)
 
 ## License
