@@ -3,8 +3,9 @@
 
 | | | | | | | |
 |-|-|-|-|-|-|-|
-| ![MIT](https://img.shields.io/github/license/mrz1836/go-sanitize.svg?style=flat) | [![Report](https://goreportcard.com/badge/github.com/mrz1836/go-sanitize?style=flat)](https://goreportcard.com/report/github.com/mrz1836/go-sanitize)  |  [![Build Status](https://travis-ci.com/mrz1836/go-sanitize.svg?branch=master)](https://travis-ci.com/mrz1836/go-sanitize)   |  [![Issues](https://img.shields.io/github/issues/mrz1836/go-sanitize.svg?style=flat)](https://github.com/mrz1836/go-sanitize/issues) | [![Release](https://img.shields.io/github/release-pre/mrz1836/go-sanitize.svg?style=flat)](https://github.com/mrz1836/go-sanitize/releases) | [![GoDoc](https://godoc.org/github.com/mrz1836/go-sanitize?status.svg&style=flat)](https://godoc.org/github.com/mrz1836/go-sanitize) | [![Donate](https://img.shields.io/badge/donate-bitcoin-brightgreen.svg)](https://mrz1818.com/?tab=tips&af=go-sanitize) |
+| ![License](https://img.shields.io/github/license/mrz1836/go-sanitize.svg?style=flat) | [![Report](https://goreportcard.com/badge/github.com/mrz1836/go-sanitize?style=flat)](https://goreportcard.com/report/github.com/mrz1836/go-sanitize)  |  [![Build Status](https://travis-ci.com/mrz1836/go-sanitize.svg?branch=master)](https://travis-ci.com/mrz1836/go-sanitize)   |  [![standard-readme compliant](https://img.shields.io/badge/standard--readme-OK-green.svg?style=flat)](https://github.com/RichardLitt/standard-readme) | [![Release](https://img.shields.io/github/release-pre/mrz1836/go-sanitize.svg?style=flat)](https://github.com/mrz1836/go-sanitize/releases) | [![GoDoc](https://godoc.org/github.com/mrz1836/go-sanitize?status.svg&style=flat)](https://godoc.org/github.com/mrz1836/go-sanitize) | [![Donate](https://img.shields.io/badge/donate-bitcoin-brightgreen.svg)](https://mrz1818.com/?tab=tips&af=go-sanitize) |
 
+## Table of Contents
 - [Installation](https://github.com/mrz1836/go-sanitize#installation)
 - [Documentation](https://github.com/mrz1836/go-sanitize#documentation)
 - [Examples & Tests](https://github.com/mrz1836/go-sanitize#examples--tests)
@@ -73,7 +74,7 @@ $ cd ../go-sanitize
 $ go vet -v
 ```
 
-## Quickstart
+## Usage
 The testable example methods are located in the [main test file](https://github.com/mrz1836/go-sanitize/blob/master/sanitize_test.go).
 Also view the [unit tests](https://github.com/mrz1836/go-sanitize/blob/master/sanitize_test.go) and [benchmarks](https://github.com/mrz1836/go-sanitize/blob/master/sanitize_test.go) to see the other implementations.
 ```golang
@@ -92,3 +93,11 @@ func main() {
 	// Output: 192.168.0.1
 }
 ```
+
+## Contributing
+
+View the [contributing guidelines](https://github.com/mrz1836/go-sanitize/blob/master/CONTRIBUTING.md) and follow the [code of conduct](https://github.com/mrz1836/go-sanitize/blob/master/CODE_OF_CONDUCT.md).
+
+## License
+
+![License](https://img.shields.io/github/license/mrz1836/go-sanitize.svg?style=flat)
