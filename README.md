@@ -17,7 +17,7 @@ $ go get -u github.com/mrz1836/go-sanitize
 You can view the generated [documentation here](https://godoc.org/github.com/mrz1836/go-sanitize).
 
 ### Examples & Tests
-All built-in unit tests and examples run using [Travis CI](https://travis-ci.com/mrz1836/go-sanitize) are passing using [Go version 1.11.x](https://golang.org/).
+All unit tests and examples run via [Travis CI](https://travis-ci.com/mrz1836/go-sanitize) and use [Go version 1.11.x](https://golang.org/). View the deployment [configuration file](https://github.com/mrz1836/go-sanitize/blob/master/.travis.yml).
 ```bash
 $ cd ../go-sanitize
 $ go test ./... -v
@@ -50,7 +50,7 @@ $ golint
 do not align with the format string. [Vet](https://golang.org/cmd/vet/) uses heuristics that do not guarantee all reports are genuine problems,
 but it can find errors not caught by the compilers.
 
-How to run [vet](https://golang.org/cmd/vet/)
+How to run [vet](https://golang.org/cmd/vet/):
 ```bash
 $ cd ../go-sanitize
 $ go vet -v
