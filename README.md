@@ -10,7 +10,7 @@
 - [Examples & Tests](https://github.com/mrz1836/go-sanitize#examples--tests)
 - [Benchmarks](https://github.com/mrz1836/go-sanitize#benchmarks)
 - [Standards](https://github.com/mrz1836/go-sanitize#standards)
-- [Example Code](https://github.com/mrz1836/go-sanitize#example-code)
+- [Quickstart](https://github.com/mrz1836/go-sanitize#quickstart)
 - [Contributing](https://github.com/mrz1836/go-sanitize/blob/master/CONTRIBUTING.md)
 
 ## Installation
@@ -24,7 +24,7 @@ $ go get -u github.com/mrz1836/go-sanitize
 You can view the generated [documentation here](https://godoc.org/github.com/mrz1836/go-sanitize).
 
 ## Examples & Tests
-All unit tests and examples run via [Travis CI](https://travis-ci.com/mrz1836/go-sanitize) and uses [Go version 1.11.x](https://golang.org/). View the deployment [configuration file](https://github.com/mrz1836/go-sanitize/blob/master/.travis.yml).
+All unit tests and [examples](https://github.com/mrz1836/go-sanitize/blob/master/sanitize_test.go) run via [Travis CI](https://travis-ci.com/mrz1836/go-sanitize) and uses [Go version 1.11.x](https://golang.org/). View the deployment [configuration file](https://github.com/mrz1836/go-sanitize/blob/master/.travis.yml).
 ```bash
 $ cd ../go-sanitize
 $ go test ./... -v
@@ -73,7 +73,7 @@ $ cd ../go-sanitize
 $ go vet -v
 ```
 
-## Example Code
+## Quickstart
 The testable example methods are located in the [main test file](https://github.com/mrz1836/go-sanitize/blob/master/sanitize_test.go).
 Also view the [unit tests](https://github.com/mrz1836/go-sanitize/blob/master/sanitize_test.go) and [benchmarks](https://github.com/mrz1836/go-sanitize/blob/master/sanitize_test.go) to see the other implementations.
 ```golang
