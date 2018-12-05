@@ -36,7 +36,7 @@ $ go test ./... -v
 Run the Go [benchmarks](https://github.com/mrz1836/go-sanitize/blob/master/sanitize_test.go):
 ```bash
 $ cd ../go-sanitize
-$ go test -bench=.
+$ go test -bench . -benchmem
 ```
 
 ## Code Standards
