@@ -1,0 +1,9 @@
+# Remove paths or files from Codacy
+exclude_paths:
+  - ".idea/**/*"
+  - ".git/**/*"
+  - "**.md"
+  - "**.mod"
+  - "**.toml"
+  - "**.lock"
+  - "**.config"
