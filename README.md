@@ -60,7 +60,7 @@ import (
 func main() {
 
 	//Execute and print
-	fmt.Println(gosanitize.IPAddress("  ##!192.168.0.1!##  "))
+	fmt.Println(sanitize.IPAddress("  ##!192.168.0.1!##  "))
 
 	// Output: 192.168.0.1
 }

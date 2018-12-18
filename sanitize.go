@@ -1,11 +1,11 @@
 /*
-Package gosanitize implements a simple library of various sanitation methods for data transformation.
+Package sanitize (go-sanitize) implements a simple library of various sanitation methods for data transformation.
 
 If you have any suggestions or comments, please feel free to open an issue on this project's GitHub page.
 
 Author: MrZ
 */
-package gosanitize
+package sanitize
 
 import (
 	"fmt"
