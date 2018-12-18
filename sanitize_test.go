@@ -901,6 +901,15 @@ func TestIPAddress(t *testing.T) {
 	if result != expectedOutput {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
+
+	//Remove special characters
+	originalString = "  ##!192.168.0.1!##  "
+	expectedOutput = "192.168.0.1"
+
+	result = IPAddress(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
 }
 
 //BenchmarkIPAddressV4 benchmarks the IPAddress method
