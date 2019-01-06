@@ -245,6 +245,49 @@ func ExampleAlphaNumeric_withSpaces() {
 	// Output: Example String 2
 }
 
+//TestBitcoinAddress will test all permitations
+func TestBitcoinAddress(t *testing.T) {
+	var (
+		expectedOutput string
+		methodName     string
+		originalString string
+	)
+
+	//Test removing invalid characters
+	originalString = "$#:1K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs!"
+	expectedOutput = "1K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs"
+	methodName = "BitcoinAddress"
+
+	result := BitcoinAddress(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//No uppercase letter O, uppercase letter I, lowercase letter l, and the number 0
+	originalString = "OIl01K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs!"
+	expectedOutput = "1K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs"
+	methodName = "BitcoinAddress"
+
+	result = BitcoinAddress(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+}
+
+//BenchmarkBitcoinAddress benchmarks the BitcoinAddress method
+func BenchmarkBitcoinAddress(b *testing.B) {
+	testString := "1K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs"
+	for i := 0; i < b.N; i++ {
+		_ = BitcoinAddress(testString)
+	}
+}
+
+//ExampleBitcoinAddress example using BitcoinAddress()
+func ExampleBitcoinAddress() {
+	fmt.Println(BitcoinAddress("1K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs!"))
+	// Output: 1K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs
+}
+
 //TestCustom tests the custom sanitize method
 func TestCustom(t *testing.T) {
 	var (

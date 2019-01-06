@@ -22,6 +22,7 @@ var (
 	alphaNumericWithSpacesRegExp = regexp.MustCompile(`[^a-zA-Z0-9\s]`)                                                           //Alpha numeric (with spaces)
 	alphaRegExp                  = regexp.MustCompile(`[^a-zA-Z]`)                                                                //Alpha characters
 	alphaWithSpacesRegExp        = regexp.MustCompile(`[^a-zA-Z\s]`)                                                              //Alpha characters (with spaces)
+	bitcoinRegExp                = regexp.MustCompile(`[^a-km-zA-HJ-NP-Z1-9]`)                                                    //Bitcoin address accepted characters
 	decimalRegExp                = regexp.MustCompile(`[^0-9.-]`)                                                                 //Decimals (positive and negative)
 	domainRegExp                 = regexp.MustCompile(`[^a-zA-Z0-9-.]`)                                                           //Domain accepted characters
 	emailRegExp                  = regexp.MustCompile(`[^a-zA-Z0-9-_.@+]`)                                                        //Email address characters
@@ -62,6 +63,12 @@ func AlphaNumeric(original string, spaces bool) string {
 
 	//No spaces
 	return string(alphaNumericRegExp.ReplaceAll([]byte(original), []byte("")))
+}
+
+//BitcoinAddress returns sanitized value for bitcoin address
+//  View examples: sanitize_test.go
+func BitcoinAddress(original string) string {
+	return string(bitcoinRegExp.ReplaceAll([]byte(original), []byte("")))
 }
 
 //Custom uses a custom regex string and returns the sanitized result. This is used for any additional regex that this package does not contain.
