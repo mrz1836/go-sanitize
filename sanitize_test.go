@@ -274,6 +274,35 @@ func TestBitcoinAddress(t *testing.T) {
 	}
 }
 
+//TestBitcoinCashAddr will test all permitations
+func TestBitcoinCashAddr(t *testing.T) {
+	var (
+		expectedOutput string
+		methodName     string
+		originalString string
+	)
+
+	//Test removing invalid characters
+	originalString = "$#:qze7yy2au5vuznvn8lzj5y0j5t066vhs75e3m0eptz!"
+	expectedOutput = "qze7yy2au5vuznvn8lzj5y0j5t066vhs75e3m0eptz"
+	methodName = "BitcoinCashAddr"
+
+	result := BitcoinCashAddr(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+
+	//No letters o, b, i, or number 1
+	originalString = "pqbq3728yw0y47sOqn6l2na30mcw6zm78idzq5ucqzc371"
+	expectedOutput = "pqq3728yw0y47sqn6l2na30mcw6zm78dzq5ucqzc37"
+	methodName = "BitcoinCashAddr"
+
+	result = BitcoinCashAddr(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
+}
+
 //BenchmarkBitcoinAddress benchmarks the BitcoinAddress method
 func BenchmarkBitcoinAddress(b *testing.B) {
 	testString := "1K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs"
