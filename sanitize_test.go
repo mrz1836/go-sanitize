@@ -288,7 +288,7 @@ func ExampleBitcoinAddress() {
 	// Output: 1K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs
 }
 
-//TestBitcoinCashAddress will test all permitations
+//TestBitcoinCashAddress will test all permitations of using BitcoinCashAddress()
 func TestBitcoinCashAddress(t *testing.T) {
 	var (
 		expectedOutput string
@@ -317,7 +317,7 @@ func TestBitcoinCashAddress(t *testing.T) {
 	}
 }
 
-//BenchmarkBitcoinCashAddress benchmarks the BitcoinCashAddress method
+//BenchmarkBitcoinCashAddress benchmarks the BitcoinCashAddress() method
 func BenchmarkBitcoinCashAddress(b *testing.B) {
 	testString := "qze7yy2au5vuznvn8lzj5y0j5t066vhs75e3m0eptz"
 	for i := 0; i < b.N; i++ {
@@ -325,7 +325,7 @@ func BenchmarkBitcoinCashAddress(b *testing.B) {
 	}
 }
 
-//ExampleBitcoinCashAddress example using BitcoinCashAddress()
+//ExampleBitcoinCashAddress example using BitcoinCashAddress() `cashaddr`
 func ExampleBitcoinCashAddress() {
 	fmt.Println(BitcoinAddress("qze7yy2au5vuznvn8lzj5y0j5t066vhs75e3m0eptz!"))
 	// Output: qze7yy2au5vuznvn8zj5yj5t66vhs75e3meptz
