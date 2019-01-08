@@ -23,7 +23,7 @@ var (
 	alphaRegExp                  = regexp.MustCompile(`[^a-zA-Z]`)                                                                //Alpha characters
 	alphaWithSpacesRegExp        = regexp.MustCompile(`[^a-zA-Z\s]`)                                                              //Alpha characters (with spaces)
 	bitcoinRegExp                = regexp.MustCompile(`[^a-km-zA-HJ-NP-Z1-9]`)                                                    //Bitcoin address accepted characters
-	bitcoinCashAddrRegExp        = regexp.MustCompile(`[^ac-hj-np-zAC-HJ-NP-Z02-9]`)                                              //Bitcoin cashaddr address accepted characters
+	bitcoinCashAddressRegExp     = regexp.MustCompile(`[^ac-hj-np-zAC-HJ-NP-Z02-9]`)                                              //Bitcoin `cashaddr` address accepted characters
 	decimalRegExp                = regexp.MustCompile(`[^0-9.-]`)                                                                 //Decimals (positive and negative)
 	domainRegExp                 = regexp.MustCompile(`[^a-zA-Z0-9-.]`)                                                           //Domain accepted characters
 	emailRegExp                  = regexp.MustCompile(`[^a-zA-Z0-9-_.@+]`)                                                        //Email address characters
@@ -72,10 +72,10 @@ func BitcoinAddress(original string) string {
 	return string(bitcoinRegExp.ReplaceAll([]byte(original), []byte("")))
 }
 
-//BitcoinCashAddr returns sanitized value for bitcoin cashaddr address
+//BitcoinCashAddress returns sanitized value for bitcoin `cashaddr` address
 //  View examples: sanitize_test.go
-func BitcoinCashAddr(original string) string {
-	return string(bitcoinCashAddrRegExp.ReplaceAll([]byte(original), []byte("")))
+func BitcoinCashAddress(original string) string {
+	return string(bitcoinCashAddressRegExp.ReplaceAll([]byte(original), []byte("")))
 }
 
 //Custom uses a custom regex string and returns the sanitized result. This is used for any additional regex that this package does not contain.
