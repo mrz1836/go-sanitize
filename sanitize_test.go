@@ -1311,6 +1311,15 @@ something else`
 	if result != expectedOutput {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
+	originalString = `	Mark
+Mc'Cuban-Host
+something else`
+	expectedOutput = " Mark Mc'Cuban-Host something else"
+
+	result = SingleLine(originalString)
+	if result != expectedOutput {
+		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	}
 }
 
 //BenchmarkSingleLine benchmarks the SingleLine method
