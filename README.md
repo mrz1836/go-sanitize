@@ -77,7 +77,7 @@ View the [contributing guidelines](https://github.com/mrz1836/go-sanitize/blob/m
 
 Support the development of this project 🙏
 
-[![Donate](https://img.shields.io/badge/donate-bitcoin%20cash-brightgreen.svg)](https://mrz1818.com/?tab=tips&af=go-sanitize)
+[![Donate](https://img.shields.io/badge/donate-bitcoin-brightgreen.svg)](https://mrz1818.com/?tab=tips&af=go-sanitize)
 
 ## License
 
