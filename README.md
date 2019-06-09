@@ -28,7 +28,7 @@ $ go get -u github.com/mrz1836/go-sanitize
 You can view the generated [documentation here](https://godoc.org/github.com/mrz1836/go-sanitize).
 
 ## Examples & Tests
-All unit tests and [examples](https://github.com/mrz1836/go-sanitize/blob/master/sanitize_test.go) run via [Travis CI](https://travis-ci.com/mrz1836/go-sanitize) and uses [Go version 1.11.x](https://golang.org/doc/go1.11). View the [deployment configuration file](https://github.com/mrz1836/go-sanitize/blob/master/.travis.yml).
+All unit tests and [examples](https://github.com/mrz1836/go-sanitize/blob/master/sanitize_test.go) run via [Travis CI](https://travis-ci.com/mrz1836/go-sanitize) and uses [Go version 1.12.x](https://golang.org/doc/go1.12). View the [deployment configuration file](https://github.com/mrz1836/go-sanitize/blob/master/.travis.yml).
 ```bash
 $ cd ../go-sanitize
 $ go test ./... -v
