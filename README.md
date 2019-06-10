@@ -1,5 +1,5 @@
 # go-sanitize
-**go-sanitize** implements a simple library of sanitation methods for data sanitation and reduction. This package was inspired by processing and protecting incoming user generated content while ensuring the data will be in the correct format. This project follows Go best practices and you can view the standards and specifications at the [end of this readme](https://github.com/mrz1836/go-sanitize#adheres-to-effective-go-standards).
+**go-sanitize** implements a simple library of sanitation methods for data sanitation and reduction.
 
 | | | | | | | |
 |-|-|-|-|-|-|-|
@@ -7,15 +7,15 @@
 
 
 ## Table of Contents
-- [Installation](https://github.com/mrz1836/go-sanitize#installation)
-- [Documentation](https://github.com/mrz1836/go-sanitize#documentation)
-- [Examples & Tests](https://github.com/mrz1836/go-sanitize#examples--tests)
-- [Benchmarks](https://github.com/mrz1836/go-sanitize#benchmarks)
-- [Code Standards](https://github.com/mrz1836/go-sanitize#code-standards)
-- [Usage](https://github.com/mrz1836/go-sanitize#usage)
-- [Maintainers](https://github.com/mrz1836/go-sanitize#maintainers)
-- [Contributing](https://github.com/mrz1836/go-sanitize#contributing)
-- [License](https://github.com/mrz1836/go-sanitize#license)
+- [Installation](#installation)
+- [Documentation](#documentation)
+- [Examples & Tests](#examples--tests)
+- [Benchmarks](#benchmarks)
+- [Code Standards](#code-standards)
+- [Usage](#usage)
+- [Maintainers](#maintainers)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## Installation
 
@@ -28,26 +28,26 @@ $ go get -u github.com/mrz1836/go-sanitize
 You can view the generated [documentation here](https://godoc.org/github.com/mrz1836/go-sanitize).
 
 ## Examples & Tests
-All unit tests and [examples](https://github.com/mrz1836/go-sanitize/blob/master/sanitize_test.go) run via [Travis CI](https://travis-ci.com/mrz1836/go-sanitize) and uses [Go version 1.12.x](https://golang.org/doc/go1.12). View the [deployment configuration file](https://github.com/mrz1836/go-sanitize/blob/master/.travis.yml).
+All unit tests and [examples](sanitize_test.go) run via [Travis CI](https://travis-ci.com/mrz1836/go-sanitize) and uses [Go version 1.12.x](https://golang.org/doc/go1.12). View the [deployment configuration file](.travis.yml).
 ```bash
 $ cd ../go-sanitize
 $ go test ./... -v
 ```
 
 ## Benchmarks
-Run the Go [benchmarks](https://github.com/mrz1836/go-sanitize/blob/master/sanitize_test.go):
+Run the Go [benchmarks](sanitize_test.go):
 ```bash
 $ cd ../go-sanitize
 $ go test -bench . -benchmem
 ```
 
 ## Code Standards
-Read more about this Go project's [code standards](https://github.com/mrz1836/go-sanitize/blob/master/CODE_STANDARDS.md).
+Read more about this Go project's [code standards](CODE_STANDARDS.md).
 
 ## Usage
-- View the [examples](https://github.com/mrz1836/go-sanitize/blob/master/sanitize_test.go)
-- View the [benchmarks](https://github.com/mrz1836/go-sanitize/blob/master/sanitize_test.go)
-- View the [tests](https://github.com/mrz1836/go-sanitize/blob/master/sanitize_test.go)
+- View the [examples](sanitize_test.go)
+- View the [benchmarks](sanitize_test.go)
+- View the [tests](sanitize_test.go)
 
 Basic implementation:
 ```golang
@@ -73,7 +73,7 @@ func main() {
 
 ## Contributing
 
-View the [contributing guidelines](https://github.com/mrz1836/go-sanitize/blob/master/CONTRIBUTING.md) and follow the [code of conduct](https://github.com/mrz1836/go-sanitize/blob/master/CODE_OF_CONDUCT.md).
+View the [contributing guidelines](CONTRIBUTING.md) and follow the [code of conduct](CODE_OF_CONDUCT.md).
 
 Support the development of this project 🙏
 
