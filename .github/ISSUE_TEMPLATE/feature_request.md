@@ -1,6 +1,8 @@
 ---
 name: Feature request
 about: Suggest an idea for this project
+labels: idea
+assignees: mrz1836
 
 ---
 

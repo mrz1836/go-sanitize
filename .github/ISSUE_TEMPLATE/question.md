@@ -1,6 +1,8 @@
 ---
 name: Question
 about: 'General template for a question '
+labels: question
+assignees: mrz1836
 
 ---
 
