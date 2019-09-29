@@ -6,11 +6,11 @@ language: go
 
 # Version
 go:
- - 1.12.x
+ - 1.13.x
 
 # Environment variables
-env:
- - GO111MODULE=on
+#env:
+# - GO111MODULE=on
 
 # Only clone the most recent commit
 git:
