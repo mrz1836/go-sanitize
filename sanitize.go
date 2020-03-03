@@ -14,28 +14,28 @@ import (
 	"unicode"
 )
 
-//Set all the regular expressions
+// Set all the regular expressions
 var (
-	alphaNumericRegExp           = regexp.MustCompile(`[^a-zA-Z0-9]`)                                                             //Alpha numeric
-	alphaNumericWithSpacesRegExp = regexp.MustCompile(`[^a-zA-Z0-9\s]`)                                                           //Alpha numeric (with spaces)
-	alphaRegExp                  = regexp.MustCompile(`[^a-zA-Z]`)                                                                //Alpha characters
-	alphaWithSpacesRegExp        = regexp.MustCompile(`[^a-zA-Z\s]`)                                                              //Alpha characters (with spaces)
-	bitcoinRegExp                = regexp.MustCompile(`[^a-km-zA-HJ-NP-Z1-9]`)                                                    //Bitcoin address accepted characters
-	bitcoinCashAddrRegExp        = regexp.MustCompile(`[^ac-hj-np-zAC-HJ-NP-Z02-9]`)                                              //Bitcoin `cashaddr` address accepted characters
-	decimalRegExp                = regexp.MustCompile(`[^0-9.-]`)                                                                 //Decimals (positive and negative)
-	domainRegExp                 = regexp.MustCompile(`[^a-zA-Z0-9-.]`)                                                           //Domain accepted characters
-	emailRegExp                  = regexp.MustCompile(`[^a-zA-Z0-9-_.@+]`)                                                        //Email address characters
-	formalNameRegExp             = regexp.MustCompile(`[^a-zA-Z0-9-',.\s]`)                                                       //Characters recognized in surnames and proper names
-	htmlRegExp                   = regexp.MustCompile(`(?i)<[^>]*>`)                                                              //HTML/XML tags or any alligator open/close tags
-	ipAddressRegExp              = regexp.MustCompile(`[^a-zA-Z0-9:.]`)                                                           //IPV4 and IPV6 characters only
-	numericRegExp                = regexp.MustCompile(`[^0-9]`)                                                                   //Numbers only
-	pathNameRegExp               = regexp.MustCompile(`[^a-zA-Z0-9-_]`)                                                           //Path name (file name, seo)
-	punctuationRegExp            = regexp.MustCompile(`[^a-zA-Z0-9-'"#&!?,.\s]+`)                                                 //Standard accepted punctuation characters
-	scriptRegExp                 = regexp.MustCompile(`(?i)<(script|iframe|embed|object)[^>]*>.*</(script|iframe|embed|object)>`) //Scripts and embeds
-	singleLineRegExp             = regexp.MustCompile(`(\r)|(\n)|(\t)|(\v)|(\f)`)                                                 //Carriage returns, line feeds, tabs, for single line transition
-	timeRegExp                   = regexp.MustCompile(`[^0-9:]`)                                                                  //Time allowed characters
-	uriRegExp                    = regexp.MustCompile(`[^a-zA-Z0-9-_/?&=#%]`)                                                     //URI allowed characters
-	urlRegExp                    = regexp.MustCompile(`[^a-zA-Z0-9-_/:.?&=#%]`)                                                   //URL allowed characters
+	alphaNumericRegExp           = regexp.MustCompile(`[^a-zA-Z0-9]`)                                                             // Alpha numeric
+	alphaNumericWithSpacesRegExp = regexp.MustCompile(`[^a-zA-Z0-9\s]`)                                                           // Alpha numeric (with spaces)
+	alphaRegExp                  = regexp.MustCompile(`[^a-zA-Z]`)                                                                // Alpha characters
+	alphaWithSpacesRegExp        = regexp.MustCompile(`[^a-zA-Z\s]`)                                                              // Alpha characters (with spaces)
+	bitcoinRegExp                = regexp.MustCompile(`[^a-km-zA-HJ-NP-Z1-9]`)                                                    // Bitcoin address accepted characters
+	bitcoinCashAddrRegExp        = regexp.MustCompile(`[^ac-hj-np-zAC-HJ-NP-Z02-9]`)                                              // Bitcoin `cashaddr` address accepted characters
+	decimalRegExp                = regexp.MustCompile(`[^0-9.-]`)                                                                 // Decimals (positive and negative)
+	domainRegExp                 = regexp.MustCompile(`[^a-zA-Z0-9-.]`)                                                           // Domain accepted characters
+	emailRegExp                  = regexp.MustCompile(`[^a-zA-Z0-9-_.@+]`)                                                        // Email address characters
+	formalNameRegExp             = regexp.MustCompile(`[^a-zA-Z0-9-',.\s]`)                                                       // Characters recognized in surnames and proper names
+	htmlRegExp                   = regexp.MustCompile(`(?i)<[^>]*>`)                                                              // HTML/XML tags or any alligator open/close tags
+	ipAddressRegExp              = regexp.MustCompile(`[^a-zA-Z0-9:.]`)                                                           // IPV4 and IPV6 characters only
+	numericRegExp                = regexp.MustCompile(`[^0-9]`)                                                                   // Numbers only
+	pathNameRegExp               = regexp.MustCompile(`[^a-zA-Z0-9-_]`)                                                           // Path name (file name, seo)
+	punctuationRegExp            = regexp.MustCompile(`[^a-zA-Z0-9-'"#&!?,.\s]+`)                                                 // Standard accepted punctuation characters
+	scriptRegExp                 = regexp.MustCompile(`(?i)<(script|iframe|embed|object)[^>]*>.*</(script|iframe|embed|object)>`) // Scripts and embeds
+	singleLineRegExp             = regexp.MustCompile(`(\r)|(\n)|(\t)|(\v)|(\f)`)                                                 // Carriage returns, line feeds, tabs, for single line transition
+	timeRegExp                   = regexp.MustCompile(`[^0-9:]`)                                                                  // Time allowed characters
+	uriRegExp                    = regexp.MustCompile(`[^a-zA-Z0-9-_/?&=#%]`)                                                     // URI allowed characters
+	urlRegExp                    = regexp.MustCompile(`[^a-zA-Z0-9-_/:.?&=#%]`)                                                   // URL allowed characters
 )
 
 // emptySpace is an empty space for replacing

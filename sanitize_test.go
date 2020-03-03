@@ -14,7 +14,7 @@ func TestAlpha(t *testing.T) {
 		originalString string
 	)
 
-	//Test removing spaces and punctuation - preserve the case of the letters
+	// Test removing spaces and punctuation - preserve the case of the letters
 	originalString = "Test This String-!123"
 	expectedOutput = "TestThisString"
 	methodName = "Alpha"
@@ -24,7 +24,7 @@ func TestAlpha(t *testing.T) {
 		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Test removing various symbols
+	// Test removing various symbols
 	originalString = `~!@#$%^&*()-_Symbols=+[{]};:'"<>,./?`
 	expectedOutput = "Symbols"
 
@@ -33,7 +33,7 @@ func TestAlpha(t *testing.T) {
 		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Test removing all carriage returns
+	// Test removing all carriage returns
 	originalString = "\nThis\nThat"
 	expectedOutput = "ThisThat"
 
@@ -42,7 +42,7 @@ func TestAlpha(t *testing.T) {
 		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Test removing fancy quotes and microsoft symbols
+	// Test removing fancy quotes and microsoft symbols
 	originalString = "“This is a quote with tick`s … ” ☺ "
 	expectedOutput = "Thisisaquotewithticks"
 
@@ -52,10 +52,10 @@ func TestAlpha(t *testing.T) {
 	}
 
 	//
-	//==================================================================================================================
+	// ==================================================================================================================
 	//
 
-	//Test removing spaces and punctuation - preserve the case of the letters
+	// Test removing spaces and punctuation - preserve the case of the letters
 	originalString = "Test This String-!123"
 	expectedOutput = "Test This String"
 
@@ -64,7 +64,7 @@ func TestAlpha(t *testing.T) {
 		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Test removing various symbols
+	// Test removing various symbols
 	originalString = `~!@#$%^&*()-_Symbols=+[{]};:'"<>,./?`
 	expectedOutput = "Symbols"
 
@@ -73,7 +73,7 @@ func TestAlpha(t *testing.T) {
 		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Test removing all carriage returns
+	// Test removing all carriage returns
 	originalString = "\nThis\nThat"
 	expectedOutput = `
 This
@@ -84,7 +84,7 @@ That`
 		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Test removing fancy quotes and microsoft symbols
+	// Test removing fancy quotes and microsoft symbols
 	originalString = "“This is a quote with tick`s … ” ☺ "
 	expectedOutput = "This is a quote with ticks    "
 
@@ -130,7 +130,7 @@ func TestAlphaNumeric(t *testing.T) {
 		originalString string
 	)
 
-	//Test the base string with mixed characters
+	// Test the base string with mixed characters
 	originalString = "Test This String-!123"
 	expectedOutput = "TestThisString123"
 	methodName = "AlphaNumeric"
@@ -140,7 +140,7 @@ func TestAlphaNumeric(t *testing.T) {
 		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Test removing various symbols
+	// Test removing various symbols
 	originalString = `~!@#$%^&*()-_Symbols=+[{]};:'"<>,./?`
 	expectedOutput = "Symbols"
 
@@ -149,7 +149,7 @@ func TestAlphaNumeric(t *testing.T) {
 		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Test removing all carriage returns
+	// Test removing all carriage returns
 	originalString = "\nThis1\nThat2"
 	expectedOutput = "This1That2"
 
@@ -158,7 +158,7 @@ func TestAlphaNumeric(t *testing.T) {
 		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Test removing fancy quotes and microsoft symbols
+	// Test removing fancy quotes and microsoft symbols
 	originalString = "“This is a quote with tick`s … ” ☺ 342"
 	expectedOutput = "Thisisaquotewithticks342"
 
@@ -168,10 +168,10 @@ func TestAlphaNumeric(t *testing.T) {
 	}
 
 	//
-	//==================================================================================================================
+	// ==================================================================================================================
 	//
 
-	//Test removing spaces and punctuation - preserve the case of the letters
+	// Test removing spaces and punctuation - preserve the case of the letters
 	originalString = "Test This String-! 123"
 	expectedOutput = "Test This String 123"
 
@@ -180,7 +180,7 @@ func TestAlphaNumeric(t *testing.T) {
 		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Test removing various symbols
+	// Test removing various symbols
 	originalString = `~!@#$%^&*()-_Symbols 123=+[{]};:'"<>,./?`
 	expectedOutput = "Symbols 123"
 
@@ -189,7 +189,7 @@ func TestAlphaNumeric(t *testing.T) {
 		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Test removing all carriage returns
+	// Test removing all carriage returns
 	originalString = "\nThis1\nThat2"
 	expectedOutput = `
 This1
@@ -200,7 +200,7 @@ That2`
 		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Test removing fancy quotes and microsoft symbols
+	// Test removing fancy quotes and microsoft symbols
 	originalString = "“This is a quote with tick`s…”☺ 123"
 	expectedOutput = "This is a quote with ticks 123"
 
@@ -246,7 +246,7 @@ func TestBitcoinAddress(t *testing.T) {
 		originalString string
 	)
 
-	//Test removing invalid characters
+	// Test removing invalid characters
 	originalString = "$#:1K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs!"
 	expectedOutput = "1K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs"
 	methodName = "BitcoinAddress"
@@ -256,7 +256,7 @@ func TestBitcoinAddress(t *testing.T) {
 		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//No uppercase letter O, uppercase letter I, lowercase letter l, and the number 0
+	// No uppercase letter O, uppercase letter I, lowercase letter l, and the number 0
 	originalString = "OIl01K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs!"
 	expectedOutput = "1K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs"
 	methodName = "BitcoinAddress"
@@ -289,7 +289,7 @@ func TestBitcoinCashAddress(t *testing.T) {
 		originalString string
 	)
 
-	//Test removing invalid characters
+	// Test removing invalid characters
 	originalString = "$#:qze7yy2au5vuznvn8lzj5y0j5t066vhs75e3m0eptz!"
 	expectedOutput = "qze7yy2au5vuznvn8lzj5y0j5t066vhs75e3m0eptz"
 	methodName = "BitcoinCashAddr"
@@ -299,7 +299,7 @@ func TestBitcoinCashAddress(t *testing.T) {
 		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//No letters o, b, i, or number 1
+	// No letters o, b, i, or number 1
 	originalString = "pqbq3728yw0y47sOqn6l2na30mcw6zm78idzq5ucqzc371"
 	expectedOutput = "pqq3728yw0y47sqn6l2na30mcw6zm78dzq5ucqzc37"
 	methodName = "BitcoinCashAddr"
@@ -333,7 +333,7 @@ func TestCustom(t *testing.T) {
 		regString      string
 	)
 
-	//Test custom Alpha Numeric
+	// Test custom Alpha Numeric
 	originalString = "ThisWorks123!"
 	expectedOutput = "ThisWorks123"
 	methodName = "Custom"
@@ -344,7 +344,7 @@ func TestCustom(t *testing.T) {
 		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Test custom Decimal
+	// Test custom Decimal
 	originalString = "ThisWorks1.23!"
 	expectedOutput = "1.23"
 	regString = `[^0-9.-]`
@@ -354,7 +354,7 @@ func TestCustom(t *testing.T) {
 		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Test invalid regString
+	// Test invalid regString
 	//
 	// will panic()
 	//
@@ -389,7 +389,7 @@ func TestDecimal(t *testing.T) {
 		originalString string
 	)
 
-	//Combined with letters
+	// Combined with letters
 	originalString = "String1.23"
 	expectedOutput = "1.23"
 	methodName = "Decimal"
@@ -399,7 +399,7 @@ func TestDecimal(t *testing.T) {
 		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Remove all symbols, spaces, words
+	// Remove all symbols, spaces, words
 	originalString = "  $-1.034234  Price"
 	expectedOutput = "-1.034234"
 
@@ -408,7 +408,7 @@ func TestDecimal(t *testing.T) {
 		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//More additional symbols, line returns
+	// More additional symbols, line returns
 	originalString = "/n<<  $-1.034234  >>/n"
 	expectedOutput = "-1.034234"
 
@@ -446,7 +446,7 @@ func TestDomain(t *testing.T) {
 		originalString string
 	)
 
-	//Start with an invalid domain name
+	// Start with an invalid domain name
 	originalString = "http://www.I am a domain.com"
 	expectedOutput = "Iamadomain.com"
 	methodName = "Domain"
@@ -456,7 +456,7 @@ func TestDomain(t *testing.T) {
 		t.Fatal(methodName, "method should have failed here. Expected:", expectedOutput, "original string:", originalString, "returned: ", result, err)
 	}
 
-	//Another invalid domain name
+	// Another invalid domain name
 	originalString = "!I_am a domain.com"
 	expectedOutput = ""
 
@@ -465,7 +465,7 @@ func TestDomain(t *testing.T) {
 		t.Fatal(methodName, "method did not function properly. Expected:", expectedOutput, "original string:", originalString, "returned: ", result, err)
 	}
 
-	//Another invalid domain name
+	// Another invalid domain name
 	originalString = ""
 	expectedOutput = ""
 
@@ -476,7 +476,7 @@ func TestDomain(t *testing.T) {
 		t.Fatal(methodName, "method did not function properly. Expected:", expectedOutput, "original string:", originalString, "returned: ", result, err)
 	}
 
-	//A valid url (preserve the case)
+	// A valid url (preserve the case)
 	originalString = "http://IAmDomain.com"
 	expectedOutput = "IAmDomain.com"
 
@@ -485,7 +485,7 @@ func TestDomain(t *testing.T) {
 		t.Fatal(methodName, "method did not function properly. Expected:", expectedOutput, "original string:", originalString, "returned: ", result, err)
 	}
 
-	//A valid url - lowercase
+	// A valid url - lowercase
 	originalString = "http://IAmDomain.com"
 	expectedOutput = "iamdomain.com"
 
@@ -494,7 +494,7 @@ func TestDomain(t *testing.T) {
 		t.Fatal(methodName, "method did not function properly. Expected:", expectedOutput, "original string:", originalString, "returned: ", result, err)
 	}
 
-	//A valid url - lowercase
+	// A valid url - lowercase
 	originalString = "https://IAmDomain.com/?this=that#plusThis"
 	expectedOutput = "iamdomain.com"
 
@@ -503,7 +503,7 @@ func TestDomain(t *testing.T) {
 		t.Fatal(methodName, "method did not function properly. Expected:", expectedOutput, "original string:", originalString, "returned: ", result, err)
 	}
 
-	//A valid url - lowercase
+	// A valid url - lowercase
 	originalString = "http://www.IAmDomain.com/?this=that#plusThis"
 	expectedOutput = "iamdomain.com"
 
@@ -512,7 +512,7 @@ func TestDomain(t *testing.T) {
 		t.Fatal(methodName, "method did not function properly. Expected:", expectedOutput, "original string:", originalString, "returned: ", result, err)
 	}
 
-	//A valid url - lowercase, remove WWW
+	// A valid url - lowercase, remove WWW
 	originalString = "IAmDomain.com/?this=that#plusThis"
 	expectedOutput = "iamdomain.com"
 
@@ -521,7 +521,7 @@ func TestDomain(t *testing.T) {
 		t.Fatal(methodName, "method did not function properly. Expected:", expectedOutput, "original string:", originalString, "returned: ", result, err)
 	}
 
-	//A valid url - lowercase, leave WWW
+	// A valid url - lowercase, leave WWW
 	originalString = "www.IAmDomain.com/?this=that#plusThis"
 	expectedOutput = "www.iamdomain.com"
 
@@ -582,7 +582,7 @@ func TestEmail(t *testing.T) {
 		originalString string
 	)
 
-	//Test removing the mailto: and lower case
+	// Test removing the mailto: and lower case
 	methodName = "Email"
 	originalString = "mailto:testME@GmAil.com"
 	expectedOutput = "testme@gmail.com"
@@ -592,7 +592,7 @@ func TestEmail(t *testing.T) {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Lowercase
+	// Lowercase
 	originalString = "test_ME@GmAil.com"
 	expectedOutput = "test_me@gmail.com"
 
@@ -601,7 +601,7 @@ func TestEmail(t *testing.T) {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Supports valid email, lowercase
+	// Supports valid email, lowercase
 	originalString = "test-ME@GmAil.com"
 	expectedOutput = "test-me@gmail.com"
 
@@ -610,7 +610,7 @@ func TestEmail(t *testing.T) {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Valid email, lowercase
+	// Valid email, lowercase
 	originalString = "test.ME@GmAil.com"
 	expectedOutput = "test.me@gmail.com"
 
@@ -619,7 +619,7 @@ func TestEmail(t *testing.T) {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Remove all spaces
+	// Remove all spaces
 	originalString = " test_ME @GmAil.com "
 	expectedOutput = "test_me@gmail.com"
 
@@ -628,7 +628,7 @@ func TestEmail(t *testing.T) {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Remove all invalid characters
+	// Remove all invalid characters
 	originalString = " <<test_ME @GmAil.com!>> "
 	expectedOutput = "test_me@gmail.com"
 
@@ -637,7 +637,7 @@ func TestEmail(t *testing.T) {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Allowed plus signs
+	// Allowed plus signs
 	originalString = " test_ME+2@GmAil.com "
 	expectedOutput = "test_me+2@gmail.com"
 
@@ -646,7 +646,7 @@ func TestEmail(t *testing.T) {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Allowed plus signs (preserve case)
+	// Allowed plus signs (preserve case)
 	originalString = " test_ME+2@GmAil.com "
 	expectedOutput = "test_ME+2@GmAil.com"
 
@@ -692,7 +692,7 @@ func TestFirstToUpper(t *testing.T) {
 		originalString string
 	)
 
-	//Test turning to uppercase
+	// Test turning to uppercase
 	originalString = "thisworks"
 	expectedOutput = "Thisworks"
 	methodName = "FirstToUpper"
@@ -702,7 +702,7 @@ func TestFirstToUpper(t *testing.T) {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Test keeping it uppercase
+	// Test keeping it uppercase
 	originalString = "Thisworks"
 	expectedOutput = "Thisworks"
 
@@ -711,7 +711,7 @@ func TestFirstToUpper(t *testing.T) {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Convert first letter to uppercase
+	// Convert first letter to uppercase
 	originalString = "this"
 	expectedOutput = "This"
 
@@ -720,7 +720,7 @@ func TestFirstToUpper(t *testing.T) {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Single letter test
+	// Single letter test
 	originalString = "t"
 	expectedOutput = "T"
 
@@ -729,7 +729,7 @@ func TestFirstToUpper(t *testing.T) {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Two letter test
+	// Two letter test
 	originalString = "tt"
 	expectedOutput = "Tt"
 
@@ -761,7 +761,7 @@ func TestFormalName(t *testing.T) {
 		originalString string
 	)
 
-	//Test a valid name
+	// Test a valid name
 	originalString = "Mark Mc'Cuban-Host"
 	expectedOutput = "Mark Mc'Cuban-Host"
 	methodName = "FormalName"
@@ -771,7 +771,7 @@ func TestFormalName(t *testing.T) {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Test a valid name
+	// Test a valid name
 	originalString = "Mark Mc'Cuban-Host the SR."
 	expectedOutput = "Mark Mc'Cuban-Host the SR."
 
@@ -780,7 +780,7 @@ func TestFormalName(t *testing.T) {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Test a valid name
+	// Test a valid name
 	originalString = "Mark Mc'Cuban-Host the Second."
 	expectedOutput = "Mark Mc'Cuban-Host the Second."
 
@@ -789,7 +789,7 @@ func TestFormalName(t *testing.T) {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Test another valid name
+	// Test another valid name
 	originalString = "Johnny Apple.Seed, Martin"
 	expectedOutput = "Johnny Apple.Seed, Martin"
 
@@ -798,7 +798,7 @@ func TestFormalName(t *testing.T) {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Test invalid characters
+	// Test invalid characters
 	originalString = "Does #Not Work!"
 	expectedOutput = "Does Not Work"
 
@@ -830,7 +830,7 @@ func TestHTML(t *testing.T) {
 		originalString string
 	)
 
-	//Test basic HTML removal
+	// Test basic HTML removal
 	methodName = "HTML"
 	originalString = "<b>This works?</b>"
 	expectedOutput = "This works?"
@@ -840,7 +840,7 @@ func TestHTML(t *testing.T) {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Advanced HTML removal
+	// Advanced HTML removal
 	originalString = "<html><b>This works?</b><i></i></br></html>"
 	expectedOutput = "This works?"
 
@@ -872,7 +872,7 @@ func TestIPAddress(t *testing.T) {
 		originalString string
 	)
 
-	//Basic IPV4 check
+	// Basic IPV4 check
 	originalString = "192.168.3.6"
 	expectedOutput = "192.168.3.6"
 	methodName = "IPAddress"
@@ -882,7 +882,7 @@ func TestIPAddress(t *testing.T) {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Basic IPV4 check (gateway mask)
+	// Basic IPV4 check (gateway mask)
 	originalString = "255.255.255.255"
 	expectedOutput = "255.255.255.255"
 
@@ -891,7 +891,7 @@ func TestIPAddress(t *testing.T) {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Invalid IPV4 out of range
+	// Invalid IPV4 out of range
 	originalString = "304.255.255.255"
 	expectedOutput = ""
 
@@ -900,7 +900,7 @@ func TestIPAddress(t *testing.T) {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Invalid ip address
+	// Invalid ip address
 	originalString = "fail"
 	expectedOutput = ""
 
@@ -909,7 +909,7 @@ func TestIPAddress(t *testing.T) {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Invalid ip address
+	// Invalid ip address
 	originalString = "192-123-122-123"
 	expectedOutput = ""
 
@@ -918,7 +918,7 @@ func TestIPAddress(t *testing.T) {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Valid IPV6
+	// Valid IPV6
 	originalString = "2602:305:bceb:1bd0:44ef:fedb:4f8f:da4f"
 	expectedOutput = "2602:305:bceb:1bd0:44ef:fedb:4f8f:da4f"
 
@@ -927,7 +927,7 @@ func TestIPAddress(t *testing.T) {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Valid formatted IPV6
+	// Valid formatted IPV6
 	originalString = "2602:305:bceb:1bd0:44ef:2:2:2"
 	expectedOutput = "2602:305:bceb:1bd0:44ef:2:2:2"
 
@@ -936,7 +936,7 @@ func TestIPAddress(t *testing.T) {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Valid formatted IPV6
+	// Valid formatted IPV6
 	originalString = "2:2:2:2:2:2:2:2"
 	expectedOutput = "2:2:2:2:2:2:2:2"
 
@@ -945,7 +945,7 @@ func TestIPAddress(t *testing.T) {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Invalid IPv4
+	// Invalid IPv4
 	originalString = "192.2"
 	expectedOutput = ""
 
@@ -954,7 +954,7 @@ func TestIPAddress(t *testing.T) {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Invalid IPV4 - bad character and too short
+	// Invalid IPV4 - bad character and too short
 	originalString = "192.2! "
 	expectedOutput = ""
 
@@ -963,7 +963,7 @@ func TestIPAddress(t *testing.T) {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Invalid string characters
+	// Invalid string characters
 	originalString = "IP: 192.168.0.1 "
 	expectedOutput = ""
 
@@ -972,7 +972,7 @@ func TestIPAddress(t *testing.T) {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Remove space characters
+	// Remove space characters
 	originalString = " 192.168.0.1 "
 	expectedOutput = "192.168.0.1"
 
@@ -981,7 +981,7 @@ func TestIPAddress(t *testing.T) {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Remove special characters
+	// Remove special characters
 	originalString = "  ##!192.168.0.1!##  "
 	expectedOutput = "192.168.0.1"
 
@@ -1027,7 +1027,7 @@ func TestNumeric(t *testing.T) {
 		originalString string
 	)
 
-	//Remove everything and leave just numbers
+	// Remove everything and leave just numbers
 	originalString = "Test This String-!1234"
 	expectedOutput = "1234"
 	methodName = "Numeric"
@@ -1037,7 +1037,7 @@ func TestNumeric(t *testing.T) {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Remove everything and leave just numbers
+	// Remove everything and leave just numbers
 	originalString = " $1.00 Price!"
 	expectedOutput = "100"
 
@@ -1069,7 +1069,7 @@ func TestPathName(t *testing.T) {
 		originalString string
 	)
 
-	//Invalid path name
+	// Invalid path name
 	originalString = "My BadPath (10)"
 	expectedOutput = "MyBadPath10"
 	methodName = "PathName"
@@ -1079,7 +1079,7 @@ func TestPathName(t *testing.T) {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Invalid characters
+	// Invalid characters
 	originalString = "My BadPath (10)[]()!$"
 	expectedOutput = "MyBadPath10"
 
@@ -1088,7 +1088,7 @@ func TestPathName(t *testing.T) {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Valid Path
+	// Valid Path
 	originalString = "My_Folder-Path-123_TEST"
 	expectedOutput = "My_Folder-Path-123_TEST"
 
@@ -1120,7 +1120,7 @@ func TestPunctuation(t *testing.T) {
 		originalString string
 	)
 
-	//Keep standard punctuation
+	// Keep standard punctuation
 	originalString = "Mark Mc'Cuban-Host"
 	expectedOutput = "Mark Mc'Cuban-Host"
 	methodName = "Punctuation"
@@ -1130,7 +1130,7 @@ func TestPunctuation(t *testing.T) {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Keep periods and commas
+	// Keep periods and commas
 	originalString = "Johnny Apple.Seed, Martin"
 	expectedOutput = "Johnny Apple.Seed, Martin"
 
@@ -1139,7 +1139,7 @@ func TestPunctuation(t *testing.T) {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Keep hashes and exclamation
+	// Keep hashes and exclamation
 	originalString = "Does #Not Work!"
 	expectedOutput = "Does #Not Work!"
 
@@ -1148,7 +1148,7 @@ func TestPunctuation(t *testing.T) {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Keep question marks
+	// Keep question marks
 	originalString = "Does #Not Work!?"
 	expectedOutput = "Does #Not Work!?"
 
@@ -1157,7 +1157,7 @@ func TestPunctuation(t *testing.T) {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Keep ampersands
+	// Keep ampersands
 	originalString = "Does #Not Work! & this"
 	expectedOutput = "Does #Not Work! & this"
 
@@ -1166,7 +1166,7 @@ func TestPunctuation(t *testing.T) {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Keep quotes
+	// Keep quotes
 	originalString = `[@"Does" 'this' work?@]this`
 	expectedOutput = `"Does" 'this' work?this`
 
@@ -1175,7 +1175,7 @@ func TestPunctuation(t *testing.T) {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Remove invalid characters
+	// Remove invalid characters
 	originalString = "Does, 123^* Not & Work!?"
 	expectedOutput = "Does, 123 Not & Work!?"
 
@@ -1207,7 +1207,7 @@ func TestScripts(t *testing.T) {
 		originalString string
 	)
 
-	//Test removing a script
+	// Test removing a script
 	originalString = "this <script>$('#something').hide()</script>"
 	expectedOutput = "this "
 	methodName = "Scripts"
@@ -1217,7 +1217,7 @@ func TestScripts(t *testing.T) {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Remove JS script
+	// Remove JS script
 	originalString = "this <script type='text/javascript'>$('#something').hide()</script>"
 	expectedOutput = "this "
 
@@ -1226,7 +1226,7 @@ func TestScripts(t *testing.T) {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Remove JS script
+	// Remove JS script
 	originalString = `this <script type="text/javascript" class="something">$('#something').hide();</script>`
 	expectedOutput = "this "
 
@@ -1235,7 +1235,7 @@ func TestScripts(t *testing.T) {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Remove iframe
+	// Remove iframe
 	originalString = `this <iframe width="50" class="something"></iframe>`
 	expectedOutput = "this "
 
@@ -1244,7 +1244,7 @@ func TestScripts(t *testing.T) {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Remove embed tag
+	// Remove embed tag
 	originalString = `this <embed width="50" class="something"></embed>`
 	expectedOutput = "this "
 
@@ -1253,7 +1253,7 @@ func TestScripts(t *testing.T) {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Remove object
+	// Remove object
 	originalString = `this <object width="50" class="something"></object>`
 	expectedOutput = "this "
 
@@ -1341,7 +1341,7 @@ func TestTime(t *testing.T) {
 		originalString string
 	)
 
-	//Just the timestamp, no timezone
+	// Just the timestamp, no timezone
 	originalString = "t00:00d -EST"
 	expectedOutput = "00:00"
 	methodName = "Time"
@@ -1351,7 +1351,7 @@ func TestTime(t *testing.T) {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Just the timestamp, no other characters
+	// Just the timestamp, no other characters
 	originalString = "t00:00:00d -EST"
 	expectedOutput = "00:00:00"
 
@@ -1360,7 +1360,7 @@ func TestTime(t *testing.T) {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Just the timestamp, remove everything else
+	// Just the timestamp, remove everything else
 	originalString = "SOMETHING t00:00:00d -EST DAY"
 	expectedOutput = "00:00:00"
 
@@ -1392,7 +1392,7 @@ func TestURI(t *testing.T) {
 		originalString string
 	)
 
-	//Test remove spaces
+	// Test remove spaces
 	originalString = "Test?=weee! &this=that"
 	expectedOutput = "Test?=weee&this=that"
 	methodName = "URI"
@@ -1402,7 +1402,7 @@ func TestURI(t *testing.T) {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Test removing invalid symbols
+	// Test removing invalid symbols
 	originalString = "Test?=weee! &this=/that/!()*^"
 	expectedOutput = "Test?=weee&this=/that/"
 
@@ -1411,7 +1411,7 @@ func TestURI(t *testing.T) {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Test valid url
+	// Test valid url
 	originalString = "/This/Works/?woot=123&this#page10%"
 	expectedOutput = "/This/Works/?woot=123&this#page10%"
 
@@ -1443,7 +1443,7 @@ func TestURL(t *testing.T) {
 		originalString string
 	)
 
-	//Invalid url, remove spaces
+	// Invalid url, remove spaces
 	originalString = "Test?=weee! &this=that#works"
 	expectedOutput = "Test?=weee&this=that#works"
 	methodName = "URL"
@@ -1453,7 +1453,7 @@ func TestURL(t *testing.T) {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Invalid characters
+	// Invalid characters
 	originalString = "/this/test?dfsf$"
 	expectedOutput = "/this/test?dfsf"
 
@@ -1462,7 +1462,7 @@ func TestURL(t *testing.T) {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Invalid characters
+	// Invalid characters
 	originalString = "https://domain.com/this/test?dfsf$!@()[]{}'<>"
 	expectedOutput = "https://domain.com/this/test?dfsf"
 
@@ -1471,7 +1471,7 @@ func TestURL(t *testing.T) {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Valid url
+	// Valid url
 	originalString = "https://domain.com/this/test?this=value&another=123%#page"
 	expectedOutput = "https://domain.com/this/test?this=value&another=123%#page"
 
@@ -1503,7 +1503,7 @@ func TestXML(t *testing.T) {
 		originalString string
 	)
 
-	//Test basic HTML removal
+	// Test basic HTML removal
 	methodName = "XML"
 	originalString = `<?xml version="1.0" encoding="UTF-8"?><note>Something</note>`
 	expectedOutput = "Something"
@@ -1513,7 +1513,7 @@ func TestXML(t *testing.T) {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Advanced XML removal
+	// Advanced XML removal
 	originalString = `<body>This works?</body><title>Something</title>`
 	expectedOutput = "This works?Something"
 
@@ -1545,7 +1545,7 @@ func TestXSS(t *testing.T) {
 		originalString string
 	)
 
-	//Remove the script tags
+	// Remove the script tags
 	originalString = "<script>alert('test');</script>"
 	expectedOutput = ">alert('test');</"
 	methodName = "XSS"
@@ -1555,7 +1555,7 @@ func TestXSS(t *testing.T) {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Remove the lt and rt characters
+	// Remove the lt and rt characters
 	originalString = "&lt;script&lt;alert('test');&lt;/script&lt;"
 	expectedOutput = "scriptalert('test');/script"
 
@@ -1564,7 +1564,7 @@ func TestXSS(t *testing.T) {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Remove javascript:
+	// Remove javascript:
 	originalString = "javascript:alert('test');"
 	expectedOutput = "alert('test');"
 
@@ -1573,7 +1573,7 @@ func TestXSS(t *testing.T) {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Remove eval
+	// Remove eval
 	originalString = "eval('test');"
 	expectedOutput = "'test');"
 
@@ -1582,7 +1582,7 @@ func TestXSS(t *testing.T) {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Remove js
+	// Remove js
 	originalString = "javascript&#58;('test');"
 	expectedOutput = "('test');"
 
@@ -1591,7 +1591,7 @@ func TestXSS(t *testing.T) {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Remove char code
+	// Remove char code
 	originalString = "fromCharCode('test');"
 	expectedOutput = "('test');"
 
@@ -1600,7 +1600,7 @@ func TestXSS(t *testing.T) {
 		t.Fatal(methodName, "did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
 	}
 
-	//Remove char code, 60 and 62
+	// Remove char code, 60 and 62
 	originalString = "&#60;&#62;fromCharCode('test');&#62;&#60;"
 	expectedOutput = "('test');"
 
