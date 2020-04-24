@@ -1,14 +1,11 @@
 # go-sanitize
-**go-sanitize** implements a simple library of sanitation methods for data sanitation and reduction.
+**go-sanitize** is a simple library of sanitation methods for data sanitation and reduction
 
 [![Go](https://img.shields.io/github/go-mod/go-version/mrz1836/go-sanitize)](https://golang.org/)
 [![Build Status](https://travis-ci.org/mrz1836/go-sanitize.svg?branch=master)](https://travis-ci.org/mrz1836/go-sanitize)
 [![Report](https://goreportcard.com/badge/github.com/mrz1836/go-sanitize?style=flat)](https://goreportcard.com/report/github.com/mrz1836/go-sanitize)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/b11a08d5619849a0ae911d91e3bb47c7)](https://www.codacy.com/app/mrz1818/go-sanitize?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=mrz1836/go-sanitize&amp;utm_campaign=Badge_Grade)
 [![Release](https://img.shields.io/github/release-pre/mrz1836/go-sanitize.svg?style=flat)](https://github.com/mrz1836/go-sanitize/releases)
-[![standard-readme compliant](https://img.shields.io/badge/standard--readme-OK-green.svg?style=flat)](https://github.com/RichardLitt/standard-readme)
-[![GoDoc](https://godoc.org/github.com/mrz1836/go-sanitize?status.svg&style=flat)](https://godoc.org/github.com/mrz1836/go-sanitize)
-
+[![GoDoc](https://godoc.org/github.com/mrz1836/go-sanitize?status.svg&style=flat)](https://pkg.go.dev/github.com/mrz1836/go-sanitize?tab=doc)
 
 ## Table of Contents
 - [Installation](#installation)
@@ -73,7 +70,9 @@ func main() {
 
 ## Maintainers
 
-[@MrZ](https://github.com/mrz1836)
+| [<img src="https://github.com/mrz1836.png" height="50" alt="MrZ" />](https://github.com/mrz1836) |
+|:---:|
+| [MrZ](https://github.com/mrz1836) |
 
 ## Contributing
 
