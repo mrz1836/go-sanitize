@@ -83,11 +83,8 @@ func BitcoinCashAddress(original string) string {
 //  View examples: sanitize_test.go
 func Custom(original string, regExp string) string {
 
-	// Try to compile (it will panic if its wrong!)
-	compiledRegExp := regexp.MustCompile(regExp)
-
-	// Return the processed string
-	return string(compiledRegExp.ReplaceAll([]byte(original), emptySpace))
+	// Return the processed string or panic if regex fails
+	return string(regexp.MustCompile(regExp).ReplaceAll([]byte(original), emptySpace))
 }
 
 // Decimal returns sanitized decimal/float values in either positive or negative.
