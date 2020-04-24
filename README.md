@@ -26,7 +26,7 @@ $ go get -u github.com/mrz1836/go-sanitize
 ```
 
 ## Documentation
-You can view the generated [documentation here](https://godoc.org/github.com/mrz1836/go-sanitize).
+You can view the generated [documentation here](https://pkg.go.dev/github.com/mrz1836/go-sanitize?tab=doc).
 
 <details>
 <summary><strong><code>Library Deployment</code></strong></summary>
