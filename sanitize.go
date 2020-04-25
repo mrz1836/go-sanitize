@@ -6,7 +6,6 @@ If you have any suggestions or comments, please feel free to open an issue on th
 package sanitize
 
 import (
-	"fmt"
 	"net"
 	"net/url"
 	"regexp"
@@ -111,11 +110,6 @@ func Domain(original string, preserveCase bool, removeWww bool) (string, error) 
 	u, err := url.Parse(original)
 	if err != nil {
 		return original, err
-	}
-
-	// Try to see if we have a host
-	if len(u.Host) == 0 {
-		return original, fmt.Errorf("unable to parse domain: %s", original)
 	}
 
 	// Remove leading www.
