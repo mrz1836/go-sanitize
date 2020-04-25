@@ -238,7 +238,7 @@ func ExampleAlphaNumeric_withSpaces() {
 	// Output: Example String 2
 }
 
-// TestBitcoinAddress will test all permitations
+// TestBitcoinAddress will test all permutations
 func TestBitcoinAddress(t *testing.T) {
 	var (
 		expectedOutput string
@@ -281,7 +281,7 @@ func ExampleBitcoinAddress() {
 	// Output: 1K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs
 }
 
-// TestBitcoinCashAddress will test all permitations of using BitcoinCashAddress()
+// TestBitcoinCashAddress will test all permutations of using BitcoinCashAddress()
 func TestBitcoinCashAddress(t *testing.T) {
 	var (
 		expectedOutput string
