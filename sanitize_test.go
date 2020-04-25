@@ -8,110 +8,50 @@ import (
 // TestAlpha tests the alpha sanitize method
 func TestAlpha(t *testing.T) {
 
-	var (
-		expectedOutput string
-		methodName     string
-		originalString string
-	)
-
-	// Test removing spaces and punctuation - preserve the case of the letters
-	originalString = "Test This String-!123"
-	expectedOutput = "TestThisString"
-	methodName = "Alpha"
-
-	result := Alpha(originalString, false)
-	if result != expectedOutput {
-		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
-	}
-
-	// Test removing various symbols
-	originalString = `~!@#$%^&*()-_Symbols=+[{]};:'"<>,./?`
-	expectedOutput = "Symbols"
-
-	result = Alpha(originalString, false)
-	if result != expectedOutput {
-		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
-	}
-
-	// Test removing all carriage returns
-	originalString = "\nThis\nThat"
-	expectedOutput = "ThisThat"
-
-	result = Alpha(originalString, false)
-	if result != expectedOutput {
-		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
-	}
-
-	// Test removing fancy quotes and microsoft symbols
-	originalString = "“This is a quote with tick`s … ” ☺ "
-	expectedOutput = "Thisisaquotewithticks"
-
-	result = Alpha(originalString, false)
-	if result != expectedOutput {
-		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
-	}
-
-	//
-	// ==================================================================================================================
-	//
-
-	// Test removing spaces and punctuation - preserve the case of the letters
-	originalString = "Test This String-!123"
-	expectedOutput = "Test This String"
-
-	result = Alpha(originalString, true)
-	if result != expectedOutput {
-		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
-	}
-
-	// Test removing various symbols
-	originalString = `~!@#$%^&*()-_Symbols=+[{]};:'"<>,./?`
-	expectedOutput = "Symbols"
-
-	result = Alpha(originalString, true)
-	if result != expectedOutput {
-		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
-	}
-
-	// Test removing all carriage returns
-	originalString = "\nThis\nThat"
-	expectedOutput = `
+	// Create the list of tests
+	var tests = []struct {
+		input    string
+		expected string
+		typeCase bool
+	}{
+		{"Test This String-!123", "TestThisString", false},
+		{`~!@#$%^&*()-_Symbols=+[{]};:'"<>,./?`, "Symbols", false},
+		{"\nThis\nThat", "ThisThat", false},
+		{"“This is a quote with tick`s … ” ☺ ", "Thisisaquotewithticks", false},
+		{"Test This String-!123", "Test This String", true},
+		{`~!@#$%^&*()-_Symbols=+[{]};:'"<>,./?`, "Symbols", true},
+		{"“This is a quote with tick`s … ” ☺ ", "This is a quote with ticks    ", true},
+		{"\nThis\nThat", `
 This
-That`
-
-	result = Alpha(originalString, true)
-	if result != expectedOutput {
-		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+That`, true},
 	}
 
-	// Test removing fancy quotes and microsoft symbols
-	originalString = "“This is a quote with tick`s … ” ☺ "
-	expectedOutput = "This is a quote with ticks    "
-
-	result = Alpha(originalString, true)
-	if result != expectedOutput {
-		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	// Test all
+	for _, test := range tests {
+		if output := Alpha(test.input, test.typeCase); output != test.expected {
+			t.Errorf("%s Failed: [%s] inputted and [%s] expected, received: [%s]", t.Name(), test.input, test.expected, output)
+		}
 	}
 }
 
 // BenchmarkAlphaNoSpaces benchmarks the Alpha method
-func BenchmarkAlphaNoSpaces(b *testing.B) {
+func BenchmarkAlpha(b *testing.B) {
 	testString := "This is the test string."
 	for i := 0; i < b.N; i++ {
 		_ = Alpha(testString, false)
 	}
 }
 
-// BenchmarkAlphaWithSpaces benchmarks the Alpha method
-func BenchmarkAlphaWithSpaces(b *testing.B) {
+// BenchmarkAlpha_WithSpaces benchmarks the Alpha method
+func BenchmarkAlpha_WithSpaces(b *testing.B) {
 	testString := "This is the test string."
 	for i := 0; i < b.N; i++ {
 		_ = Alpha(testString, true)
 	}
 }
 
-// ExampleAlpha_noSpaces example using Alpha() and no spaces flag
-func ExampleAlpha_noSpaces() {
+// ExampleAlpha example using Alpha() and no spaces flag
+func ExampleAlpha() {
 	fmt.Println(Alpha("Example String!", false))
 	// Output: ExampleString
 }
@@ -124,110 +64,51 @@ func ExampleAlpha_withSpaces() {
 
 // TestAlphaNumeric tests the alpha numeric sanitize method
 func TestAlphaNumeric(t *testing.T) {
-	var (
-		expectedOutput string
-		methodName     string
-		originalString string
-	)
 
-	// Test the base string with mixed characters
-	originalString = "Test This String-!123"
-	expectedOutput = "TestThisString123"
-	methodName = "AlphaNumeric"
-
-	result := AlphaNumeric(originalString, false)
-	if result != expectedOutput {
-		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
-	}
-
-	// Test removing various symbols
-	originalString = `~!@#$%^&*()-_Symbols=+[{]};:'"<>,./?`
-	expectedOutput = "Symbols"
-
-	result = AlphaNumeric(originalString, false)
-	if result != expectedOutput {
-		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
-	}
-
-	// Test removing all carriage returns
-	originalString = "\nThis1\nThat2"
-	expectedOutput = "This1That2"
-
-	result = AlphaNumeric(originalString, false)
-	if result != expectedOutput {
-		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
-	}
-
-	// Test removing fancy quotes and microsoft symbols
-	originalString = "“This is a quote with tick`s … ” ☺ 342"
-	expectedOutput = "Thisisaquotewithticks342"
-
-	result = AlphaNumeric(originalString, false)
-	if result != expectedOutput {
-		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
-	}
-
-	//
-	// ==================================================================================================================
-	//
-
-	// Test removing spaces and punctuation - preserve the case of the letters
-	originalString = "Test This String-! 123"
-	expectedOutput = "Test This String 123"
-
-	result = AlphaNumeric(originalString, true)
-	if result != expectedOutput {
-		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
-	}
-
-	// Test removing various symbols
-	originalString = `~!@#$%^&*()-_Symbols 123=+[{]};:'"<>,./?`
-	expectedOutput = "Symbols 123"
-
-	result = AlphaNumeric(originalString, true)
-	if result != expectedOutput {
-		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
-	}
-
-	// Test removing all carriage returns
-	originalString = "\nThis1\nThat2"
-	expectedOutput = `
+	// Create the list of tests
+	var tests = []struct {
+		input    string
+		expected string
+		typeCase bool
+	}{
+		{"Test This String-!123", "TestThisString123", false},
+		{`~!@#$%^&*()-_Symbols=+[{]};:'"<>,./?`, "Symbols", false},
+		{"\nThis1\nThat2", "This1That2", false},
+		{"“This is a quote with tick`s … ” ☺ 342", "Thisisaquotewithticks342", false},
+		{"Test This String-! 123", "Test This String 123", true},
+		{`~!@#$%^&*()-_Symbols 123=+[{]};:'"<>,./?`, "Symbols 123", true},
+		{"“This is a quote with tick`s…”☺ 123", "This is a quote with ticks 123", true},
+		{"\nThis1\nThat2", `
 This1
-That2`
-
-	result = AlphaNumeric(originalString, true)
-	if result != expectedOutput {
-		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+That2`, true},
 	}
 
-	// Test removing fancy quotes and microsoft symbols
-	originalString = "“This is a quote with tick`s…”☺ 123"
-	expectedOutput = "This is a quote with ticks 123"
-
-	result = AlphaNumeric(originalString, true)
-	if result != expectedOutput {
-		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	// Test all
+	for _, test := range tests {
+		if output := AlphaNumeric(test.input, test.typeCase); output != test.expected {
+			t.Errorf("%s Failed: [%s] inputted and [%s] expected, received: [%s]", t.Name(), test.input, test.expected, output)
+		}
 	}
 }
 
-// BenchmarkAlphaNumericNoSpaces benchmarks the AlphaNumeric method
-func BenchmarkAlphaNumericNoSpaces(b *testing.B) {
+// BenchmarkAlphaNumeric benchmarks the AlphaNumeric method
+func BenchmarkAlphaNumeric(b *testing.B) {
 	testString := "This is the test string 12345."
 	for i := 0; i < b.N; i++ {
 		_ = AlphaNumeric(testString, false)
 	}
 }
 
-// BenchmarkAlphaNumericWithSpaces benchmarks the AlphaNumeric method
-func BenchmarkAlphaNumericWithSpaces(b *testing.B) {
+// BenchmarkAlphaNumeric_WithSpaces benchmarks the AlphaNumeric method
+func BenchmarkAlphaNumeric_WithSpaces(b *testing.B) {
 	testString := "This is the test string 12345."
 	for i := 0; i < b.N; i++ {
 		_ = AlphaNumeric(testString, true)
 	}
 }
 
-// ExampleAlphaNumeric_noSpaces example using AlphaNumeric() with no spaces
-func ExampleAlphaNumeric_noSpaces() {
+// ExampleAlphaNumeric example using AlphaNumeric() with no spaces
+func ExampleAlphaNumeric() {
 	fmt.Println(AlphaNumeric("Example String 2!", false))
 	// Output: ExampleString2
 }
@@ -240,30 +121,27 @@ func ExampleAlphaNumeric_withSpaces() {
 
 // TestBitcoinAddress will test all permutations
 func TestBitcoinAddress(t *testing.T) {
-	var (
-		expectedOutput string
-		methodName     string
-		originalString string
-	)
 
-	// Test removing invalid characters
-	originalString = "$#:1K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs!"
-	expectedOutput = "1K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs"
-	methodName = "BitcoinAddress"
+	// Create the list of tests
+	var tests = []struct {
+		input    string
+		expected string
+	}{
+		{":1K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs", "1K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs"},
+		{"   1K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs    ", "1K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs"},
+		{"   1K6c7 LGpdB 8LwoGNVfG5 1dRV 9UUEijbrWs    ", "1K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs"},
+		{"$#:1K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs!", "1K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs"},
+		{"$#:1K6c_7LGpd^B8Lw_oGN=VfG+51_dRV9-UUEijbrWs!", "1K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs"},
 
-	result := BitcoinAddress(originalString)
-	if result != expectedOutput {
-		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+		// No uppercase letter O, uppercase letter I, lowercase letter l, and the number 0
+		{"OIl01K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs!", "1K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs"},
 	}
 
-	// No uppercase letter O, uppercase letter I, lowercase letter l, and the number 0
-	originalString = "OIl01K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs!"
-	expectedOutput = "1K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs"
-	methodName = "BitcoinAddress"
-
-	result = BitcoinAddress(originalString)
-	if result != expectedOutput {
-		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	// Test all
+	for _, test := range tests {
+		if output := BitcoinAddress(test.input); output != test.expected {
+			t.Errorf("%s Failed: [%s] inputted and [%s] expected, received: [%s]", t.Name(), test.input, test.expected, output)
+		}
 	}
 }
 
@@ -277,36 +155,29 @@ func BenchmarkBitcoinAddress(b *testing.B) {
 
 // ExampleBitcoinAddress example using BitcoinAddress()
 func ExampleBitcoinAddress() {
-	fmt.Println(BitcoinAddress("1K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs!"))
+	fmt.Println(BitcoinAddress(":1K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs!"))
 	// Output: 1K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs
 }
 
 // TestBitcoinCashAddress will test all permutations of using BitcoinCashAddress()
 func TestBitcoinCashAddress(t *testing.T) {
-	var (
-		expectedOutput string
-		methodName     string
-		originalString string
-	)
+	// Create the list of tests
+	var tests = []struct {
+		input    string
+		expected string
+	}{
+		{"$#:qze7yy2au5vuznvn8lzj5y0j5t066vhs75e3m0eptz!", "qze7yy2au5vuznvn8lzj5y0j5t066vhs75e3m0eptz"},
+		{" $#:qze7yy2 au5vuznvn8lzj5y0j5t066 vhs75e3m0eptz! ", "qze7yy2au5vuznvn8lzj5y0j5t066vhs75e3m0eptz"},
 
-	// Test removing invalid characters
-	originalString = "$#:qze7yy2au5vuznvn8lzj5y0j5t066vhs75e3m0eptz!"
-	expectedOutput = "qze7yy2au5vuznvn8lzj5y0j5t066vhs75e3m0eptz"
-	methodName = "BitcoinCashAddr"
-
-	result := BitcoinCashAddress(originalString)
-	if result != expectedOutput {
-		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+		// No letters o, b, i, or number 1
+		{"pqbq3728yw0y47sOqn6l2na30mcw6zm78idzq5ucqzc371", "pqq3728yw0y47sqn6l2na30mcw6zm78dzq5ucqzc37"},
 	}
 
-	// No letters o, b, i, or number 1
-	originalString = "pqbq3728yw0y47sOqn6l2na30mcw6zm78idzq5ucqzc371"
-	expectedOutput = "pqq3728yw0y47sqn6l2na30mcw6zm78dzq5ucqzc37"
-	methodName = "BitcoinCashAddr"
-
-	result = BitcoinCashAddress(originalString)
-	if result != expectedOutput {
-		t.Fatal(methodName, "method did not work properly, expected result: [", expectedOutput, "] but received: [", result, "]")
+	// Test all
+	for _, test := range tests {
+		if output := BitcoinCashAddress(test.input); output != test.expected {
+			t.Errorf("%s Failed: [%s] inputted and [%s] expected, received: [%s]", t.Name(), test.input, test.expected, output)
+		}
 	}
 }
 
@@ -368,8 +239,8 @@ func BenchmarkCustom(b *testing.B) {
 	}
 }
 
-// ExampleCustom_alpha example using Custom() using an alpha regex
-func ExampleCustom_alpha() {
+// ExampleCustom example using Custom() using an alpha regex
+func ExampleCustom() {
 	fmt.Println(Custom("Example String 2!", `[^a-zA-Z]`))
 	// Output: ExampleString
 }
@@ -426,8 +297,8 @@ func BenchmarkDecimal(b *testing.B) {
 	}
 }
 
-// ExampleDecimal_positive example using Decimal() for a positive number
-func ExampleDecimal_positive() {
+// ExampleDecimal example using Decimal() for a positive number
+func ExampleDecimal() {
 	fmt.Println(Decimal("$ 99.99!"))
 	// Output: 99.99
 }
@@ -540,16 +411,16 @@ func BenchmarkDomain(b *testing.B) {
 	}
 }
 
-// BenchmarkDomainPreserveCase benchmarks the Domain method
-func BenchmarkDomainPreserveCase(b *testing.B) {
+// BenchmarkDomain_PreserveCase benchmarks the Domain method
+func BenchmarkDomain_PreserveCase(b *testing.B) {
 	testString := "https://Example.COM/?param=value"
 	for i := 0; i < b.N; i++ {
 		_, _ = Domain(testString, true, false)
 	}
 }
 
-// BenchmarkDomainRemoveWww benchmarks the Domain method
-func BenchmarkDomainRemoveWww(b *testing.B) {
+// BenchmarkDomain_RemoveWww benchmarks the Domain method
+func BenchmarkDomain_RemoveWww(b *testing.B) {
 	testString := "https://Example.COM/?param=value"
 	for i := 0; i < b.N; i++ {
 		_, _ = Domain(testString, false, true)
@@ -664,8 +535,8 @@ func BenchmarkEmail(b *testing.B) {
 	}
 }
 
-// BenchmarkEmailPreserveCase benchmarks the Email method
-func BenchmarkEmailPreserveCase(b *testing.B) {
+// BenchmarkEmail_PreserveCase benchmarks the Email method
+func BenchmarkEmail_PreserveCase(b *testing.B) {
 	testString := "mailto:Person@Example.COM "
 	for i := 0; i < b.N; i++ {
 		_ = Email(testString, true)
@@ -991,24 +862,24 @@ func TestIPAddress(t *testing.T) {
 	}
 }
 
-// BenchmarkIPAddressV4 benchmarks the IPAddress method
-func BenchmarkIPAddressV4(b *testing.B) {
+// BenchmarkIPAddress benchmarks the IPAddress method
+func BenchmarkIPAddress(b *testing.B) {
 	testString := " 192.168.0.1 "
 	for i := 0; i < b.N; i++ {
 		_ = IPAddress(testString)
 	}
 }
 
-// BenchmarkIPAddressV6 benchmarks the IPAddress method
-func BenchmarkIPAddressV6(b *testing.B) {
+// BenchmarkIPAddress_V6 benchmarks the IPAddress method
+func BenchmarkIPAddress_IPV6(b *testing.B) {
 	testString := " 2602:305:bceb:1bd0:44ef:fedb:4f8f:da4f "
 	for i := 0; i < b.N; i++ {
 		_ = IPAddress(testString)
 	}
 }
 
-// ExampleIPAddress_ipv4 example using IPAddress() for IPV4 address
-func ExampleIPAddress_ipv4() {
+// ExampleIPAddress example using IPAddress() for IPV4 address
+func ExampleIPAddress() {
 	fmt.Println(IPAddress(" 192.168.0.1 "))
 	// Output: 192.168.0.1
 }
