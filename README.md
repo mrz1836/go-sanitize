@@ -4,6 +4,7 @@
 [![Go](https://img.shields.io/github/go-mod/go-version/mrz1836/go-sanitize)](https://golang.org/)
 [![Build Status](https://travis-ci.org/mrz1836/go-sanitize.svg?branch=master)](https://travis-ci.org/mrz1836/go-sanitize)
 [![Report](https://goreportcard.com/badge/github.com/mrz1836/go-sanitize?style=flat)](https://goreportcard.com/report/github.com/mrz1836/go-sanitize)
+[![codecov](https://codecov.io/gh/mrz1836/go-sanitize/branch/master/graph/badge.svg)](https://codecov.io/gh/mrz1836/go-sanitize)
 [![Release](https://img.shields.io/github/release-pre/mrz1836/go-sanitize.svg?style=flat)](https://github.com/mrz1836/go-sanitize/releases)
 [![GoDoc](https://godoc.org/github.com/mrz1836/go-sanitize?status.svg&style=flat)](https://pkg.go.dev/github.com/mrz1836/go-sanitize?tab=doc)
 
@@ -93,17 +94,18 @@ Read more about this Go project's [code standards](CODE_STANDARDS.md).
 - View the [tests](sanitize_test.go)
 
 Basic implementation:
-```golang
+```go
 package main
 
 import (
-	"fmt"
-	"github.com/mrz1836/go-sanitize"
+    "fmt"
+    
+    "github.com/mrz1836/go-sanitize"
 )
 
 func main() {
 
-	//Execute and print
+	// Execute and print
 	fmt.Println(sanitize.IPAddress("  ##!192.168.0.1!##  "))
 
 	// Output: 192.168.0.1
