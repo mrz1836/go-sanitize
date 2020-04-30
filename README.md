@@ -1,5 +1,5 @@
 # go-sanitize
-**go-sanitize** is a simple library of sanitation methods for data sanitation and reduction
+> Simple library of sanitation methods for data sanitation and reduction
 
 [![Go](https://img.shields.io/github/go-mod/go-version/mrz1836/go-sanitize)](https://golang.org/)
 [![Build Status](https://travis-ci.com/mrz1836/go-sanitize.svg?branch=master)](https://travis-ci.com/mrz1836/go-sanitize)
@@ -22,8 +22,8 @@
 ## Installation
 
 **go-sanitize** requires a [supported release of Go](https://golang.org/doc/devel/release.html#policy).
-```bash
-$ go get -u github.com/mrz1836/go-sanitize
+```shell script
+go get -u github.com/mrz1836/go-sanitize
 ```
 
 ## Documentation
@@ -43,8 +43,8 @@ Use `make release-snap` to create a snapshot version of the release, and finally
 <summary><strong><code>Makefile Commands</code></strong></summary>
 
 View all `makefile` commands
-```bash
-$ make help
+```shell script
+make help
 ```
 
 List of all current commands:
@@ -75,14 +75,14 @@ vet                            Run the Go vet application
 All unit tests and [examples](sanitize_test.go) run via [Travis CI](https://travis-ci.org/mrz1836/go-sanitize) and uses [Go version 1.14.x](https://golang.org/doc/go1.14). View the [deployment configuration file](.travis.yml).
 
 Run all tests (including integration tests)
-```bash
-$ make test
+```shell script
+make test
 ```
 
 ## Benchmarks
 Run the Go [benchmarks](sanitize_test.go):
-```bash
-$ make bench
+```shell script
+make bench
 ```
 
 ## Code Standards
