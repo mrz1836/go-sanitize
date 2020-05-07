@@ -37,6 +37,7 @@ help: ## Show all make commands available
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
 lint: ## Run the Go lint application
+	@if [ "$(shell command -v golint)" = "" ]; then go get -u golang.org/x/lint/golint; fi
 	@golint
 
 release: ## Full production release (creates release in Github)
@@ -75,6 +76,11 @@ test-short: ## Runs vet, lint and tests (excludes integration tests)
 	@$(MAKE) vet
 	@$(MAKE) lint
 	@go test ./... -v -test.short
+
+test-travis: ## Runs tests via Travis (also exports coverage)
+	@$(MAKE) vet
+	@$(MAKE) lint
+	@go test ./... -race -coverprofile=coverage.txt -covermode=atomic
 
 update:  ## Update all project dependencies
 	@go get -u ./...
