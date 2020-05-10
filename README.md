@@ -34,7 +34,9 @@ go get -u github.com/mrz1836/go-sanitize
 <br/>
 
 ## Documentation
-You can view the generated [documentation here](https://pkg.go.dev/github.com/mrz1836/go-sanitize?tab=doc) [![GoDoc](https://godoc.org/github.com/mrz1836/go-sanitize?status.svg&style=flat)](https://pkg.go.dev/github.com/mrz1836/go-sanitize?tab=doc)
+View the generated [documentation](https://pkg.go.dev/github.com/mrz1836/go-sanitize?tab=doc)
+
+[![GoDoc](https://godoc.org/github.com/mrz1836/go-sanitize?status.svg&style=flat)](https://pkg.go.dev/github.com/mrz1836/go-sanitize?tab=doc)
 
 <details>
 <summary><strong><code>Library Deployment</code></strong></summary>
