@@ -17,7 +17,7 @@ endif
 
 ## Not defined? Use default repo name which is the application
 ifeq ($(REPO_NAME),)
-	REPO_NAME="paymail-inspector"
+	REPO_NAME="go-sanitize"
 endif
 
 ## Not defined? Use default repo owner
