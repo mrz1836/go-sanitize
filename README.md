@@ -40,6 +40,7 @@ View the generated [documentation](https://pkg.go.dev/github.com/mrz1836/go-sani
 
 <details>
 <summary><strong><code>Library Deployment</code></strong></summary>
+<br/>
 
 [goreleaser](https://github.com/goreleaser/goreleaser) for easy binary or library deployment to Github and can be installed via: `brew install goreleaser`.
 
@@ -50,6 +51,7 @@ Use `make release-snap` to create a snapshot version of the release, and finally
 
 <details>
 <summary><strong><code>Makefile Commands</code></strong></summary>
+<br/>
 
 View all `makefile` commands
 ```shell script
@@ -58,25 +60,27 @@ make help
 
 List of all current commands:
 ```text
-all                            Runs lint, test and vet
-bench                          Run all benchmarks in the Go application
-clean                          Remove previous builds and any test cache data
-clean-mods                     Remove all the Go mod cache
-coverage                       Shows the test coverage
-godocs                         Sync the latest tag with GoDocs
-help                           Show all make commands available
-lint                           Run the Go lint application
-release                        Full production release (creates release in Github)
-release-test                   Full production test release (everything except deploy)
-release-snap                   Test the full release (build binaries)
-tag                            Generate a new tag and push (IE: tag version=0.0.0)
-tag-remove                     Remove a tag if found (IE: tag-remove version=0.0.0)
-tag-update                     Update an existing tag to current commit (IE: tag-update version=0.0.0)
-test                           Runs vet, lint and ALL tests
-test-short                     Runs vet, lint and tests (excludes integration tests)
-update                         Update all project dependencies
-update-releaser                Update the goreleaser application
-vet                            Run the Go vet application
+all                  Runs multiple commands
+clean                Remove previous builds and any test cache data
+clean-mods           Remove all the Go mod cache
+coverage             Shows the test coverage
+godocs               Sync the latest tag with GoDocs
+help                 Show this help message
+install              Install the application
+install-go           Install the application (Using Native Go)
+lint                 Run the Go lint application
+release              Full production release (creates release in Github)
+release-snap         Test the full release (build binaries)
+release-test         Full production test release (everything except deploy)
+replace-version      Replaces the version in HTML/JS (pre-deploy)
+tag                  Generate a new tag and push (tag version=0.0.0)
+tag-remove           Remove a tag if found (tag-remove version=0.0.0)
+tag-update           Update an existing tag to current commit (tag-update version=0.0.0)
+test                 Runs vet, lint and ALL tests
+test-short           Runs vet, lint and tests (excludes integration tests)
+test-travis          Runs tests via Travis (also exports coverage)
+uninstall            Uninstall the application (and remove files)
+vet                  Run the Go vet application
 ```
 </details>
 
@@ -132,7 +136,6 @@ func main() {
 <br/>
 
 ## Maintainers
-
 | [<img src="https://github.com/mrz1836.png" height="50" alt="MrZ" />](https://github.com/mrz1836) |
 |:---:|
 | [MrZ](https://github.com/mrz1836) |
