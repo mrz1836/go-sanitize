@@ -21,6 +21,7 @@ all: ## Runs multiple commands
 
 clean: ## Remove previous builds and any test cache data
 	@go clean -cache -testcache -i -r
+	@test $(DISTRIBUTIONS_DIR)
 	@if [ -d $(DISTRIBUTIONS_DIR) ]; then rm -r $(DISTRIBUTIONS_DIR); fi
 
 release:: ## Runs common.release then runs godocs
