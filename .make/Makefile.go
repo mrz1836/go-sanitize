@@ -54,10 +54,15 @@ test-short: ## Runs vet, lint and tests (excludes integration tests)
 	@$(MAKE) lint
 	@go test ./... -v -test.short
 
-test-travis: ## Runs tests via Travis (also exports coverage)
+test-travis: ## Runs all tests via Travis (also exports coverage)
 	@$(MAKE) vet
 	@$(MAKE) lint
 	@go test ./... -race -coverprofile=coverage.txt -covermode=atomic
+
+test-travis-short: ## Runs unit tests via Travis (also exports coverage)
+	@$(MAKE) vet
+	@$(MAKE) lint
+	@go test ./... -test.short -race -coverprofile=coverage.txt -covermode=atomic
 
 uninstall: ## Uninstall the application (and remove files)
 	@test $(BINARY_NAME)
