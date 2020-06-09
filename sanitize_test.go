@@ -813,7 +813,8 @@ func TestURL(t *testing.T) {
 	}{
 		{"Test?=what! &this=that#works", "Test?=what&this=that#works"},
 		{"/this/test?param$", "/this/test?param"},
-		{"https://domain.com/this/test?param$!@()[]{}'<>", "https://domain.com/this/test?param"},
+		{"https://medium.com/@username/some-title-that-is-a-article", "https://medium.com/@username/some-title-that-is-a-article"},
+		{"https://domain.com/this/test?param$!@()[]{}'<>", "https://domain.com/this/test?param@"},
 		{"https://domain.com/this/test?this=value&another=123%#page", "https://domain.com/this/test?this=value&another=123%#page"},
 	}
 
