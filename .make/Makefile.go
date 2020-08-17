@@ -16,7 +16,7 @@ WINDOWS=$(BINARY_NAME)-windows.exe
 .PHONY: test lint install
 
 bench:  ## Run all benchmarks in the Go application
-	@go test -bench ./... -benchmem -v
+	@go test -bench=. -benchmem
 
 build-go:  ## Build the Go application (locally)
 	@go build -o bin/$(BINARY_NAME)
