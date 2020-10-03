@@ -7,6 +7,7 @@ import (
 
 // TestAlpha tests the alpha sanitize method
 func TestAlpha(t *testing.T) {
+	t.Parallel()
 
 	// Create the list of tests
 	var tests = []struct {
@@ -62,6 +63,7 @@ func ExampleAlpha_withSpaces() {
 
 // TestAlphaNumeric tests the alpha numeric sanitize method
 func TestAlphaNumeric(t *testing.T) {
+	t.Parallel()
 
 	// Create the list of tests
 	var tests = []struct {
@@ -117,6 +119,7 @@ func ExampleAlphaNumeric_withSpaces() {
 
 // TestBitcoinAddress will test all permutations
 func TestBitcoinAddress(t *testing.T) {
+	t.Parallel()
 
 	// Create the list of tests
 	var tests = []struct {
@@ -156,6 +159,8 @@ func ExampleBitcoinAddress() {
 
 // TestBitcoinCashAddress will test all permutations of using BitcoinCashAddress()
 func TestBitcoinCashAddress(t *testing.T) {
+	t.Parallel()
+
 	// Create the list of tests
 	var tests = []struct {
 		input    string
@@ -191,6 +196,8 @@ func ExampleBitcoinCashAddress() {
 
 // TestCustom tests the custom sanitize method
 func TestCustom(t *testing.T) {
+	t.Parallel()
+
 	// Create the list of tests
 	var tests = []struct {
 		input    string
@@ -231,6 +238,7 @@ func ExampleCustom_numeric() {
 
 // TestDecimal tests the decimal sanitize method
 func TestDecimal(t *testing.T) {
+	t.Parallel()
 
 	// Create the list of tests
 	var tests = []struct {
@@ -273,6 +281,7 @@ func ExampleDecimal_negative() {
 
 // TestDomain tests the domain sanitize method
 func TestDomain(t *testing.T) {
+	t.Parallel()
 
 	// Create the list of tests
 	var tests = []struct {
@@ -347,6 +356,8 @@ func ExampleDomain_removeWww() {
 
 // TestEmail tests the email sanitize method
 func TestEmail(t *testing.T) {
+	t.Parallel()
+
 	// Create the list of tests
 	var tests = []struct {
 		input        string
@@ -399,6 +410,8 @@ func ExampleEmail_preserveCase() {
 
 // TestFirstToUpper tests the first to upper method
 func TestFirstToUpper(t *testing.T) {
+	t.Parallel()
+
 	// Create the list of tests
 	var tests = []struct {
 		input    string
@@ -434,6 +447,7 @@ func ExampleFirstToUpper() {
 
 // TestFormalName tests the formal name method
 func TestFormalName(t *testing.T) {
+	t.Parallel()
 
 	// Create the list of tests
 	var tests = []struct {
@@ -470,6 +484,8 @@ func ExampleFormalName() {
 
 // TestHTML tests the HTML sanitize method
 func TestHTML(t *testing.T) {
+	t.Parallel()
+
 	// Create the list of tests
 	var tests = []struct {
 		input    string
@@ -503,6 +519,8 @@ func ExampleHTML() {
 
 // TestIPAddress tests the ip address sanitize method
 func TestIPAddress(t *testing.T) {
+	t.Parallel()
+
 	// Create the list of tests
 	var tests = []struct {
 		input    string
@@ -559,6 +577,8 @@ func ExampleIPAddress_ipv6() {
 
 // TestNumeric tests the numeric sanitize method
 func TestNumeric(t *testing.T) {
+	t.Parallel()
+
 	// Create the list of tests
 	var tests = []struct {
 		input    string
@@ -591,6 +611,8 @@ func ExampleNumeric() {
 
 // TestPathName tests the path name sanitize method
 func TestPathName(t *testing.T) {
+	t.Parallel()
+
 	// Create the list of tests
 	var tests = []struct {
 		input    string
@@ -624,6 +646,8 @@ func ExamplePathName() {
 
 // TestPunctuation tests the punctuation method
 func TestPunctuation(t *testing.T) {
+	t.Parallel()
+
 	// Create the list of tests
 	var tests = []struct {
 		input    string
@@ -661,6 +685,8 @@ func ExamplePunctuation() {
 
 // TestScripts tests the script removal
 func TestScripts(t *testing.T) {
+	t.Parallel()
+
 	// Create the list of tests
 	var tests = []struct {
 		input    string
@@ -697,6 +723,8 @@ func ExampleScripts() {
 
 // TestSingleLine test the single line sanitize method
 func TestSingleLine(t *testing.T) {
+	t.Parallel()
+
 	// Create the list of tests
 	var tests = []struct {
 		input    string
@@ -740,6 +768,8 @@ Work?`))
 
 // TestTime tests the time sanitize method
 func TestTime(t *testing.T) {
+	t.Parallel()
+
 	// Create the list of tests
 	var tests = []struct {
 		input    string
@@ -773,6 +803,8 @@ func ExampleTime() {
 
 // TestURI tests the URI sanitize method
 func TestURI(t *testing.T) {
+	t.Parallel()
+
 	// Create the list of tests
 	var tests = []struct {
 		input    string
@@ -806,6 +838,8 @@ func ExampleURI() {
 
 // TestURL tests the URL sanitize method
 func TestURL(t *testing.T) {
+	t.Parallel()
+
 	// Create the list of tests
 	var tests = []struct {
 		input    string
@@ -841,6 +875,8 @@ func ExampleURL() {
 
 // TestXML tests the XML sanitize method
 func TestXML(t *testing.T) {
+	t.Parallel()
+
 	// Create the list of tests
 	var tests = []struct {
 		input    string
@@ -873,6 +909,8 @@ func ExampleXML() {
 
 // TestXSS tests the XSS sanitize method
 func TestXSS(t *testing.T) {
+	t.Parallel()
+
 	// Create the list of tests
 	var tests = []struct {
 		input    string
