@@ -13,7 +13,7 @@ DARWIN=$(BINARY_NAME)-darwin
 LINUX=$(BINARY_NAME)-linux
 WINDOWS=$(BINARY_NAME)-windows.exe
 
-.PHONY: test lint install
+.PHONY: test lint vet install
 
 bench:  ## Run all benchmarks in the Go application
 	@go test -bench=. -benchmem
@@ -40,28 +40,29 @@ install: ## Install the application
 install-go: ## Install the application (Using Native Go)
 	@go install $(GIT_DOMAIN)/$(REPO_OWNER)/$(REPO_NAME)
 
-lint: ## Run the Go lint application
-	@if [ "$(shell command -v golint)" = "" ]; then go get -u golang.org/x/lint/golint; fi
-	@golint
+lint: ## Run the golangci-lint application (install if not found)
+	@if [ "$(shell command -v golangci-lint)" = "" ]; then curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.31.0 && sudo cp ./bin/golangci-lint $(go env GOPATH)/bin/; fi;
+	@echo "running golangci-lint..."
+	@golangci-lint run
 
 test: ## Runs vet, lint and ALL tests
-	@$(MAKE) vet
 	@$(MAKE) lint
+	@echo "running tests..."
 	@go test ./... -v
 
 test-short: ## Runs vet, lint and tests (excludes integration tests)
-	@$(MAKE) vet
 	@$(MAKE) lint
+	@echo "running tests (short)..."
 	@go test ./... -v -test.short
 
 test-travis: ## Runs all tests via Travis (also exports coverage)
-	@$(MAKE) vet
 	@$(MAKE) lint
+	@echo "running tests..."
 	@go test ./... -race -coverprofile=coverage.txt -covermode=atomic
 
 test-travis-short: ## Runs unit tests via Travis (also exports coverage)
-	@$(MAKE) vet
 	@$(MAKE) lint
+	@echo "running tests (short)..."
 	@go test ./... -test.short -race -coverprofile=coverage.txt -covermode=atomic
 
 uninstall: ## Uninstall the application (and remove files)
@@ -76,5 +77,9 @@ uninstall: ## Uninstall the application (and remove files)
 update:  ## Update all project dependencies
 	@go get -u ./... && go mod tidy
 
+update-linter: ## Update the golangci-lint package (macOS only)
+	@brew upgrade golangci-lint
+
 vet: ## Run the Go vet application
+	@echo "running go vet..."
 	@go vet -v ./...
