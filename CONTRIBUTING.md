@@ -13,6 +13,5 @@ All tests follow the standard Go testing pattern.
 
 This project follows [effective Go standards](https://golang.org/doc/effective_go.html) and uses additional convention tools:
 - [godoc](https://godoc.org/golang.org/x/tools/cmd/godoc)
-- [golint](https://github.com/golang/lint)
-- [vet](https://golang.org/cmd/vet/)
-- [GoReportCard.com](https://goreportcard.com/report/github.com/mrz1836/go-sanitize)
+- [golangci-lint](https://golangci-lint.run/)
+- [GoReportCard.com](https://goreportcard.com/)
