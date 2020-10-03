@@ -223,7 +223,7 @@ linters-settings:
       - atomicalign
     enable-all: false
     disable:
-      - shadow
+      #- shadow
     disable-all: false
   depguard:
     list-type: blacklist
