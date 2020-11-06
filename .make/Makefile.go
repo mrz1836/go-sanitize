@@ -41,7 +41,12 @@ install-go: ## Install the application (Using Native Go)
 	@go install $(GIT_DOMAIN)/$(REPO_OWNER)/$(REPO_NAME)
 
 lint: ## Run the golangci-lint application (install if not found)
-	@if [ "$(shell command -v golangci-lint)" = "" ]; then curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.31.0 && sudo cp ./bin/golangci-lint $(go env GOPATH)/bin/; fi;
+	@#Travis (has sudo)
+	@if [ "$(shell command -v golangci-lint)" = "" ] && [ $(TRAVIS) ]; then curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.32.2 && sudo cp ./bin/golangci-lint $(go env GOPATH)/bin/; fi;
+	@#AWS CodePipeline
+	@if [ "$(shell command -v golangci-lint)" = "" ] && [ "$(CODEBUILD_BUILD_ID)" != "" ]; then curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.32.2; fi;
+	@#Brew - MacOS
+	@if [ "$(shell command -v golangci-lint)" = "" ] && [ "$(shell command -v brew)" != "" ]; then brew install golangci-lint; fi;
 	@echo "running golangci-lint..."
 	@golangci-lint run
 
