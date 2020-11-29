@@ -799,19 +799,23 @@ func TestURL(t *testing.T) {
 	t.Parallel()
 
 	var tests = []struct {
+		name     string
 		input    string
 		expected string
 	}{
-		{"Test?=what! &this=that#works", "Test?=what&this=that#works"},
-		{"/this/test?param$", "/this/test?param"},
-		{"https://medium.com/@username/some-title-that-is-a-article", "https://medium.com/@username/some-title-that-is-a-article"},
-		{"https://domain.com/this/test?param$!@()[]{}'<>", "https://domain.com/this/test?param@"},
-		{"https://domain.com/this/test?this=value&another=123%#page", "https://domain.com/this/test?this=value&another=123%#page"},
+		{"remove spaces", "Test?=what! &this=that#works", "Test?=what&this=that#works"},
+		{"no dollar signs", "/this/test?param$", "/this/test?param"},
+		{"using at sign", "https://medium.com/@username/some-title-that-is-a-article", "https://medium.com/@username/some-title-that-is-a-article"},
+		{"removing symbols", "https://domain.com/this/test?param$!@()[]{}'<>", "https://domain.com/this/test?param@"},
+		{"params and anchors", "https://domain.com/this/test?this=value&another=123%#page", "https://domain.com/this/test?this=value&another=123%#page"},
+		{"allow commas", "https://domain.com/this/test,this,value", "https://domain.com/this/test,this,value"},
 	}
 
 	for _, test := range tests {
-		output := URL(test.input)
-		assert.Equal(t, test.expected, output)
+		t.Run(test.name, func(t *testing.T) {
+			output := URL(test.input)
+			assert.Equal(t, test.expected, output)
+		})
 	}
 }
 

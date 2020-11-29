@@ -34,7 +34,7 @@ var (
 	singleLineRegExp             = regexp.MustCompile(`(\r)|(\n)|(\t)|(\v)|(\f)`)                                                 // Carriage returns, line feeds, tabs, for single line transition
 	timeRegExp                   = regexp.MustCompile(`[^0-9:]`)                                                                  // Time allowed characters
 	uriRegExp                    = regexp.MustCompile(`[^a-zA-Z0-9-_/?&=#%]`)                                                     // URI allowed characters
-	urlRegExp                    = regexp.MustCompile(`[^a-zA-Z0-9-_/:.?&@=#%]`)                                                  // URL allowed characters
+	urlRegExp                    = regexp.MustCompile(`[^a-zA-Z0-9-_/:.,?&@=#%]`)                                                 // URL allowed characters
 )
 
 // emptySpace is an empty space for replacing
