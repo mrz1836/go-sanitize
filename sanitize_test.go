@@ -3,35 +3,37 @@ package sanitize
 import (
 	"fmt"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 // TestAlpha tests the alpha sanitize method
 func TestAlpha(t *testing.T) {
 	t.Parallel()
 
-	// Create the list of tests
 	var tests = []struct {
+		name     string
 		input    string
 		expected string
 		typeCase bool
 	}{
-		{"Test This String-!123", "TestThisString", false},
-		{`~!@#$%^&*()-_Symbols=+[{]};:'"<>,./?`, "Symbols", false},
-		{"\nThis\nThat", "ThisThat", false},
-		{"“This is a quote with tick`s … ” ☺ ", "Thisisaquotewithticks", false},
-		{"Test This String-!123", "Test This String", true},
-		{`~!@#$%^&*()-_Symbols=+[{]};:'"<>,./?`, "Symbols", true},
-		{"“This is a quote with tick`s … ” ☺ ", "This is a quote with ticks    ", true},
-		{"\nThis\nThat", `
+		{"regular string", "Test This String-!123", "TestThisString", false},
+		{"various symbols", `~!@#$%^&*()-_Symbols=+[{]};:'"<>,./?`, "Symbols", false},
+		{"carriage returns", "\nThis\nThat", "ThisThat", false},
+		{"quotes and ticks", "“This is a quote with tick`s … ” ☺ ", "Thisisaquotewithticks", false},
+		{"spaces", "Test This String-!123", "Test This String", true},
+		{"symbols and spaces", `~!@#$%^&*()-_Symbols=+[{]};:'"<>,./?`, "Symbols", true},
+		{"quotes and spaces", "“This is a quote with tick`s … ” ☺ ", "This is a quote with ticks    ", true},
+		{"carriage returns", "\nThis\nThat", `
 This
 That`, true},
 	}
 
-	// Test all
 	for _, test := range tests {
-		if output := Alpha(test.input, test.typeCase); output != test.expected {
-			t.Errorf("%s Failed: [%s] inputted and [%s] expected, received: [%s]", t.Name(), test.input, test.expected, output)
-		}
+		t.Run(test.name, func(t *testing.T) {
+			output := Alpha(test.input, test.typeCase)
+			assert.Equal(t, test.expected, output)
+		})
 	}
 }
 
@@ -65,29 +67,29 @@ func ExampleAlpha_withSpaces() {
 func TestAlphaNumeric(t *testing.T) {
 	t.Parallel()
 
-	// Create the list of tests
 	var tests = []struct {
+		name     string
 		input    string
 		expected string
 		typeCase bool
 	}{
-		{"Test This String-!123", "TestThisString123", false},
-		{`~!@#$%^&*()-_Symbols=+[{]};:'"<>,./?`, "Symbols", false},
-		{"\nThis1\nThat2", "This1That2", false},
-		{"“This is a quote with tick`s … ” ☺ 342", "Thisisaquotewithticks342", false},
-		{"Test This String-! 123", "Test This String 123", true},
-		{`~!@#$%^&*()-_Symbols 123=+[{]};:'"<>,./?`, "Symbols 123", true},
-		{"“This is a quote with tick`s…”☺ 123", "This is a quote with ticks 123", true},
-		{"\nThis1\nThat2", `
+		{"regular string", "Test This String-!123", "TestThisString123", false},
+		{"symbols", `~!@#$%^&*()-_Symbols=+[{]};:'"<>,./?`, "Symbols", false},
+		{"carriage returns", "\nThis1\nThat2", "This1That2", false},
+		{"quotes and ticks", "“This is a quote with tick`s … ” ☺ 342", "Thisisaquotewithticks342", false},
+		{"string with spaces", "Test This String-! 123", "Test This String 123", true},
+		{"symbols and spaces", `~!@#$%^&*()-_Symbols 123=+[{]};:'"<>,./?`, "Symbols 123", true},
+		{"ticks and spaces", "“This is a quote with tick`s…”☺ 123", "This is a quote with ticks 123", true},
+		{"carriage return and spaces", "\nThis1\nThat2", `
 This1
 That2`, true},
 	}
 
-	// Test all
 	for _, test := range tests {
-		if output := AlphaNumeric(test.input, test.typeCase); output != test.expected {
-			t.Errorf("%s Failed: [%s] inputted and [%s] expected, received: [%s]", t.Name(), test.input, test.expected, output)
-		}
+		t.Run(test.name, func(t *testing.T) {
+			output := AlphaNumeric(test.input, test.typeCase)
+			assert.Equal(t, test.expected, output)
+		})
 	}
 }
 
@@ -121,26 +123,26 @@ func ExampleAlphaNumeric_withSpaces() {
 func TestBitcoinAddress(t *testing.T) {
 	t.Parallel()
 
-	// Create the list of tests
 	var tests = []struct {
+		name     string
 		input    string
 		expected string
 	}{
-		{":1K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs", "1K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs"},
-		{"   1K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs    ", "1K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs"},
-		{"   1K6c7 LGpdB 8LwoGNVfG5 1dRV 9UUEijbrWs    ", "1K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs"},
-		{"$#:1K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs!", "1K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs"},
-		{"$#:1K6c_7LGpd^B8Lw_oGN=VfG+51_dRV9-UUEijbrWs!", "1K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs"},
+		{"remove symbol", ":1K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs", "1K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs"},
+		{"remove spaces", "   1K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs    ", "1K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs"},
+		{"remove spaces 2", "   1K6c7 LGpdB 8LwoGNVfG5 1dRV 9UUEijbrWs    ", "1K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs"},
+		{"remove symbols 2", "$#:1K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs!", "1K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs"},
+		{"remove symbols 3", "$#:1K6c_7LGpd^B8Lw_oGN=VfG+51_dRV9-UUEijbrWs!", "1K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs"},
 
 		// No uppercase letter O, uppercase letter I, lowercase letter l, and the number 0
-		{"OIl01K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs!", "1K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs"},
+		{"uppercase letters", "OIl01K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs!", "1K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs"},
 	}
 
-	// Test all
 	for _, test := range tests {
-		if output := BitcoinAddress(test.input); output != test.expected {
-			t.Errorf("%s Failed: [%s] inputted and [%s] expected, received: [%s]", t.Name(), test.input, test.expected, output)
-		}
+		t.Run(test.name, func(t *testing.T) {
+			output := BitcoinAddress(test.input)
+			assert.Equal(t, test.expected, output)
+		})
 	}
 }
 
@@ -161,23 +163,23 @@ func ExampleBitcoinAddress() {
 func TestBitcoinCashAddress(t *testing.T) {
 	t.Parallel()
 
-	// Create the list of tests
 	var tests = []struct {
+		name     string
 		input    string
 		expected string
 	}{
-		{"$#:qze7yy2au5vuznvn8lzj5y0j5t066vhs75e3m0eptz!", "qze7yy2au5vuznvn8lzj5y0j5t066vhs75e3m0eptz"},
-		{" $#:qze7yy2 au5vuznvn8lzj5y0j5t066 vhs75e3m0eptz! ", "qze7yy2au5vuznvn8lzj5y0j5t066vhs75e3m0eptz"},
+		{"remove symbols", "$#:qze7yy2au5vuznvn8lzj5y0j5t066vhs75e3m0eptz!", "qze7yy2au5vuznvn8lzj5y0j5t066vhs75e3m0eptz"},
+		{"remove spaces", " $#:qze7yy2 au5vuznvn8lzj5y0j5t066 vhs75e3m0eptz! ", "qze7yy2au5vuznvn8lzj5y0j5t066vhs75e3m0eptz"},
 
 		// No letters o, b, i, or number 1
-		{"pqbq3728yw0y47sOqn6l2na30mcw6zm78idzq5ucqzc371", "pqq3728yw0y47sqn6l2na30mcw6zm78dzq5ucqzc37"},
+		{"remove ignored characters", "pqbq3728yw0y47sOqn6l2na30mcw6zm78idzq5ucqzc371", "pqq3728yw0y47sqn6l2na30mcw6zm78dzq5ucqzc37"},
 	}
 
-	// Test all
 	for _, test := range tests {
-		if output := BitcoinCashAddress(test.input); output != test.expected {
-			t.Errorf("%s Failed: [%s] inputted and [%s] expected, received: [%s]", t.Name(), test.input, test.expected, output)
-		}
+		t.Run(test.name, func(t *testing.T) {
+			output := BitcoinCashAddress(test.input)
+			assert.Equal(t, test.expected, output)
+		})
 	}
 }
 
@@ -198,7 +200,6 @@ func ExampleBitcoinCashAddress() {
 func TestCustom(t *testing.T) {
 	t.Parallel()
 
-	// Create the list of tests
 	var tests = []struct {
 		input    string
 		expected string
@@ -209,11 +210,9 @@ func TestCustom(t *testing.T) {
 		{"ThisWorks1.23!", "ThisWorks123", `[^0-9a-zA-Z]`},
 	}
 
-	// Test all
 	for _, test := range tests {
-		if output := Custom(test.input, test.regex); output != test.expected {
-			t.Errorf("%s Failed: [%s] inputted and [%s] expected, received: [%s]", t.Name(), test.input, test.expected, output)
-		}
+		output := Custom(test.input, test.regex)
+		assert.Equal(t, test.expected, output)
 	}
 }
 
@@ -240,7 +239,6 @@ func ExampleCustom_numeric() {
 func TestDecimal(t *testing.T) {
 	t.Parallel()
 
-	// Create the list of tests
 	var tests = []struct {
 		input    string
 		expected string
@@ -252,11 +250,9 @@ func TestDecimal(t *testing.T) {
 		{"/n<<  $-1.034234  >>/n", "-1.034234"},
 	}
 
-	// Test all
 	for _, test := range tests {
-		if output := Decimal(test.input); output != test.expected {
-			t.Errorf("%s Failed: [%s] inputted and [%s] expected, received: [%s]", t.Name(), test.input, test.expected, output)
-		}
+		output := Decimal(test.input)
+		assert.Equal(t, test.expected, output)
 	}
 }
 
@@ -283,7 +279,6 @@ func ExampleDecimal_negative() {
 func TestDomain(t *testing.T) {
 	t.Parallel()
 
-	// Create the list of tests
 	var tests = []struct {
 		input         string
 		expected      string
@@ -303,7 +298,6 @@ func TestDomain(t *testing.T) {
 		{"www.IAmaDomain.com/?this=that#plusThis", "www.iamadomain.com", false, false, false},
 	}
 
-	// Test all
 	for _, test := range tests {
 		if output, err := Domain(test.input, test.preserveCase, test.removeWww); output != test.expected && !test.expectedError {
 			t.Errorf("%s Failed: [%s] inputted and [%s] expected, received: [%s]", t.Name(), test.input, test.expected, output)
@@ -358,7 +352,6 @@ func ExampleDomain_removeWww() {
 func TestEmail(t *testing.T) {
 	t.Parallel()
 
-	// Create the list of tests
 	var tests = []struct {
 		input        string
 		expected     string
@@ -374,11 +367,9 @@ func TestEmail(t *testing.T) {
 		{" test_ME+2@GmAil.com ", "test_ME+2@GmAil.com", true},
 	}
 
-	// Test all
 	for _, test := range tests {
-		if output := Email(test.input, test.preserveCase); output != test.expected {
-			t.Errorf("%s Failed: [%s] inputted and [%s] expected, received: [%s]", t.Name(), test.input, test.expected, output)
-		}
+		output := Email(test.input, test.preserveCase)
+		assert.Equal(t, test.expected, output)
 	}
 }
 
@@ -412,7 +403,6 @@ func ExampleEmail_preserveCase() {
 func TestFirstToUpper(t *testing.T) {
 	t.Parallel()
 
-	// Create the list of tests
 	var tests = []struct {
 		input    string
 		expected string
@@ -424,11 +414,9 @@ func TestFirstToUpper(t *testing.T) {
 		{"tt", "Tt"},
 	}
 
-	// Test all
 	for _, test := range tests {
-		if output := FirstToUpper(test.input); output != test.expected {
-			t.Errorf("%s Failed: [%s] inputted and [%s] expected, received: [%s]", t.Name(), test.input, test.expected, output)
-		}
+		output := FirstToUpper(test.input)
+		assert.Equal(t, test.expected, output)
 	}
 }
 
@@ -449,7 +437,6 @@ func ExampleFirstToUpper() {
 func TestFormalName(t *testing.T) {
 	t.Parallel()
 
-	// Create the list of tests
 	var tests = []struct {
 		input    string
 		expected string
@@ -461,11 +448,9 @@ func TestFormalName(t *testing.T) {
 		{"Does #Not Work!", "Does Not Work"},
 	}
 
-	// Test all
 	for _, test := range tests {
-		if output := FormalName(test.input); output != test.expected {
-			t.Errorf("%s Failed: [%s] inputted and [%s] expected, received: [%s]", t.Name(), test.input, test.expected, output)
-		}
+		output := FormalName(test.input)
+		assert.Equal(t, test.expected, output)
 	}
 }
 
@@ -486,7 +471,6 @@ func ExampleFormalName() {
 func TestHTML(t *testing.T) {
 	t.Parallel()
 
-	// Create the list of tests
 	var tests = []struct {
 		input    string
 		expected string
@@ -496,11 +480,9 @@ func TestHTML(t *testing.T) {
 		{"<html><b class='test'>This works?</b><i></i></br></html>", "This works?"},
 	}
 
-	// Test all
 	for _, test := range tests {
-		if output := HTML(test.input); output != test.expected {
-			t.Errorf("%s Failed: [%s] inputted and [%s] expected, received: [%s]", t.Name(), test.input, test.expected, output)
-		}
+		output := HTML(test.input)
+		assert.Equal(t, test.expected, output)
 	}
 }
 
@@ -521,7 +503,6 @@ func ExampleHTML() {
 func TestIPAddress(t *testing.T) {
 	t.Parallel()
 
-	// Create the list of tests
 	var tests = []struct {
 		input    string
 		expected string
@@ -541,11 +522,9 @@ func TestIPAddress(t *testing.T) {
 		{"  ##!192.168.0.1!##  ", "192.168.0.1"},
 	}
 
-	// Test all
 	for _, test := range tests {
-		if output := IPAddress(test.input); output != test.expected {
-			t.Errorf("%s Failed: [%s] inputted and [%s] expected, received: [%s]", t.Name(), test.input, test.expected, output)
-		}
+		output := IPAddress(test.input)
+		assert.Equal(t, test.expected, output)
 	}
 }
 
@@ -579,7 +558,6 @@ func ExampleIPAddress_ipv6() {
 func TestNumeric(t *testing.T) {
 	t.Parallel()
 
-	// Create the list of tests
 	var tests = []struct {
 		input    string
 		expected string
@@ -588,11 +566,9 @@ func TestNumeric(t *testing.T) {
 		{" $1.00 Price!", "100"},
 	}
 
-	// Test all
 	for _, test := range tests {
-		if output := Numeric(test.input); output != test.expected {
-			t.Errorf("%s Failed: [%s] inputted and [%s] expected, received: [%s]", t.Name(), test.input, test.expected, output)
-		}
+		output := Numeric(test.input)
+		assert.Equal(t, test.expected, output)
 	}
 }
 
@@ -613,7 +589,6 @@ func ExampleNumeric() {
 func TestPathName(t *testing.T) {
 	t.Parallel()
 
-	// Create the list of tests
 	var tests = []struct {
 		input    string
 		expected string
@@ -623,11 +598,9 @@ func TestPathName(t *testing.T) {
 		{"My_Folder-Path-123_TEST", "My_Folder-Path-123_TEST"},
 	}
 
-	// Test all
 	for _, test := range tests {
-		if output := PathName(test.input); output != test.expected {
-			t.Errorf("%s Failed: [%s] inputted and [%s] expected, received: [%s]", t.Name(), test.input, test.expected, output)
-		}
+		output := PathName(test.input)
+		assert.Equal(t, test.expected, output)
 	}
 }
 
@@ -648,7 +621,6 @@ func ExamplePathName() {
 func TestPunctuation(t *testing.T) {
 	t.Parallel()
 
-	// Create the list of tests
 	var tests = []struct {
 		input    string
 		expected string
@@ -662,11 +634,9 @@ func TestPunctuation(t *testing.T) {
 		{"Does, 123^* Not & Work!?", "Does, 123 Not & Work!?"},
 	}
 
-	// Test all
 	for _, test := range tests {
-		if output := Punctuation(test.input); output != test.expected {
-			t.Errorf("%s Failed: [%s] inputted and [%s] expected, received: [%s]", t.Name(), test.input, test.expected, output)
-		}
+		output := Punctuation(test.input)
+		assert.Equal(t, test.expected, output)
 	}
 }
 
@@ -687,7 +657,6 @@ func ExamplePunctuation() {
 func TestScripts(t *testing.T) {
 	t.Parallel()
 
-	// Create the list of tests
 	var tests = []struct {
 		input    string
 		expected string
@@ -700,11 +669,9 @@ func TestScripts(t *testing.T) {
 		{`this <object width="50" class="something"></object>`, "this "},
 	}
 
-	// Test all
 	for _, test := range tests {
-		if output := Scripts(test.input); output != test.expected {
-			t.Errorf("%s Failed: [%s] inputted and [%s] expected, received: [%s]", t.Name(), test.input, test.expected, output)
-		}
+		output := Scripts(test.input)
+		assert.Equal(t, test.expected, output)
 	}
 }
 
@@ -725,7 +692,6 @@ func ExampleScripts() {
 func TestSingleLine(t *testing.T) {
 	t.Parallel()
 
-	// Create the list of tests
 	var tests = []struct {
 		input    string
 		expected string
@@ -740,11 +706,9 @@ Mc'Cuban-Host
 something else`, " Mark Mc'Cuban-Host something else"},
 	}
 
-	// Test all
 	for _, test := range tests {
-		if output := SingleLine(test.input); output != test.expected {
-			t.Errorf("%s Failed: [%s] inputted and [%s] expected, received: [%s]", t.Name(), test.input, test.expected, output)
-		}
+		output := SingleLine(test.input)
+		assert.Equal(t, test.expected, output)
 	}
 }
 
@@ -770,7 +734,6 @@ Work?`))
 func TestTime(t *testing.T) {
 	t.Parallel()
 
-	// Create the list of tests
 	var tests = []struct {
 		input    string
 		expected string
@@ -780,11 +743,9 @@ func TestTime(t *testing.T) {
 		{"SOMETHING t00:00:00d -EST DAY", "00:00:00"},
 	}
 
-	// Test all
 	for _, test := range tests {
-		if output := Time(test.input); output != test.expected {
-			t.Errorf("%s Failed: [%s] inputted and [%s] expected, received: [%s]", t.Name(), test.input, test.expected, output)
-		}
+		output := Time(test.input)
+		assert.Equal(t, test.expected, output)
 	}
 }
 
@@ -805,7 +766,6 @@ func ExampleTime() {
 func TestURI(t *testing.T) {
 	t.Parallel()
 
-	// Create the list of tests
 	var tests = []struct {
 		input    string
 		expected string
@@ -815,11 +775,9 @@ func TestURI(t *testing.T) {
 		{"/This/Works/?that=123&this#page10%", "/This/Works/?that=123&this#page10%"},
 	}
 
-	// Test all
 	for _, test := range tests {
-		if output := URI(test.input); output != test.expected {
-			t.Errorf("%s Failed: [%s] inputted and [%s] expected, received: [%s]", t.Name(), test.input, test.expected, output)
-		}
+		output := URI(test.input)
+		assert.Equal(t, test.expected, output)
 	}
 }
 
@@ -840,7 +798,6 @@ func ExampleURI() {
 func TestURL(t *testing.T) {
 	t.Parallel()
 
-	// Create the list of tests
 	var tests = []struct {
 		input    string
 		expected string
@@ -852,11 +809,9 @@ func TestURL(t *testing.T) {
 		{"https://domain.com/this/test?this=value&another=123%#page", "https://domain.com/this/test?this=value&another=123%#page"},
 	}
 
-	// Test all
 	for _, test := range tests {
-		if output := URL(test.input); output != test.expected {
-			t.Errorf("%s Failed: [%s] inputted and [%s] expected, received: [%s]", t.Name(), test.input, test.expected, output)
-		}
+		output := URL(test.input)
+		assert.Equal(t, test.expected, output)
 	}
 }
 
@@ -877,7 +832,6 @@ func ExampleURL() {
 func TestXML(t *testing.T) {
 	t.Parallel()
 
-	// Create the list of tests
 	var tests = []struct {
 		input    string
 		expected string
@@ -886,11 +840,9 @@ func TestXML(t *testing.T) {
 		{`<body>This works?</body><title>Something</title>`, "This works?Something"},
 	}
 
-	// Test all
 	for _, test := range tests {
-		if output := XML(test.input); output != test.expected {
-			t.Errorf("%s Failed: [%s] inputted and [%s] expected, received: [%s]", t.Name(), test.input, test.expected, output)
-		}
+		output := XML(test.input)
+		assert.Equal(t, test.expected, output)
 	}
 }
 
@@ -911,7 +863,6 @@ func ExampleXML() {
 func TestXSS(t *testing.T) {
 	t.Parallel()
 
-	// Create the list of tests
 	var tests = []struct {
 		input    string
 		expected string
@@ -925,11 +876,9 @@ func TestXSS(t *testing.T) {
 		{"&#60;&#62;fromCharCode('test');&#62;&#60;", "('test');"},
 	}
 
-	// Test all
 	for _, test := range tests {
-		if output := XSS(test.input); output != test.expected {
-			t.Errorf("%s Failed: [%s] inputted and [%s] expected, received: [%s]", t.Name(), test.input, test.expected, output)
-		}
+		output := XSS(test.input)
+		assert.Equal(t, test.expected, output)
 	}
 }
 
