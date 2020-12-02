@@ -279,34 +279,113 @@ func ExampleDecimal_negative() {
 func TestDomain(t *testing.T) {
 	t.Parallel()
 
-	var tests = []struct {
-		input         string
-		expected      string
-		expectedError bool
-		preserveCase  bool
-		removeWww     bool
-	}{
-		{"http://www.I am a domain.com", "Iamadomain.com", true, false, false},
-		{"!I_am a domain.com", "", true, true, false},
-		{"", "", false, true, false},
-		{"http://IAmaDomain.com", "IAmaDomain.com", false, true, false},
-		{"http://IAmaDomain.com", "iamadomain.com", false, false, false},
-		{"http://IAmaDomaiN.Com", "iamadomain.com", false, false, false},
-		{"https://IAmaDomain.com/?this=that#plusThis", "iamadomain.com", false, false, false},
-		{"http://www.IAmaDomain.com/?this=that#plusThis", "iamadomain.com", false, false, true},
-		{"IAmaDomain.com/?this=that#plusThis", "iamadomain.com", false, false, true},
-		{"www.IAmaDomain.com/?this=that#plusThis", "www.iamadomain.com", false, false, false},
-	}
+	t.Run("valid cases", func(t *testing.T) {
 
-	for _, test := range tests {
-		if output, err := Domain(test.input, test.preserveCase, test.removeWww); output != test.expected && !test.expectedError {
-			t.Errorf("%s Failed: [%s] inputted and [%s] expected, received: [%s]", t.Name(), test.input, test.expected, output)
-		} else if err == nil && test.expectedError {
-			t.Errorf("%s Failed: expected to throw an error, no error [%s] inputted and [%s] expected", t.Name(), test.input, test.expected)
-		} else if err != nil && !test.expectedError {
-			t.Errorf("%s Failed: [%s] inputted and [%s] expected, received: [%s] error [%s]", t.Name(), test.input, test.expected, output, err.Error())
+		var tests = []struct {
+			name         string
+			input        string
+			expected     string
+			preserveCase bool
+			removeWww    bool
+		}{
+			{
+				"no domain name",
+				"",
+				"",
+				true,
+				true,
+			},
+			{
+				"remove leading http",
+				"http://IAmaDomain.com",
+				"IAmaDomain.com",
+				true,
+				false,
+			},
+			{
+				"remove leading http and lowercase",
+				"http://IAmaDomain.com",
+				"iamadomain.com",
+				false,
+				false,
+			},
+			{
+				"full url with params",
+				"https://IAmaDomain.com/?this=that#plusThis",
+				"iamadomain.com",
+				false,
+				false,
+			},
+			{
+				"full url with params, remove www",
+				"http://www.IAmaDomain.com/?this=that#plusThis",
+				"iamadomain.com",
+				false,
+				true,
+			},
+			{
+				"full url with params, leave www",
+				"http://www.IAmaDomain.com/?this=that#plusThis",
+				"www.iamadomain.com",
+				false,
+				false,
+			},
+			{
+				"caps domain, remove www",
+				"WWW.DOMAIN.COM",
+				"domain.com",
+				false,
+				true,
+			},
+			{
+				"mixed caps domain, remove www",
+				"WwW.DOMAIN.COM",
+				"domain.com",
+				false,
+				true,
+			},
 		}
-	}
+		for _, test := range tests {
+			t.Run(test.name, func(t *testing.T) {
+				output, err := Domain(test.input, test.preserveCase, test.removeWww)
+				assert.NoError(t, err)
+				assert.Equal(t, test.expected, output)
+			})
+		}
+	})
+
+	t.Run("invalid cases", func(t *testing.T) {
+
+		var tests = []struct {
+			name         string
+			input        string
+			expected     string
+			preserveCase bool
+			removeWww    bool
+		}{
+			{
+				"spaces in domain",
+				"http://www.I am a domain.com",
+				"http://www.I am a domain.com",
+				true,
+				true,
+			},
+			{
+				"symbol in domain",
+				"!I_am a domain.com",
+				"http://!I_am a domain.com",
+				true,
+				true,
+			},
+		}
+		for _, test := range tests {
+			t.Run(test.name, func(t *testing.T) {
+				output, err := Domain(test.input, test.preserveCase, test.removeWww)
+				assert.Error(t, err)
+				assert.Equal(t, test.expected, output)
+			})
+		}
+	})
 }
 
 // BenchmarkDomain benchmarks the Domain method

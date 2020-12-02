@@ -19,8 +19,8 @@ var (
 	alphaNumericWithSpacesRegExp = regexp.MustCompile(`[^a-zA-Z0-9\s]`)                                                           // Alpha numeric (with spaces)
 	alphaRegExp                  = regexp.MustCompile(`[^a-zA-Z]`)                                                                // Alpha characters
 	alphaWithSpacesRegExp        = regexp.MustCompile(`[^a-zA-Z\s]`)                                                              // Alpha characters (with spaces)
-	bitcoinRegExp                = regexp.MustCompile(`[^a-km-zA-HJ-NP-Z1-9]`)                                                    // Bitcoin address accepted characters
 	bitcoinCashAddrRegExp        = regexp.MustCompile(`[^ac-hj-np-zAC-HJ-NP-Z02-9]`)                                              // Bitcoin `cashaddr` address accepted characters
+	bitcoinRegExp                = regexp.MustCompile(`[^a-km-zA-HJ-NP-Z1-9]`)                                                    // Bitcoin address accepted characters
 	decimalRegExp                = regexp.MustCompile(`[^0-9.-]`)                                                                 // Decimals (positive and negative)
 	domainRegExp                 = regexp.MustCompile(`[^a-zA-Z0-9-.]`)                                                           // Domain accepted characters
 	emailRegExp                  = regexp.MustCompile(`[^a-zA-Z0-9-_.@+]`)                                                        // Email address characters
@@ -35,6 +35,7 @@ var (
 	timeRegExp                   = regexp.MustCompile(`[^0-9:]`)                                                                  // Time allowed characters
 	uriRegExp                    = regexp.MustCompile(`[^a-zA-Z0-9-_/?&=#%]`)                                                     // URI allowed characters
 	urlRegExp                    = regexp.MustCompile(`[^a-zA-Z0-9-_/:.,?&@=#%]`)                                                 // URL allowed characters
+	wwwRegExp                    = regexp.MustCompile(`(?i)www.`)                                                                 // For removing www
 )
 
 // emptySpace is an empty space for replacing
@@ -114,7 +115,7 @@ func Domain(original string, preserveCase bool, removeWww bool) (string, error) 
 
 	// Remove leading www.
 	if removeWww {
-		u.Host = strings.Replace(u.Host, "www.", "", -1)
+		u.Host = wwwRegExp.ReplaceAllString(u.Host, "")
 	}
 
 	// Keeps the exact case of the original input string
