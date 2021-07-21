@@ -16,7 +16,7 @@ import (
 // Set all the regular expressions
 var (
 	alphaNumericRegExp           = regexp.MustCompile(`[^a-zA-Z0-9]`)                                                             // Alpha numeric
-	alphaNumericWithSpacesRegExp = regexp.MustCompile(`[^a-zA-Z0-9\s]`)                                                           // Alpha numeric (with spaces)
+	alphaNumericWithSpacesRegExp = regexp.MustCompile(`[^a-zA-Z0-9\s]`)                                                           // Alphanumeric (with spaces)
 	alphaRegExp                  = regexp.MustCompile(`[^a-zA-Z]`)                                                                // Alpha characters
 	alphaWithSpacesRegExp        = regexp.MustCompile(`[^a-zA-Z\s]`)                                                              // Alpha characters (with spaces)
 	bitcoinCashAddrRegExp        = regexp.MustCompile(`[^ac-hj-np-zAC-HJ-NP-Z02-9]`)                                              // Bitcoin `cashaddr` address accepted characters
@@ -131,7 +131,7 @@ func Domain(original string, preserveCase bool, removeWww bool) (string, error) 
 //  View examples: sanitize_test.go
 func Email(original string, preserveCase bool) string {
 
-	// Leave the email address in it's original case
+	// Leave the email address in its original case
 	if preserveCase {
 		return string(emailRegExp.ReplaceAll([]byte(strings.Replace(original, "mailto:", "", -1)), emptySpace))
 	}

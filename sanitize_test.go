@@ -63,7 +63,7 @@ func ExampleAlpha_withSpaces() {
 	// Output: Example String
 }
 
-// TestAlphaNumeric tests the alpha numeric sanitize method
+// TestAlphaNumeric tests the alphanumeric sanitize method
 func TestAlphaNumeric(t *testing.T) {
 	t.Parallel()
 
@@ -599,6 +599,7 @@ func TestIPAddress(t *testing.T) {
 		{"IP: 192.168.0.1 ", ""},
 		{" 192.168.0.1 ", "192.168.0.1"},
 		{"  ##!192.168.0.1!##  ", "192.168.0.1"},
+		{`		192.168.1.1`, "192.168.1.1"},
 	}
 
 	for _, test := range tests {
@@ -722,7 +723,7 @@ func TestPunctuation(t *testing.T) {
 // BenchmarkPunctuation benchmarks the Punctuation method
 func BenchmarkPunctuation(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_ = Punctuation("Does this work? The're doing it?")
+		_ = Punctuation("Does this work? They're doing it?")
 	}
 }
 
