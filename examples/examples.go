@@ -21,4 +21,6 @@ func main() {
 	// Only numbers
 	formattedString = sanitize.Numeric(testString)
 	fmt.Printf("only numbers: %s\n", formattedString)
+
+	// See more in: sanitize_test.go
 }

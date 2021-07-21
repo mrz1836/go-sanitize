@@ -119,25 +119,6 @@ Read more about this Go project's [code standards](CODE_STANDARDS.md).
 - View the [benchmarks](sanitize_test.go)
 - View the [tests](sanitize_test.go)
 
-Basic implementation:
-```go
-package main
-
-import (
-    "fmt"
-    
-    "github.com/mrz1836/go-sanitize"
-)
-
-func main() {
-
-	// Execute and print
-	fmt.Println(sanitize.IPAddress("  ##!192.168.0.1!##  "))
-
-	// Output: 192.168.0.1
-}
-```
-
 <br/>
 
 ## Maintainers
