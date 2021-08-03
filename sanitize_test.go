@@ -344,6 +344,13 @@ func TestDomain(t *testing.T) {
 				false,
 				true,
 			},
+			{
+				"domain with tabs and spaces",
+				`		domain.com`,
+				"domain.com",
+				false,
+				true,
+			},
 		}
 		for _, test := range tests {
 			t.Run(test.name, func(t *testing.T) {

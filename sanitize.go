@@ -41,7 +41,8 @@ var (
 // emptySpace is an empty space for replacing
 var emptySpace = []byte("")
 
-// Alpha returns only alpha characters. Set the parameter spaces to true if you want to allow space characters. Valid characters are a-z and A-Z.
+// Alpha returns only alpha characters. Set the parameter spaces to true if you
+// want to allow space characters. Valid characters are a-z and A-Z.
 //  View examples: sanitize_test.go
 func Alpha(original string, spaces bool) string {
 
@@ -54,7 +55,8 @@ func Alpha(original string, spaces bool) string {
 	return string(alphaRegExp.ReplaceAll([]byte(original), emptySpace))
 }
 
-// AlphaNumeric returns only alphanumeric characters. Set the parameter spaces to true if you want to allow space characters. Valid characters are a-z, A-Z and 0-9.
+// AlphaNumeric returns only alphanumeric characters. Set the parameter spaces to true
+// if you want to allow space characters. Valid characters are a-z, A-Z and 0-9.
 //  View examples: sanitize_test.go
 func AlphaNumeric(original string, spaces bool) string {
 
@@ -73,13 +75,15 @@ func BitcoinAddress(original string) string {
 	return string(bitcoinRegExp.ReplaceAll([]byte(original), emptySpace))
 }
 
-// BitcoinCashAddress returns sanitized value for bitcoin `cashaddr` address (https://www.bitcoinabc.org/2018-01-14-CashAddr/)
+// BitcoinCashAddress returns sanitized value for bitcoin `cashaddr`
+// address (https://www.bitcoinabc.org/2018-01-14-CashAddr/)
 //  View examples: sanitize_test.go
 func BitcoinCashAddress(original string) string {
 	return string(bitcoinCashAddrRegExp.ReplaceAll([]byte(original), emptySpace))
 }
 
-// Custom uses a custom regex string and returns the sanitized result. This is used for any additional regex that this package does not contain.
+// Custom uses a custom regex string and returns the sanitized result.
+// This is used for any additional regex that this package does not contain.
 //  View examples: sanitize_test.go
 func Custom(original string, regExp string) string {
 
@@ -93,7 +97,9 @@ func Decimal(original string) string {
 	return string(decimalRegExp.ReplaceAll([]byte(original), emptySpace))
 }
 
-// Domain returns a proper hostname / domain name. Preserve case is to flag keeping the case versus forcing to lowercase. Use the removeWww flag to strip the www sub-domain. This method returns an error if parse critically fails.
+// Domain returns a proper hostname / domain name. Preserve case is to flag keeping the case
+// versus forcing to lowercase. Use the removeWww flag to strip the www sub-domain.
+// This method returns an error if parse critically fails.
 //  View examples: sanitize_test.go
 func Domain(original string, preserveCase bool, removeWww bool) (string, error) {
 
@@ -104,7 +110,7 @@ func Domain(original string, preserveCase bool, removeWww bool) (string, error) 
 
 	// Missing http?
 	if !strings.Contains(original, "http") {
-		original = "http://" + original
+		original = "http://" + strings.TrimSpace(original)
 	}
 
 	// Try to parse the url
@@ -127,20 +133,26 @@ func Domain(original string, preserveCase bool, removeWww bool) (string, error) 
 	return string(domainRegExp.ReplaceAll([]byte(strings.ToLower(u.Host)), emptySpace)), nil
 }
 
-// Email returns a sanitized email address string. Email addresses are forced to lowercase and removes any mail-to prefixes.
+// Email returns a sanitized email address string. Email addresses are forced
+// to lowercase and removes any mail-to prefixes.
 //  View examples: sanitize_test.go
 func Email(original string, preserveCase bool) string {
 
 	// Leave the email address in its original case
 	if preserveCase {
-		return string(emailRegExp.ReplaceAll([]byte(strings.Replace(original, "mailto:", "", -1)), emptySpace))
+		return string(emailRegExp.ReplaceAll(
+			[]byte(strings.Replace(original, "mailto:", "", -1)), emptySpace),
+		)
 	}
 
 	// Standard is forced to lowercase
-	return string(emailRegExp.ReplaceAll([]byte(strings.ToLower(strings.Replace(original, "mailto:", "", -1))), emptySpace))
+	return string(emailRegExp.ReplaceAll(
+		[]byte(strings.ToLower(strings.Replace(original, "mailto:", "", -1))), emptySpace),
+	)
 }
 
-// FirstToUpper overwrites the first letter as an uppercase letter and preserves the rest of the string.
+// FirstToUpper overwrites the first letter as an uppercase letter
+// and preserves the rest of the string.
 //  View examples: sanitize_test.go
 func FirstToUpper(original string) string {
 
@@ -170,7 +182,9 @@ func HTML(original string) string {
 //  View examples: sanitize_test.go
 func IPAddress(original string) string {
 	// Parse the IP - Remove any invalid characters first
-	ipAddress := net.ParseIP(string(ipAddressRegExp.ReplaceAll([]byte(original), emptySpace)))
+	ipAddress := net.ParseIP(
+		string(ipAddressRegExp.ReplaceAll([]byte(original), emptySpace)),
+	)
 	if ipAddress == nil {
 		return ""
 	}
