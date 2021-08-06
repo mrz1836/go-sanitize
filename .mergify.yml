@@ -4,7 +4,7 @@ pull_request_rules:
   # DEPENDABOT
   # ===============================================================================
 
-  - name: Automatic Merge for Dependabot Pull Requests
+  - name: Automatic Merge for Dependabot Minor Version Pull Requests
     conditions:
       - -draft
       - author~=^dependabot(|-preview)\[bot\]$
@@ -14,8 +14,22 @@ pull_request_rules:
       - check-success='Analyze (go)'
       - title~=^Bump [^\s]+ from ([\d]+)\..+ to \1\.
     actions:
+      review:
+        type: APPROVE
+        message: Automatically approving dependabot pull request
       merge:
         method: merge
+  - name: Alert on major version detection
+    conditions:
+      - author~=^dependabot(|-preview)\[bot\]$
+      - check-success='test (1.14.x, ubuntu-latest)'
+      - check-success='test (1.15.x, ubuntu-latest)'
+      - check-success='test (1.16.x, ubuntu-latest)'
+      - check-success='Analyze (go)'
+      - -title~=^Bump [^\s]+ from ([\d]+)\..+ to \1\.
+    actions:
+      comment:
+        message: "⚠️ @mrz1836: this is a major version bump and requires your attention"
 
   # ===============================================================================
   # AUTOMATIC MERGE (APPROVALS)
@@ -50,21 +64,21 @@ pull_request_rules:
       - label=automerge
     actions:
       comment:
-        message: "[✅] @{{author}}: **{{title}}** has been merged successfully."
+        message: "✅ @{{author}}: **{{title}}** has been merged successfully."
   - name: Alert on merge conflict
     conditions:
       - conflict
       - label=automerge
     actions:
       comment:
-        message: "[🆘] @{{author}}: `{{head}}` has conflicts with `{{base}}` that must be resolved."
+        message: "🆘 @{{author}}: `{{head}}` has conflicts with `{{base}}` that must be resolved."
   - name: Alert on tests failure for automerge
     conditions:
       - label=automerge
       - status-failure=commit
     actions:
       comment:
-        message: "[🆘] @{{author}}: unable to merge due to CI failure."
+        message: "🆘 @{{author}}: unable to merge due to CI failure."
 
   # ===============================================================================
   # LABELS
@@ -141,7 +155,8 @@ pull_request_rules:
   - name: Welcome New Contributors
     conditions:
       - and:
-        - author!=dependabot
+        - author!=dependabot[bot]
+        - author!=mergify[bot]
         - author!=mrz1836
         - author!=rohenaz
     actions:
