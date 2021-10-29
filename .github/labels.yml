@@ -32,11 +32,23 @@
   description: "Anything GUI related"
   name: "ui-ux"
 - color: 006b75
-  description: "Simple dependency updates or version bumps"
+  description: "Simple updates or version bumps"
   name: "chore"
+- color: 006b75
+  description: "Dependency updates"
+  name: "dependencies"
 - color: 006b75
   description: "General updates"
   name: "update"
 - color: FFA500
   description: "Any significant refactoring"
   name: "refactor"
+- color: FEF2C0
+  description: "Used for automatic merging"
+  name: "automerge"
+- color: FBCA04
+  description: "Used for denoting a WIP, stops auto-merge"
+  name: "work-in-progress"
+- color: c2e0c6
+  description: "Old, stale, unused"
+  name: "stale"

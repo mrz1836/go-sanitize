@@ -1,0 +1,36 @@
+# From: https://goreleaser.com/ci/actions/#usage
+name: release
+
+env:
+  GO111MODULE: on
+
+on:
+  push:
+    tags:
+      - '*'
+
+permissions:
+  contents: write
+
+jobs:
+  goreleaser:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.3.5
+        with:
+          fetch-depth: 0
+      - name: Set up Go
+        uses: actions/setup-go@v2.1.4
+        with:
+          go-version: 1.17
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v2.8.0
+        with:
+          distribution: goreleaser
+          version: latest
+          args: release --rm-dist --debug
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Syndicate to GoDocs
+        run: make godocs
