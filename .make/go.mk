@@ -13,21 +13,30 @@ DARWIN=$(BINARY_NAME)-darwin
 LINUX=$(BINARY_NAME)-linux
 WINDOWS=$(BINARY_NAME)-windows.exe
 
-.PHONY: test lint vet install
+.PHONY: test lint vet install generate
 
 bench:  ## Run all benchmarks in the Go application
+	@echo "running benchmarks..."
 	@go test -bench=. -benchmem
 
 build-go:  ## Build the Go application (locally)
+	@echo "building go app..."
 	@go build -o bin/$(BINARY_NAME)
 
 clean-mods: ## Remove all the Go mod cache
+	@echo "cleaning mods..."
 	@go clean -modcache
 
 coverage: ## Shows the test coverage
+	@echo "creating coverage report..."
 	@go test -coverprofile=coverage.out ./... && go tool cover -func=coverage.out
 
+generate: ## Runs the go generate command in the base of the repo
+	@echo "generating files..."
+	@go generate -v
+
 godocs: ## Sync the latest tag with GoDocs
+	@echo "syndicating to GoDocs..."
 	@test $(GIT_DOMAIN)
 	@test $(REPO_OWNER)
 	@test $(REPO_NAME)
@@ -35,27 +44,36 @@ godocs: ## Sync the latest tag with GoDocs
 	@curl https://proxy.golang.org/$(GIT_DOMAIN)/$(REPO_OWNER)/$(REPO_NAME)/@v/$(VERSION_SHORT).info
 
 install: ## Install the application
+	@echo "installing binary..."
 	@go build -o $$GOPATH/bin/$(BINARY_NAME)
 
 install-go: ## Install the application (Using Native Go)
+	@echo "installing package..."
 	@go install $(GIT_DOMAIN)/$(REPO_OWNER)/$(REPO_NAME)
 
 lint: ## Run the golangci-lint application (install if not found)
+	@echo "installing golangci-lint..."
 	@#Travis (has sudo)
-	@if [ "$(shell command -v golangci-lint)" = "" ] && [ $(TRAVIS) ]; then curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.41.1 && sudo cp ./bin/golangci-lint $(go env GOPATH)/bin/; fi;
+	@if [ "$(shell command -v golangci-lint)" = "" ] && [ $(TRAVIS) ]; then curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.42.1 && sudo cp ./bin/golangci-lint $(go env GOPATH)/bin/; fi;
 	@#AWS CodePipeline
-	@if [ "$(shell command -v golangci-lint)" = "" ] && [ "$(CODEBUILD_BUILD_ID)" != "" ]; then curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.41.1; fi;
+	@if [ "$(shell command -v golangci-lint)" = "" ] && [ "$(CODEBUILD_BUILD_ID)" != "" ]; then curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.42.1; fi;
 	@#Github Actions
-	@if [ "$(shell command -v golangci-lint)" = "" ] && [ "$(GITHUB_WORKFLOW)" != "" ]; then curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sudo sh -s -- -b $(go env GOPATH)/bin v1.41.1; fi;
+	@if [ "$(shell command -v golangci-lint)" = "" ] && [ "$(GITHUB_WORKFLOW)" != "" ]; then curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sudo sh -s -- -b $(go env GOPATH)/bin v1.42.1; fi;
 	@#Brew - MacOS
 	@if [ "$(shell command -v golangci-lint)" = "" ] && [ "$(shell command -v brew)" != "" ]; then brew install golangci-lint; fi;
+	@#MacOS Vanilla
+	@if [ "$(shell command -v golangci-lint)" = "" ] && [ "$(shell command -v brew)" != "" ]; then curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- v1.42.1; fi;
 	@echo "running golangci-lint..."
 	@golangci-lint run --verbose
 
-test: ## Runs vet, lint and ALL tests
+test: ## Runs lint and ALL tests
 	@$(MAKE) lint
 	@echo "running tests..."
 	@go test ./... -v
+
+test-unit: ## Runs tests and outputs coverage
+	@echo "running unit tests..."
+	@go test ./... -race -coverprofile=coverage.txt -covermode=atomic
 
 test-short: ## Runs vet, lint and tests (excludes integration tests)
 	@$(MAKE) lint
@@ -77,7 +95,12 @@ test-ci-short: ## Runs unit tests via CI (exports coverage)
 	@echo "running tests (CI - unit tests only)..."
 	@go test ./... -test.short -race -coverprofile=coverage.txt -covermode=atomic
 
+test-no-lint: ## Runs just tests
+	@echo "running tests..."
+	@go test ./... -v
+
 uninstall: ## Uninstall the application (and remove files)
+	@echo "uninstalling go application..."
 	@test $(BINARY_NAME)
 	@test $(GIT_DOMAIN)
 	@test $(REPO_OWNER)
@@ -87,9 +110,11 @@ uninstall: ## Uninstall the application (and remove files)
 	@rm -rf $$GOPATH/bin/$(BINARY_NAME)
 
 update:  ## Update all project dependencies
+	@echo "updating dependencies..."
 	@go get -u ./... && go mod tidy
 
 update-linter: ## Update the golangci-lint package (macOS only)
+	@echo "upgrading golangci-lint..."
 	@brew upgrade golangci-lint
 
 vet: ## Run the Go vet application
