@@ -16,13 +16,6 @@ changelog:
       - '^test:'
 
 # ---------------------------
-# Publishers
-# ---------------------------
-# publishers:
-#  - name: "Publish GoDocs"
-#    cmd: make godocs
-
-# ---------------------------
 # Builder
 # ---------------------------
 build:
