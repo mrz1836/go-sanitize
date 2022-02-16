@@ -123,8 +123,8 @@ Read more about this Go project's [code standards](.github/CODE_STANDARDS.md).
 
 ## Maintainers
 | [<img src="https://github.com/mrz1836.png" height="50" alt="MrZ" />](https://github.com/mrz1836) |
-|:---:|
-| [MrZ](https://github.com/mrz1836) |
+|:------------------------------------------------------------------------------------------------:|
+|                                [MrZ](https://github.com/mrz1836)                                 |
 
 <br/>
 
@@ -141,4 +141,4 @@ or by making a [**bitcoin donation**](https://mrz1818.com/?tab=tips&utm_source=g
 
 ## License
 
-![License](https://img.shields.io/github/license/mrz1836/go-sanitize.svg?style=flat)
+[![License](https://img.shields.io/github/license/mrz1836/go-sanitize.svg?style=flat)](LICENSE)
