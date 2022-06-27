@@ -2,4 +2,4 @@ module github.com/mrz1836/go-sanitize
 
 go 1.15
 
-require github.com/stretchr/testify v1.7.2
+require github.com/stretchr/testify v1.7.5
