@@ -2,7 +2,7 @@
 > Simple library of sanitation methods for data sanitation and reduction
 
 [![Release](https://img.shields.io/github/release-pre/mrz1836/go-sanitize.svg?logo=github&style=flat)](https://github.com/mrz1836/go-sanitize/releases)
-[![Build Status](https://img.shields.io/github/workflow/status/mrz1836/go-sanitize/run-go-tests?logo=github&v=3)](https://github.com/mrz1836/go-sanitize/actions)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/mrz1836/go-sanitize/run-tests.yml?branch=master&logo=github&v=3)](https://github.com/mrz1836/go-sanitize/actions)
 [![Report](https://goreportcard.com/badge/github.com/mrz1836/go-sanitize?style=flat)](https://goreportcard.com/report/github.com/mrz1836/go-sanitize)
 [![codecov](https://codecov.io/gh/mrz1836/go-sanitize/branch/master/graph/badge.svg)](https://codecov.io/gh/mrz1836/go-sanitize)
 [![Go](https://img.shields.io/github/go-mod/go-version/mrz1836/go-sanitize)](https://golang.org/)
