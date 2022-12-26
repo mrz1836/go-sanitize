@@ -42,7 +42,7 @@ View the generated [documentation](https://pkg.go.dev/github.com/mrz1836/go-sani
 <summary><strong><code>Library Deployment</code></strong></summary>
 <br/>
 
-[goreleaser](https://github.com/goreleaser/goreleaser) for easy binary or library deployment to Github and can be installed via: `brew install goreleaser`.
+[goreleaser](https://github.com/goreleaser/goreleaser) for easy binary or library deployment to GitHub and can be installed via: `brew install goreleaser`.
 
 The [.goreleaser.yml](.goreleaser.yml) file is used to configure [goreleaser](https://github.com/goreleaser/goreleaser).
 
@@ -91,8 +91,8 @@ vet                  Run the Go vet application
 <br/>
 
 ## Examples & Tests
-All unit tests and [examples](examples) run via [Github Actions](https://github.com/mrz1836/go-sanitize/actions) and
-uses [Go version 1.15.x](https://golang.org/doc/go1.15). View the [configuration file](.github/workflows/run-tests.yml).
+All unit tests and [examples](examples) run via [GitHub Actions](https://github.com/mrz1836/go-sanitize/actions) and
+uses [Go version 1.16.x](https://golang.org/doc/go1.16). View the [configuration file](.github/workflows/run-tests.yml).
 
 Run all tests (including any integration tests)
 ```shell script
