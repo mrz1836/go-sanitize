@@ -30,6 +30,7 @@ var (
 	numericRegExp                = regexp.MustCompile(`[^0-9]`)                                                                   // Numbers only
 	pathNameRegExp               = regexp.MustCompile(`[^a-zA-Z0-9-_]`)                                                           // Path name (file name, seo)
 	punctuationRegExp            = regexp.MustCompile(`[^a-zA-Z0-9-'"#&!?,.\s]+`)                                                 // Standard accepted punctuation characters
+	scientificNotationRegExp     = regexp.MustCompile(`[^0-9.eE+-]`)                                                              // Scientific Notation (float) (positive and negative)
 	scriptRegExp                 = regexp.MustCompile(`(?i)<(script|iframe|embed|object)[^>]*>.*</(script|iframe|embed|object)>`) // Scripts and embeds
 	singleLineRegExp             = regexp.MustCompile(`(\r)|(\n)|(\t)|(\v)|(\f)`)                                                 // Carriage returns, line feeds, tabs, for single line transition
 	timeRegExp                   = regexp.MustCompile(`[^0-9:]`)                                                                  // Time allowed characters
@@ -223,6 +224,13 @@ func PathName(original string) string {
 //	View examples: sanitize_test.go
 func Punctuation(original string) string {
 	return string(punctuationRegExp.ReplaceAll([]byte(original), emptySpace))
+}
+
+// ScientificNotation returns sanitized decimal/float values in either positive or negative.
+//
+//	View examples: sanitize_test.go
+func ScientificNotation(original string) string {
+	return string(scientificNotationRegExp.ReplaceAll([]byte(original), emptySpace))
 }
 
 // Scripts removes all scripts, iframes and embeds tags from string.

@@ -428,7 +428,7 @@ func ExampleDomain_preserveCase() {
 	// Output: www.Example.COM <nil>
 }
 
-// ExampleDomain_removeWww example using Domain() and removing the www sub-domain
+// ExampleDomain_removeWww example using Domain() and removing the www subdomain
 func ExampleDomain_removeWww() {
 	fmt.Println(Domain("https://www.Example.COM/?param=value", false, true))
 	// Output: example.com <nil>
@@ -744,6 +744,42 @@ func BenchmarkPunctuation(b *testing.B) {
 func ExamplePunctuation() {
 	fmt.Println(Punctuation(`[@"Does" 'this' work?@] this too`))
 	// Output: "Does" 'this' work? this too
+}
+
+// TestScientificNotation tests the scientific notation sanitize method
+func TestScientificNotation(t *testing.T) {
+	t.Parallel()
+
+	var tests = []struct {
+		input    string
+		expected string
+	}{
+		{" String: 1.23 ", "1.23"},
+		{" String: 1.23e-3 ", "1.23e-3"},
+		{" String: -1.23e-3 ", "-1.23e-3"},
+		{" String: 001.2300 ", "001.2300"},
+		{"  $-1.034234  word", "-1.034234"},
+		{"  $-1%.034234e  word", "-1.034234e"},
+		{"/n<<  $-1.034234  >>/n", "-1.034234"},
+	}
+
+	for _, test := range tests {
+		output := ScientificNotation(test.input)
+		assert.Equal(t, test.expected, output)
+	}
+}
+
+// BenchmarkDecimal benchmarks the ScientificNotation method
+func BenchmarkScientificNotation(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_ = ScientificNotation("String: -1.096e-3")
+	}
+}
+
+// ExampleDecimal example using Decimal() for a positive number
+func ExampleScientificNotation() {
+	fmt.Println(ScientificNotation("$ 1.096e-3!"))
+	// Output: 1.096e-3
 }
 
 // TestScripts tests the script removal
