@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 // TestAlpha tests the alpha sanitize method
@@ -355,7 +356,7 @@ func TestDomain(t *testing.T) {
 		for _, test := range tests {
 			t.Run(test.name, func(t *testing.T) {
 				output, err := Domain(test.input, test.preserveCase, test.removeWww)
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				assert.Equal(t, test.expected, output)
 			})
 		}
@@ -388,7 +389,7 @@ func TestDomain(t *testing.T) {
 		for _, test := range tests {
 			t.Run(test.name, func(t *testing.T) {
 				output, err := Domain(test.input, test.preserveCase, test.removeWww)
-				assert.Error(t, err)
+				require.Error(t, err)
 				assert.Equal(t, test.expected, output)
 			})
 		}
@@ -951,7 +952,7 @@ func TestURL(t *testing.T) {
 // BenchmarkURL benchmarks the URL method
 func BenchmarkURL(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_ = XSS("/Test/This/Url/?param=value")
+		_ = URL("/Test/This/Url/?param=value")
 	}
 }
 
