@@ -65,19 +65,31 @@ install-go: ## Install the application (Using Native Go)
 
 .PHONY: lint
 lint: ## Run the golangci-lint application (install if not found)
-	@echo "installing golangci-lint..."
-	@#Travis (has sudo)
-	@if [ "$(shell command -v golangci-lint)" = "" ] && [ $(TRAVIS) ]; then curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.54.0 && sudo cp ./bin/golangci-lint $(go env GOPATH)/bin/; fi;
-	@#AWS CodePipeline
-	@if [ "$(shell command -v golangci-lint)" = "" ] && [ "$(CODEBUILD_BUILD_ID)" != "" ]; then curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.54.0; fi;
-	@#GitHub Actions
-	@if [ "$(shell command -v golangci-lint)" = "" ] && [ "$(GITHUB_WORKFLOW)" != "" ]; then curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sudo sh -s -- -b $(go env GOPATH)/bin v1.54.0; fi;
-	@#Brew - MacOS
-	@if [ "$(shell command -v golangci-lint)" = "" ] && [ "$(shell command -v brew)" != "" ]; then brew install golangci-lint; fi;
-	@#MacOS Vanilla
-	@if [ "$(shell command -v golangci-lint)" = "" ] && [ "$(shell command -v brew)" != "" ]; then curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- v1.54.0; fi;
-	@echo "running golangci-lint..."
-	@golangci-lint run --verbose
+	@if [ "$(shell which golangci-lint)" = "" ]; then \
+		if [ "$(shell command -v brew)" != "" ]; then \
+			echo "Brew detected, attempting to install golangci-lint..."; \
+			if ! brew list golangci-lint &>/dev/null; then \
+				brew install golangci-lint; \
+			else \
+				echo "golangci-lint is already installed via brew."; \
+			fi; \
+		else \
+			echo "Installing golangci-lint via curl..."; \
+			GOPATH=$$(go env GOPATH); \
+			if [ -z "$$GOPATH" ]; then GOPATH=$$HOME/go; fi; \
+			echo "Installation path: $$GOPATH/bin"; \
+			curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $$GOPATH/bin v1.57.2; \
+		fi; \
+	fi; \
+	if [ "$(TRAVIS)" != "" ]; then \
+		echo "Travis CI environment detected."; \
+	elif [ "$(CODEBUILD_BUILD_ID)" != "" ]; then \
+		echo "AWS CodePipeline environment detected."; \
+	elif [ "$(GITHUB_WORKFLOW)" != "" ]; then \
+		echo "GitHub Actions environment detected."; \
+	fi; \
+	echo "Running golangci-lint..."; \
+	golangci-lint run --verbose
 
 .PHONY: test
 test: ## Runs lint and ALL tests
