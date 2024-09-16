@@ -72,10 +72,9 @@ linters-settings:
     # default is false: such cases aren't reported by default.
     check-blank: false
 
-    # [deprecated] comma-separated list of pairs of the form pkg:regex
-    # the regex is used to ignore names within pkg. (default "fmt:.*").
-    # see https://github.com/kisielk/errcheck#the-deprecated-method for details
-    ignore: fmt:.*,io/ioutil:^Read.*
+    # path to a file containing a list of functions to exclude from checking
+    # see https://github.com/kisielk/errcheck#excluding-functions for details
+    exclude-functions: fmt:.*,io/ioutil:^Read.*
 
     # path to a file containing a list of functions to exclude from checking
     # see https://github.com/kisielk/errcheck#excluding-functions for details
@@ -176,7 +175,7 @@ linters-settings:
       - atomicalign
       - shadow
     enable-all: false
-      #disable:
+    #disable:
     #- shadow
     disable-all: false
   #depguard:
@@ -283,17 +282,19 @@ linters-settings:
 
 linters:
   enable:
-    - megacheck
+    - gosimple
+    - staticcheck
+    - unused
     - govet
     - gofmt
     - gosec
+    - copyloopvar
     - bodyclose
     - revive
     - unconvert
     - misspell
     - dogsled
     - prealloc
-    - exportloopref
     - exhaustive
     - sqlclosecheck
     - nolintlint
@@ -336,10 +337,11 @@ linters:
     - gochecknoglobals # this project uses some globals
     - godot # some comments do not end in a period
     - godox # finds all the HACKs
-    - goerr113 # requires a lot of fixes for errors with wrapping
+    - err113 # requires a lot of fixes for errors with wrapping
     - gomnd # we have too many raw numbers that are not magic
     - gomoddirectives # we use replace as needed
     - nilnil # we do not conform to this
+    - testifylint # Need to fix all the lint issues before enabling
     #- contextcheck # having issues with this
   disable-all: false
   presets:
