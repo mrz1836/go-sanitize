@@ -10,6 +10,8 @@ pull_request_rules:
       - author~=^dependabot(|-preview)\[bot\]$
       - check-success='test (1.18.x, ubuntu-latest)'
       - check-success='test (1.19.x, ubuntu-latest)'
+      - check-success='test (1.23.x, ubuntu-latest)'
+      - check-success='test (1.24.x, ubuntu-latest)'
       - check-success='Analyze (go)'
       - title~=^Bump [^\s]+ from ([\d]+)\..+ to \1\.
     actions:
@@ -23,6 +25,8 @@ pull_request_rules:
       - author~=^dependabot(|-preview)\[bot\]$
       - check-success='test (1.18.x, ubuntu-latest)'
       - check-success='test (1.19.x, ubuntu-latest)'
+      - check-success='test (1.23.x, ubuntu-latest)'
+      - check-success='test (1.24.x, ubuntu-latest)'
       - check-success='Analyze (go)'
       - -title~=^Bump [^\s]+ from ([\d]+)\..+ to \1\.
     actions:
@@ -40,6 +44,8 @@ pull_request_rules:
       - "#changes-requested-reviews-by=0"
       - check-success='test (1.18.x, ubuntu-latest)'
       - check-success='test (1.19.x, ubuntu-latest)'
+      - check-success='test (1.23.x, ubuntu-latest)'
+      - check-success='test (1.24.x, ubuntu-latest)'
       - check-success='Analyze (go)'
       - -title~=(?i)wip
       - label!=work-in-progress
