@@ -1,9 +1,11 @@
-package sanitize
+package sanitize_test
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
+	"github.com/mrz1836/go-sanitize"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -32,7 +34,30 @@ That`, true},
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			output := Alpha(test.input, test.typeCase)
+			output := sanitize.Alpha(test.input, test.typeCase)
+			assert.Equal(t, test.expected, output)
+		})
+	}
+}
+
+// TestAlphaEdgeCases tests the alpha sanitize method with edge cases
+func TestAlphaEdgeCases(t *testing.T) {
+	t.Parallel()
+
+	var tests = []struct {
+		name     string
+		input    string
+		expected string
+		typeCase bool
+	}{
+		{"empty string", "", "", false},
+		{"only special characters", "!@#$%^&*()", "", false},
+		{"very long string", strings.Repeat("a", 1000), strings.Repeat("a", 1000), false},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			output := sanitize.Alpha(test.input, test.typeCase)
 			assert.Equal(t, test.expected, output)
 		})
 	}
@@ -41,26 +66,26 @@ That`, true},
 // BenchmarkAlphaNoSpaces benchmarks the Alpha method
 func BenchmarkAlpha(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_ = Alpha("This is the test string.", false)
+		_ = sanitize.Alpha("This is the test string.", false)
 	}
 }
 
 // BenchmarkAlpha_WithSpaces benchmarks the Alpha method
 func BenchmarkAlpha_WithSpaces(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_ = Alpha("This is the test string.", true)
+		_ = sanitize.Alpha("This is the test string.", true)
 	}
 }
 
 // ExampleAlpha example using Alpha() and no spaces flag
 func ExampleAlpha() {
-	fmt.Println(Alpha("Example String!", false))
+	fmt.Println(sanitize.Alpha("Example String!", false))
 	// Output: ExampleString
 }
 
 // ExampleAlpha_withSpaces example using Alpha with spaces flag
 func ExampleAlpha_withSpaces() {
-	fmt.Println(Alpha("Example String!", true))
+	fmt.Println(sanitize.Alpha("Example String!", true))
 	// Output: Example String
 }
 
@@ -88,7 +113,7 @@ That2`, true},
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			output := AlphaNumeric(test.input, test.typeCase)
+			output := sanitize.AlphaNumeric(test.input, test.typeCase)
 			assert.Equal(t, test.expected, output)
 		})
 	}
@@ -97,26 +122,26 @@ That2`, true},
 // BenchmarkAlphaNumeric benchmarks the AlphaNumeric method
 func BenchmarkAlphaNumeric(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_ = AlphaNumeric("This is the test string 12345.", false)
+		_ = sanitize.AlphaNumeric("This is the test string 12345.", false)
 	}
 }
 
 // BenchmarkAlphaNumeric_WithSpaces benchmarks the AlphaNumeric method
 func BenchmarkAlphaNumeric_WithSpaces(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_ = AlphaNumeric("This is the test string 12345.", true)
+		_ = sanitize.AlphaNumeric("This is the test string 12345.", true)
 	}
 }
 
 // ExampleAlphaNumeric example using AlphaNumeric() with no spaces
 func ExampleAlphaNumeric() {
-	fmt.Println(AlphaNumeric("Example String 2!", false))
+	fmt.Println(sanitize.AlphaNumeric("Example String 2!", false))
 	// Output: ExampleString2
 }
 
 // ExampleAlphaNumeric_withSpaces example using AlphaNumeric() with spaces
 func ExampleAlphaNumeric_withSpaces() {
-	fmt.Println(AlphaNumeric("Example String 2!", true))
+	fmt.Println(sanitize.AlphaNumeric("Example String 2!", true))
 	// Output: Example String 2
 }
 
@@ -141,7 +166,7 @@ func TestBitcoinAddress(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			output := BitcoinAddress(test.input)
+			output := sanitize.BitcoinAddress(test.input)
 			assert.Equal(t, test.expected, output)
 		})
 	}
@@ -150,13 +175,13 @@ func TestBitcoinAddress(t *testing.T) {
 // BenchmarkBitcoinAddress benchmarks the BitcoinAddress method
 func BenchmarkBitcoinAddress(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_ = BitcoinAddress("1K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs")
+		_ = sanitize.BitcoinAddress("1K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs")
 	}
 }
 
 // ExampleBitcoinAddress example using BitcoinAddress()
 func ExampleBitcoinAddress() {
-	fmt.Println(BitcoinAddress(":1K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs!"))
+	fmt.Println(sanitize.BitcoinAddress(":1K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs!"))
 	// Output: 1K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs
 }
 
@@ -178,7 +203,7 @@ func TestBitcoinCashAddress(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			output := BitcoinCashAddress(test.input)
+			output := sanitize.BitcoinCashAddress(test.input)
 			assert.Equal(t, test.expected, output)
 		})
 	}
@@ -187,13 +212,13 @@ func TestBitcoinCashAddress(t *testing.T) {
 // BenchmarkBitcoinCashAddress benchmarks the BitcoinCashAddress() method
 func BenchmarkBitcoinCashAddress(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_ = BitcoinCashAddress("qze7yy2au5vuznvn8lzj5y0j5t066vhs75e3m0eptz")
+		_ = sanitize.BitcoinCashAddress("qze7yy2au5vuznvn8lzj5y0j5t066vhs75e3m0eptz")
 	}
 }
 
 // ExampleBitcoinCashAddress example using BitcoinCashAddress() `cashaddr`
 func ExampleBitcoinCashAddress() {
-	fmt.Println(BitcoinAddress("qze7yy2au5vuznvn8lzj5y0j5t066vhs75e3m0eptz!"))
+	fmt.Println(sanitize.BitcoinAddress("qze7yy2au5vuznvn8lzj5y0j5t066vhs75e3m0eptz!"))
 	// Output: qze7yy2au5vuznvn8zj5yj5t66vhs75e3meptz
 }
 
@@ -212,7 +237,7 @@ func TestCustom(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		output := Custom(test.input, test.regex)
+		output := sanitize.Custom(test.input, test.regex)
 		assert.Equal(t, test.expected, output)
 	}
 }
@@ -220,19 +245,19 @@ func TestCustom(t *testing.T) {
 // BenchmarkCustom benchmarks the Custom method
 func BenchmarkCustom(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_ = Custom("This is the test string 12345.", `[^a-zA-Z0-9]`)
+		_ = sanitize.Custom("This is the test string 12345.", `[^a-zA-Z0-9]`)
 	}
 }
 
 // ExampleCustom example using Custom() using an alpha regex
 func ExampleCustom() {
-	fmt.Println(Custom("Example String 2!", `[^a-zA-Z]`))
+	fmt.Println(sanitize.Custom("Example String 2!", `[^a-zA-Z]`))
 	// Output: ExampleString
 }
 
 // ExampleCustom_numeric example using Custom() using a numeric regex
 func ExampleCustom_numeric() {
-	fmt.Println(Custom("Example String 2!", `[^0-9]`))
+	fmt.Println(sanitize.Custom("Example String 2!", `[^0-9]`))
 	// Output: 2
 }
 
@@ -252,7 +277,7 @@ func TestDecimal(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		output := Decimal(test.input)
+		output := sanitize.Decimal(test.input)
 		assert.Equal(t, test.expected, output)
 	}
 }
@@ -260,19 +285,19 @@ func TestDecimal(t *testing.T) {
 // BenchmarkDecimal benchmarks the Decimal method
 func BenchmarkDecimal(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_ = Decimal("String: -123.12345")
+		_ = sanitize.Decimal("String: -123.12345")
 	}
 }
 
 // ExampleDecimal example using Decimal() for a positive number
 func ExampleDecimal() {
-	fmt.Println(Decimal("$ 99.99!"))
+	fmt.Println(sanitize.Decimal("$ 99.99!"))
 	// Output: 99.99
 }
 
 // ExampleDecimal_negative example using Decimal() for a negative number
 func ExampleDecimal_negative() {
-	fmt.Println(Decimal("$ -99.99!"))
+	fmt.Println(sanitize.Decimal("$ -99.99!"))
 	// Output: -99.99
 }
 
@@ -355,7 +380,7 @@ func TestDomain(t *testing.T) {
 		}
 		for _, test := range tests {
 			t.Run(test.name, func(t *testing.T) {
-				output, err := Domain(test.input, test.preserveCase, test.removeWww)
+				output, err := sanitize.Domain(test.input, test.preserveCase, test.removeWww)
 				require.NoError(t, err)
 				assert.Equal(t, test.expected, output)
 			})
@@ -388,7 +413,7 @@ func TestDomain(t *testing.T) {
 		}
 		for _, test := range tests {
 			t.Run(test.name, func(t *testing.T) {
-				output, err := Domain(test.input, test.preserveCase, test.removeWww)
+				output, err := sanitize.Domain(test.input, test.preserveCase, test.removeWww)
 				require.Error(t, err)
 				assert.Equal(t, test.expected, output)
 			})
@@ -399,39 +424,39 @@ func TestDomain(t *testing.T) {
 // BenchmarkDomain benchmarks the Domain method
 func BenchmarkDomain(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_, _ = Domain("https://Example.COM/?param=value", false, false)
+		_, _ = sanitize.Domain("https://Example.COM/?param=value", false, false)
 	}
 }
 
 // BenchmarkDomain_PreserveCase benchmarks the Domain method
 func BenchmarkDomain_PreserveCase(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_, _ = Domain("https://Example.COM/?param=value", true, false)
+		_, _ = sanitize.Domain("https://Example.COM/?param=value", true, false)
 	}
 }
 
 // BenchmarkDomain_RemoveWww benchmarks the Domain method
 func BenchmarkDomain_RemoveWww(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_, _ = Domain("https://Example.COM/?param=value", false, true)
+		_, _ = sanitize.Domain("https://Example.COM/?param=value", false, true)
 	}
 }
 
 // ExampleDomain example using Domain()
 func ExampleDomain() {
-	fmt.Println(Domain("https://www.Example.COM/?param=value", false, false))
+	fmt.Println(sanitize.Domain("https://www.Example.COM/?param=value", false, false))
 	// Output: www.example.com <nil>
 }
 
 // ExampleDomain_preserveCase example using Domain() and preserving the case
 func ExampleDomain_preserveCase() {
-	fmt.Println(Domain("https://www.Example.COM/?param=value", true, false))
+	fmt.Println(sanitize.Domain("https://www.Example.COM/?param=value", true, false))
 	// Output: www.Example.COM <nil>
 }
 
 // ExampleDomain_removeWww example using Domain() and removing the www subdomain
 func ExampleDomain_removeWww() {
-	fmt.Println(Domain("https://www.Example.COM/?param=value", false, true))
+	fmt.Println(sanitize.Domain("https://www.Example.COM/?param=value", false, true))
 	// Output: example.com <nil>
 }
 
@@ -455,7 +480,7 @@ func TestEmail(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		output := Email(test.input, test.preserveCase)
+		output := sanitize.Email(test.input, test.preserveCase)
 		assert.Equal(t, test.expected, output)
 	}
 }
@@ -463,26 +488,26 @@ func TestEmail(t *testing.T) {
 // BenchmarkEmail benchmarks the Email method
 func BenchmarkEmail(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_ = Email("mailto:Person@Example.COM ", false)
+		_ = sanitize.Email("mailto:Person@Example.COM ", false)
 	}
 }
 
 // BenchmarkEmail_PreserveCase benchmarks the Email method
 func BenchmarkEmail_PreserveCase(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_ = Email("mailto:Person@Example.COM ", true)
+		_ = sanitize.Email("mailto:Person@Example.COM ", true)
 	}
 }
 
 // ExampleEmail example using Email()
 func ExampleEmail() {
-	fmt.Println(Email("mailto:Person@Example.COM", false))
+	fmt.Println(sanitize.Email("mailto:Person@Example.COM", false))
 	// Output: person@example.com
 }
 
 // ExampleEmail_preserveCase example using Email() and preserving the case
 func ExampleEmail_preserveCase() {
-	fmt.Println(Email("mailto:Person@Example.COM", true))
+	fmt.Println(sanitize.Email("mailto:Person@Example.COM", true))
 	// Output: Person@Example.COM
 }
 
@@ -502,7 +527,7 @@ func TestFirstToUpper(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		output := FirstToUpper(test.input)
+		output := sanitize.FirstToUpper(test.input)
 		assert.Equal(t, test.expected, output)
 	}
 }
@@ -510,13 +535,13 @@ func TestFirstToUpper(t *testing.T) {
 // BenchmarkFirstToUpper benchmarks the FirstToUpper method
 func BenchmarkFirstToUpper(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_ = FirstToUpper("make this upper")
+		_ = sanitize.FirstToUpper("make this upper")
 	}
 }
 
 // ExampleFirstToUpper example using FirstToUpper()
 func ExampleFirstToUpper() {
-	fmt.Println(FirstToUpper("this works"))
+	fmt.Println(sanitize.FirstToUpper("this works"))
 	// Output: This works
 }
 
@@ -536,7 +561,7 @@ func TestFormalName(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		output := FormalName(test.input)
+		output := sanitize.FormalName(test.input)
 		assert.Equal(t, test.expected, output)
 	}
 }
@@ -544,13 +569,13 @@ func TestFormalName(t *testing.T) {
 // BenchmarkFormalName benchmarks the FormalName method
 func BenchmarkFormalName(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_ = FormalName("John McDonald Jr.")
+		_ = sanitize.FormalName("John McDonald Jr.")
 	}
 }
 
 // ExampleFormalName example using FormalName()
 func ExampleFormalName() {
-	fmt.Println(FormalName("John McDonald Jr.!"))
+	fmt.Println(sanitize.FormalName("John McDonald Jr.!"))
 	// Output: John McDonald Jr.
 }
 
@@ -568,7 +593,7 @@ func TestHTML(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		output := HTML(test.input)
+		output := sanitize.HTML(test.input)
 		assert.Equal(t, test.expected, output)
 	}
 }
@@ -576,13 +601,13 @@ func TestHTML(t *testing.T) {
 // BenchmarkHTML benchmarks the HTML method
 func BenchmarkHTML(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_ = FormalName("<html><b>Test This!</b></html>")
+		_ = sanitize.HTML("<html><b>Test This!</b></html>")
 	}
 }
 
 // ExampleHTML example using HTML()
 func ExampleHTML() {
-	fmt.Println(HTML("<body>This Works?</body>"))
+	fmt.Println(sanitize.HTML("<body>This Works?</body>"))
 	// Output: This Works?
 }
 
@@ -617,7 +642,7 @@ func TestIPAddress(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		output := IPAddress(test.input)
+		output := sanitize.IPAddress(test.input)
 		assert.Equal(t, test.expected, output)
 	}
 }
@@ -625,26 +650,26 @@ func TestIPAddress(t *testing.T) {
 // BenchmarkIPAddress benchmarks the IPAddress method
 func BenchmarkIPAddress(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_ = IPAddress(" 192.168.0.1 ")
+		_ = sanitize.IPAddress(" 192.168.0.1 ")
 	}
 }
 
 // BenchmarkIPAddress_V6 benchmarks the IPAddress method
 func BenchmarkIPAddress_IPV6(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_ = IPAddress(" 2602:305:bceb:1bd0:44ef:fedb:4f8f:da4f ")
+		_ = sanitize.IPAddress(" 2602:305:bceb:1bd0:44ef:fedb:4f8f:da4f ")
 	}
 }
 
 // ExampleIPAddress example using IPAddress() for IPV4 address
 func ExampleIPAddress() {
-	fmt.Println(IPAddress(" 192.168.0.1 "))
+	fmt.Println(sanitize.IPAddress(" 192.168.0.1 "))
 	// Output: 192.168.0.1
 }
 
 // ExampleIPAddress_ipv6 example using IPAddress() for IPV6 address
 func ExampleIPAddress_ipv6() {
-	fmt.Println(IPAddress(" 2602:305:bceb:1bd0:44ef:fedb:4f8f:da4f "))
+	fmt.Println(sanitize.IPAddress(" 2602:305:bceb:1bd0:44ef:fedb:4f8f:da4f "))
 	// Output: 2602:305:bceb:1bd0:44ef:fedb:4f8f:da4f
 }
 
@@ -661,7 +686,7 @@ func TestNumeric(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		output := Numeric(test.input)
+		output := sanitize.Numeric(test.input)
 		assert.Equal(t, test.expected, output)
 	}
 }
@@ -669,13 +694,13 @@ func TestNumeric(t *testing.T) {
 // BenchmarkNumeric benchmarks the numeric method
 func BenchmarkNumeric(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_ = Numeric(" 192.168.0.1 ")
+		_ = sanitize.Numeric(" 192.168.0.1 ")
 	}
 }
 
 // ExampleNumeric example using Numeric()
 func ExampleNumeric() {
-	fmt.Println(Numeric("This:123 + 90!"))
+	fmt.Println(sanitize.Numeric("This:123 + 90!"))
 	// Output: 12390
 }
 
@@ -693,7 +718,7 @@ func TestPathName(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		output := PathName(test.input)
+		output := sanitize.PathName(test.input)
 		assert.Equal(t, test.expected, output)
 	}
 }
@@ -701,13 +726,13 @@ func TestPathName(t *testing.T) {
 // BenchmarkPathName benchmarks the PathName method
 func BenchmarkPathName(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_ = PathName("/This-Path-Name_Works-/")
+		_ = sanitize.PathName("/This-Path-Name_Works-/")
 	}
 }
 
 // ExampleNumeric example using PathName()
 func ExamplePathName() {
-	fmt.Println(PathName("/This-Works_Now-123/!"))
+	fmt.Println(sanitize.PathName("/This-Works_Now-123/!"))
 	// Output: This-Works_Now-123
 }
 
@@ -729,7 +754,7 @@ func TestPunctuation(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		output := Punctuation(test.input)
+		output := sanitize.Punctuation(test.input)
 		assert.Equal(t, test.expected, output)
 	}
 }
@@ -737,13 +762,13 @@ func TestPunctuation(t *testing.T) {
 // BenchmarkPunctuation benchmarks the Punctuation method
 func BenchmarkPunctuation(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_ = Punctuation("Does this work? They're doing it?")
+		_ = sanitize.Punctuation("Does this work? They're doing it?")
 	}
 }
 
 // ExamplePunctuation example using Punctuation()
 func ExamplePunctuation() {
-	fmt.Println(Punctuation(`[@"Does" 'this' work?@] this too`))
+	fmt.Println(sanitize.Punctuation(`[@"Does" 'this' work?@] this too`))
 	// Output: "Does" 'this' work? this too
 }
 
@@ -765,7 +790,7 @@ func TestScientificNotation(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		output := ScientificNotation(test.input)
+		output := sanitize.ScientificNotation(test.input)
 		assert.Equal(t, test.expected, output)
 	}
 }
@@ -773,13 +798,13 @@ func TestScientificNotation(t *testing.T) {
 // BenchmarkDecimal benchmarks the ScientificNotation method
 func BenchmarkScientificNotation(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_ = ScientificNotation("String: -1.096e-3")
+		_ = sanitize.ScientificNotation("String: -1.096e-3")
 	}
 }
 
 // ExampleDecimal example using Decimal() for a positive number
 func ExampleScientificNotation() {
-	fmt.Println(ScientificNotation("$ 1.096e-3!"))
+	fmt.Println(sanitize.ScientificNotation("$ 1.096e-3!"))
 	// Output: 1.096e-3
 }
 
@@ -800,7 +825,7 @@ func TestScripts(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		output := Scripts(test.input)
+		output := sanitize.Scripts(test.input)
 		assert.Equal(t, test.expected, output)
 	}
 }
@@ -808,13 +833,13 @@ func TestScripts(t *testing.T) {
 // BenchmarkScripts benchmarks the Scripts method
 func BenchmarkScripts(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_ = Scripts("<script>$(){ var remove='me'; }</script>")
+		_ = sanitize.Scripts("<script>$(){ var remove='me'; }</script>")
 	}
 }
 
 // ExampleScripts example using Scripts()
 func ExampleScripts() {
-	fmt.Println(Scripts(`Does<script>This</script>Work?`))
+	fmt.Println(sanitize.Scripts(`Does<script>This</script>Work?`))
 	// Output: DoesWork?
 }
 
@@ -837,7 +862,7 @@ something else`, " Mark Mc'Cuban-Host something else"},
 	}
 
 	for _, test := range tests {
-		output := SingleLine(test.input)
+		output := sanitize.SingleLine(test.input)
 		assert.Equal(t, test.expected, output)
 	}
 }
@@ -848,13 +873,13 @@ func BenchmarkSingleLine(b *testing.B) {
 That Line
 Another Line`
 	for i := 0; i < b.N; i++ {
-		_ = SingleLine(testString)
+		_ = sanitize.SingleLine(testString)
 	}
 }
 
 // ExampleSingleLine example using SingleLine()
 func ExampleSingleLine() {
-	fmt.Println(SingleLine(`Does
+	fmt.Println(sanitize.SingleLine(`Does
 This
 Work?`))
 	// Output: Does This Work?
@@ -874,7 +899,7 @@ func TestTime(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		output := Time(test.input)
+		output := sanitize.Time(test.input)
 		assert.Equal(t, test.expected, output)
 	}
 }
@@ -882,13 +907,13 @@ func TestTime(t *testing.T) {
 // BenchmarkTime benchmarks the Time method
 func BenchmarkTime(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_ = Time("Time is 05:10:23")
+		_ = sanitize.Time("Time is 05:10:23")
 	}
 }
 
 // ExampleTime example using Time()
 func ExampleTime() {
-	fmt.Println(Time(`Time 01:02:03!`))
+	fmt.Println(sanitize.Time(`Time 01:02:03!`))
 	// Output: 01:02:03
 }
 
@@ -906,7 +931,7 @@ func TestURI(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		output := URI(test.input)
+		output := sanitize.URI(test.input)
 		assert.Equal(t, test.expected, output)
 	}
 }
@@ -914,13 +939,13 @@ func TestURI(t *testing.T) {
 // BenchmarkURI benchmarks the URI method
 func BenchmarkURI(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_ = XSS("/Test/This/Url/?param=value")
+		_ = sanitize.URI("/Test/This/Url/?param=value")
 	}
 }
 
 // ExampleURI example using URI()
 func ExampleURI() {
-	fmt.Println(URI("/This/Works?^No&this"))
+	fmt.Println(sanitize.URI("/This/Works?^No&this"))
 	// Output: /This/Works?No&this
 }
 
@@ -943,7 +968,7 @@ func TestURL(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			output := URL(test.input)
+			output := sanitize.URL(test.input)
 			assert.Equal(t, test.expected, output)
 		})
 	}
@@ -952,13 +977,13 @@ func TestURL(t *testing.T) {
 // BenchmarkURL benchmarks the URL method
 func BenchmarkURL(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_ = URL("/Test/This/Url/?param=value")
+		_ = sanitize.URL("/Test/This/Url/?param=value")
 	}
 }
 
 // ExampleURL example using URL()
 func ExampleURL() {
-	fmt.Println(URL("https://Example.com/This/Works?^No&this"))
+	fmt.Println(sanitize.URL("https://Example.com/This/Works?^No&this"))
 	// Output: https://Example.com/This/Works?No&this
 }
 
@@ -975,7 +1000,7 @@ func TestXML(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		output := XML(test.input)
+		output := sanitize.XML(test.input)
 		assert.Equal(t, test.expected, output)
 	}
 }
@@ -983,13 +1008,13 @@ func TestXML(t *testing.T) {
 // BenchmarkXML benchmarks the XML method
 func BenchmarkXML(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_ = XML("<xml>Test This!</xml>")
+		_ = sanitize.XML("<xml>Test This!</xml>")
 	}
 }
 
 // ExampleXML example using XML()
 func ExampleXML() {
-	fmt.Println(XML("<xml>This?</xml>"))
+	fmt.Println(sanitize.XML("<xml>This?</xml>"))
 	// Output: This?
 }
 
@@ -997,34 +1022,67 @@ func ExampleXML() {
 func TestXSS(t *testing.T) {
 	t.Parallel()
 
-	var tests = []struct {
+	tests := []struct {
+		name     string
 		input    string
 		expected string
 	}{
-		{"<script>alert('test');</script>", ">alert('test');</"},
-		{"&lt;script&lt;alert('test');&lt;/script&lt;", "scriptalert('test');/script"},
-		{"javascript:alert('test');", "alert('test');"},
-		{"eval('test');", "'test');"},
-		{"javascript&#58;('test');", "('test');"},
-		{"fromCharCode('test');", "('test');"},
-		{"&#60;&#62;fromCharCode('test');&#62;&#60;", "('test');"},
+		// Lines 1-11: Common script injection vectors
+		{"Remove <script", "<script", ""},
+		{"Remove script>", "script>", ""},
+		{"Remove eval(", "eval(", ""},
+		{"Remove eval&#40;", "eval&#40;", ""},
+		{"Remove javascript:", "javascript:", ""},
+		{"Remove javascript&#58;", "javascript&#58;", ""},
+		{"Remove fromCharCode", "fromCharCode", ""},
+		{"Remove &#62;", "&#62;", ""},
+		{"Remove &#60;", "&#60;", ""},
+		{"Remove &lt;", "&lt;", ""},
+		{"Remove &rt;", "&rt;", ""},
+
+		// Lines 12-21: Inline event handlers
+		{"Remove onclick=", "onclick=", ""},
+		{"Remove onerror=", "onerror=", ""},
+		{"Remove onload=", "onload=", ""},
+		{"Remove onmouseover=", "onmouseover=", ""},
+		{"Remove onfocus=", "onfocus=", ""},
+		{"Remove onblur=", "onblur=", ""},
+		{"Remove ondblclick=", "ondblclick=", ""},
+		{"Remove onkeydown=", "onkeydown=", ""},
+		{"Remove onkeyup=", "onkeyup=", ""},
+		{"Remove onkeypress=", "onkeypress=", ""},
+
+		// Line 22: Potential CSS/Style-based attacks
+		{"Remove expression(", "expression(", ""},
+
+		// Line 23: Potentially malicious protocols
+		{"Remove data:", "data:", ""},
+
+		// Lines 24-26: References to dangerous objects/functions
+		{"Remove document.cookie", "document.cookie", ""},
+		{"Remove document.write", "document.write", ""},
+		{"Remove window.location", "window.location", ""},
 	}
 
-	for _, test := range tests {
-		output := XSS(test.input)
-		assert.Equal(t, test.expected, output)
+	for _, tt := range tests {
+		tt := tt // pin variable for parallel sub-tests
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			output := sanitize.XSS(tt.input)
+			assert.Equal(t, tt.expected, output)
+		})
 	}
 }
 
 // BenchmarkXSS benchmarks the XSS method
 func BenchmarkXSS(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		_ = XSS("<script>Test This!</script>")
+		_ = sanitize.XSS("<script>Test This!</script>")
 	}
 }
 
 // ExampleXSS example using XSS()
 func ExampleXSS() {
-	fmt.Println(XSS("<script>This?</script>"))
+	fmt.Println(sanitize.XSS("<script>This?</script>"))
 	// Output: >This?</
 }
