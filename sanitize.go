@@ -289,13 +289,13 @@ func Email(original string, preserveCase bool) string {
 	// Leave the email address in its original case
 	if preserveCase {
 		return string(emailRegExp.ReplaceAll(
-			[]byte(strings.Replace(original, "mailto:", "", -1)), emptySpace),
+			[]byte(strings.ReplaceAll(original, "mailto:", "")), emptySpace),
 		)
 	}
 
 	// Standard is forced to lowercase
 	return string(emailRegExp.ReplaceAll(
-		[]byte(strings.ToLower(strings.Replace(original, "mailto:", "", -1))), emptySpace),
+		[]byte(strings.ToLower(strings.ReplaceAll(original, "mailto:", ""))), emptySpace),
 	)
 }
 
@@ -626,17 +626,17 @@ func XML(original string) string {
 //
 // View more examples in the `sanitize_test.go` file.
 func XSS(original string) string {
-	original = strings.Replace(original, "<script", "", -1)
-	original = strings.Replace(original, "script>", "", -1)
-	original = strings.Replace(original, "eval(", "", -1)
-	original = strings.Replace(original, "eval&#40;", "", -1)
-	original = strings.Replace(original, "javascript:", "", -1)
-	original = strings.Replace(original, "javascript&#58;", "", -1)
-	original = strings.Replace(original, "fromCharCode", "", -1)
-	original = strings.Replace(original, "&#62;", "", -1)
-	original = strings.Replace(original, "&#60;", "", -1)
-	original = strings.Replace(original, "&lt;", "", -1)
-	original = strings.Replace(original, "&rt;", "", -1)
+	original = strings.ReplaceAll(original, "<script", "")
+	original = strings.ReplaceAll(original, "script>", "")
+	original = strings.ReplaceAll(original, "eval(", "")
+	original = strings.ReplaceAll(original, "eval&#40;", "")
+	original = strings.ReplaceAll(original, "javascript:", "")
+	original = strings.ReplaceAll(original, "javascript&#58;", "")
+	original = strings.ReplaceAll(original, "fromCharCode", "")
+	original = strings.ReplaceAll(original, "&#62;", "")
+	original = strings.ReplaceAll(original, "&#60;", "")
+	original = strings.ReplaceAll(original, "&lt;", "")
+	original = strings.ReplaceAll(original, "&rt;", "")
 
 	// Some inline event handlers
 	original = strings.ReplaceAll(original, "onclick=", "")
