@@ -107,6 +107,41 @@ Run the Go [benchmarks](sanitize_test.go):
 make bench
 ```
 
+### Benchmark Results
+
+| Benchmark                        | Iterations |   ns/op | B/op | allocs/op |
+|----------------------------------|------------|--------:|-----:|----------:|
+| BenchmarkAlpha                   | 1,879,712  |   635.2 |  120 |         6 |
+| BenchmarkAlpha_WithSpaces        | 2,388,141  |   502.9 |   88 |         4 |
+| BenchmarkAlphaNumeric            | 1,587,366  |   757.7 |  128 |         6 |
+| BenchmarkAlphaNumeric_WithSpaces | 1,911,022  |   634.4 |  112 |         4 |
+| BenchmarkBitcoinAddress          | 2,156,088  |   555.2 |  160 |         4 |
+| BenchmarkBitcoinCashAddress      | 1,619,050  |   744.5 |  160 |         4 |
+| BenchmarkCustom                  | 879,280    | 1,279.0 |  943 |        17 |
+| BenchmarkDecimal                 | 2,035,514  |   595.4 |   56 |         3 |
+| BenchmarkDomain                  | 2,493,144  |   473.0 |  225 |         6 |
+| BenchmarkDomain_PreserveCase     | 2,879,966  |   420.9 |  209 |         5 |
+| BenchmarkDomain_RemoveWww        | 1,673,802  |   719.2 |  274 |         9 |
+| BenchmarkEmail                   | 2,140,860  |   560.2 |  136 |         6 |
+| BenchmarkEmail_PreserveCase      | 2,634,862  |   458.5 |  112 |         5 |
+| BenchmarkFirstToUpper            | 13,146,956 |    90.7 |   24 |         1 |
+| BenchmarkFormalName              | 3,300,636  |   360.5 |   64 |         3 |
+| BenchmarkHTML                    | 2,541,874  |   473.1 |   64 |         3 |
+| BenchmarkIPAddress               | 2,895,540  |   408.4 |   80 |         5 |
+| BenchmarkIPAddress_IPV6          | 1,000,000  | 1,074.0 |  225 |         6 |
+| BenchmarkNumeric                 | 2,908,365  |   414.4 |   40 |         3 |
+| BenchmarkPathName                | 2,348,728  |   510.1 |   64 |         3 |
+| BenchmarkPunctuation             | 1,929,290  |   624.6 |  160 |         4 |
+| BenchmarkScientificNotation      | 1,955,768  |   614.5 |   56 |         3 |
+| BenchmarkScripts                 | 2,020,128  |   598.1 |   64 |         2 |
+| BenchmarkSingleLine              | 536,860    | 2,146.0 |   96 |         4 |
+| BenchmarkTime                    | 2,159,088  |   556.3 |   40 |         3 |
+| BenchmarkURI                     | 2,309,937  |   518.2 |   80 |         3 |
+| BenchmarkURL                     | 2,329,815  |   514.4 |   80 |         3 |
+| BenchmarkXML                     | 4,123,827  |   290.3 |   56 |         3 |
+| BenchmarkXSS                     | 3,485,330  |   344.7 |   40 |         2 |
+
+
 <br/>
 
 ## Code Standards
