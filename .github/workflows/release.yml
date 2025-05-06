@@ -1,36 +1,65 @@
-# From: https://goreleaser.com/ci/actions/#usage
+# Workflow Name: release
+# Purpose: Build & publish releases via GoReleaser whenever a semver tag is pushed.
 name: release
 
 env:
-  GO111MODULE: on
+  GO111MODULE: on        # explicit, though modern Go enables this by default
 
 on:
   push:
     tags:
-      - '*'
+      - 'v*'             # run only on tags that start with "v"
 
 permissions:
-  contents: write
+  contents: write        # upload assets and create the release
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   goreleaser:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout
+      # ———————————————————————————————————————————————
+      # 1. Check out full history and tags
+      # ———————————————————————————————————————————————
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 0          # required for changelog generation
+
+      # ———————————————————————————————————————————————
+      # 2. Set up Go with a built‑in module and build cache
+      # ———————————————————————————————————————————————
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: 1.23
-      - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v6.3.0
+          go-version-file: go.mod # single source of truth
+          cache: true
+          cache-dependency-path: |
+            **/go.mod
+            **/go.sum
+
+      # ———————————————————————————————————————————————
+      # 3. (Optional) Pre‑flight config validation
+      # ———————————————————————————————————————————————
+      - name: GoReleaser config check
+        uses: goreleaser/goreleaser-action@v6
         with:
-          distribution: goreleaser
-          version: latest
+          version: v2.0.1         # pin exact or at least major
+          args: check
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # ———————————————————————————————————————————————
+      # 4. Build & publish the release
+      # ———————————————————————————————————————————————
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          version: v2.0.1
           args: release --clean --verbose
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Syndicate to GoDocs
-        run: make godocs
