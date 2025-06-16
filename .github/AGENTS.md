@@ -103,7 +103,7 @@ We use the `testify` suite for unit tests. All tests must follow these conventio
 * Use `require.InDelta` or `require.InEpsilon` for floating-point comparisons
 * Prefer **table-driven tests** for clarity and reusability
 * Use subtests (`t.Run`) to isolate and describe scenarios
-* **Do not use** `t.Parallel()` unless explicitly testing concurrent behavior
+* **Optionally use** `t.Parallel()` , but try and avoid it unless testing for concurrency issues
 * Avoid flaky, timing-sensitive, or non-deterministic tests
 
 Run tests locally with:
