@@ -16,7 +16,7 @@ View the [effective go](https://golang.org/doc/effective_go.html) standards docu
 ### *golangci-lint* specifications
 The package [golangci-lint](https://golangci-lint.run/usage/quick-start) runs several linters in one package/cmd.
 
-View the active linters in the [configuration file](../.golangci.yml).
+View the active linters in the [configuration file](../.golangci.json).
 
 Install via macOS:
 ```shell
@@ -31,4 +31,4 @@ golangci-lint --version
 ```
 
 ### *godoc* specifications
-All code is written with documentation in mind. Follow the best practices with naming, examples and function descriptions.
+All code is written with documentation in mind. Follow the best practices with naming, examples, and function descriptions.
