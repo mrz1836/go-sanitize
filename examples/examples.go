@@ -13,8 +13,8 @@ func main() {
 	log.Printf("Alpha(%q) => %q\n", alphaIn, sanitize.Alpha(alphaIn, false))
 
 	// AlphaNumeric removes symbols but preserves letters and numbers.
-	alnumIn := "Hello 2nd World!"
-	log.Printf("AlphaNumeric(%q) => %q\n", alnumIn, sanitize.AlphaNumeric(alnumIn, false))
+	alphaNumericIn := "Hello 2nd World!"
+	log.Printf("AlphaNumeric(%q) => %q\n", alphaNumericIn, sanitize.AlphaNumeric(alphaNumericIn, false))
 
 	// BitcoinAddress strips invalid bitcoin address characters.
 	btcIn := " :1K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs!"
@@ -44,7 +44,7 @@ func main() {
 	emailIn := "mailto:Person@Example.COM"
 	log.Printf("Email(%q) => %q\n", emailIn, sanitize.Email(emailIn, false))
 
-	// FirstToUpper capitalizes the first character.
+	// FirstToUpper function capitalizes the first character.
 	firstIn := "hello world"
 	log.Printf("FirstToUpper(%q) => %q\n", firstIn, sanitize.FirstToUpper(firstIn))
 
@@ -69,14 +69,14 @@ func main() {
 	log.Printf("PathName(%q) => %q\n", pathIn, sanitize.PathName(pathIn))
 
 	// Punctuation retains standard punctuation characters.
-	punctIn := `[@"Does" 'this' work?@] this too`
-	log.Printf("Punctuation(%q) => %q\n", punctIn, sanitize.Punctuation(punctIn))
+	punctuationIn := `[@"Does" 'this' work?@] this too`
+	log.Printf("Punctuation(%q) => %q\n", punctuationIn, sanitize.Punctuation(punctuationIn))
 
 	// ScientificNotation keeps floats with exponent notation.
 	sciIn := "$ 1.096e-3!"
 	log.Printf("ScientificNotation(%q) => %q\n", sciIn, sanitize.ScientificNotation(sciIn))
 
-	// Scripts removes script, iframe, embed and object tags.
+	// Scripts removes script, iframe, embed, and object tags.
 	scriptIn := `Does<script>This</script>Work?`
 	log.Printf("Scripts(%q) => %q\n", scriptIn, sanitize.Scripts(scriptIn))
 
