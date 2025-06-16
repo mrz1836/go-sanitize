@@ -112,7 +112,7 @@ func main() {
 	sanitized := sanitize.AlphaNumeric(input)
 
 	// Output: "Sanitized String: HelloWorld2025"
-	fmt.Println("Sanitized String: ", sanitized) 
+	fmt.Println("Sanitized String:", sanitized) 
 }
 ```
 
