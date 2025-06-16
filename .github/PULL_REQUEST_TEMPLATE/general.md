@@ -1,7 +1,11 @@
-Fixes #
+## What Changed
+- 
 
-## Proposed Changes
+## Why It Was Necessary
+- 
 
-  -
-  -
-  -
+## Testing Performed
+- 
+
+## Impact / Risk
+- 
