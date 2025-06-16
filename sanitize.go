@@ -14,7 +14,7 @@ Features:
 - Handle XSS attack strings
 
 Usage:
-To use this package, simply import it and call the desired sanitization function with the input data. Each function is documented with examples in the `sanitize_test.go` file.
+To use this package, import it and call the desired sanitization function with the input data. Each function is documented with examples in the `sanitize_test.go` file.
 
 Example:
 
@@ -22,7 +22,7 @@ Example:
 
 	import (
 	    "fmt"
-	    "github.com/yourusername/go-sanitize"
+	    "github.com/mrz1836/go-sanitize"
 	)
 
 	func main() {
@@ -263,12 +263,12 @@ func Domain(original string, preserveCase bool, removeWww bool) (string, error) 
 		return string(domainRegExp.ReplaceAll([]byte(u.Host), emptySpace)), nil
 	}
 
-	// Generally all domains should be uniform and lowercase
+	// Generally, all domains should be uniform and lowercase
 	return string(domainRegExp.ReplaceAll([]byte(strings.ToLower(u.Host)), emptySpace)), nil
 }
 
 // Email returns a sanitized email address string. Email addresses are forced
-// to lowercase and removes any mail-to prefixes.
+// to lowercase and remove any mail-to prefixes.
 //
 // Parameters:
 // - original: The input string to be sanitized.

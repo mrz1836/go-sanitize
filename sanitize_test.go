@@ -83,7 +83,7 @@ func ExampleAlpha() {
 	// Output: ExampleString
 }
 
-// ExampleAlpha_withSpaces example using Alpha with spaces flag
+// ExampleAlpha_withSpaces example using Alpha with space flag
 func ExampleAlpha_withSpaces() {
 	fmt.Println(sanitize.Alpha("Example String!", true))
 	// Output: Example String
