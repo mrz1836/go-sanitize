@@ -135,7 +135,29 @@ View the generated [documentation](https://pkg.go.dev/github.com/mrz1836/go-sani
 - URI, URL and XSS sanitization
 
 ### Functions
-- [`Func()`](sanitize.go): Brief description of the function.
+- [`Alpha`](sanitize.go): Remove non-alphabetic characters, optionally keep spaces
+- [`AlphaNumeric`](sanitize.go): Remove non-alphanumeric characters, optionally keep spaces
+- [`BitcoinAddress`](sanitize.go): Filter input to valid Bitcoin address characters
+- [`BitcoinCashAddress`](sanitize.go): Filter input to valid Bitcoin Cash address characters
+- [`Custom`](sanitize.go): Use a custom regex to filter input
+- [`Decimal`](sanitize.go): Keep only decimal or float characters
+- [`Domain`](sanitize.go): Sanitize domain, optionally preserving case and removing www
+- [`Email`](sanitize.go): Normalize an email address
+- [`FirstToUpper`](sanitize.go): Capitalize the first letter of a string
+- [`FormalName`](sanitize.go): Keep only formal name characters
+- [`HTML`](sanitize.go): Strip HTML tags
+- [`IPAddress`](sanitize.go): Return sanitized IPv4 or IPv6 address
+- [`Numeric`](sanitize.go): Remove all but numeric digits
+- [`PathName`](sanitize.go): Sanitize to a path-friendly name
+- [`Punctuation`](sanitize.go): Allow letters, numbers and basic punctuation
+- [`ScientificNotation`](sanitize.go): Keep characters valid in scientific notation
+- [`Scripts`](sanitize.go): Remove script, iframe and object tags
+- [`SingleLine`](sanitize.go): Replace line breaks and tabs with spaces
+- [`Time`](sanitize.go): Keep only valid time characters
+- [`URI`](sanitize.go): Keep characters allowed in a URI
+- [`URL`](sanitize.go): Keep characters allowed in a URL
+- [`XML`](sanitize.go): Strip XML tags
+- [`XSS`](sanitize.go): Remove common XSS attack strings
 
 
 ### Additional Documentation & Repository Management
