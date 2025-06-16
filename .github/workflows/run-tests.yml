@@ -120,9 +120,10 @@ jobs:
 
       # ————————————————————————————————————————————————————————————————
       # 7. Scan for vulnerabilities with govulncheck
+      # Note: issue running <=1.23.x with govulncheck, so we skip it
       # ————————————————————————————————————————————————————————————————
       - name: Run govulncheck
-        if: matrix.go-version == '1.23.x' || matrix.go-version == '1.24.x'
+        if: matrix.go-version == '1.24.x'
         run: make govulncheck
 
       # ————————————————————————————————————————————————————————————————
