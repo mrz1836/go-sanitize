@@ -127,7 +127,12 @@ View the generated [documentation](https://pkg.go.dev/github.com/mrz1836/go-sani
 <br/>
 
 ### Features
-- TODO:
+- Alpha and alphanumeric sanitization with optional spaces
+- Bitcoin and Bitcoin Cash address sanitizers
+- Custom regular expression helper for arbitrary patterns
+- Decimal, domain, email and IP address normalization
+- HTML and XML stripping with script removal
+- URI, URL and XSS sanitization
 
 ### Functions
 - [`Func()`](sanitize.go): Brief description of the function.
