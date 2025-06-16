@@ -11,8 +11,7 @@ import (
 )
 
 // TestAlpha tests the alpha sanitize method
-func TestAlpha(t *testing.T) {
-	t.Parallel()
+func TestAlpha_Basic(t *testing.T) {
 
 	var tests = []struct {
 		name     string
@@ -41,8 +40,7 @@ That`, true},
 }
 
 // TestAlphaEdgeCases tests the alpha sanitize method with edge cases
-func TestAlphaEdgeCases(t *testing.T) {
-	t.Parallel()
+func TestAlpha_EdgeCases(t *testing.T) {
 
 	var tests = []struct {
 		name     string
@@ -90,8 +88,7 @@ func ExampleAlpha_withSpaces() {
 }
 
 // TestAlphaNumeric tests the alphanumeric sanitize method
-func TestAlphaNumeric(t *testing.T) {
-	t.Parallel()
+func TestAlphaNumeric_Basic(t *testing.T) {
 
 	var tests = []struct {
 		name     string
@@ -146,8 +143,7 @@ func ExampleAlphaNumeric_withSpaces() {
 }
 
 // TestBitcoinAddress will test all permutations
-func TestBitcoinAddress(t *testing.T) {
-	t.Parallel()
+func TestBitcoinAddress_Basic(t *testing.T) {
 
 	var tests = []struct {
 		name     string
@@ -186,8 +182,7 @@ func ExampleBitcoinAddress() {
 }
 
 // TestBitcoinCashAddress will test all permutations of using BitcoinCashAddress()
-func TestBitcoinCashAddress(t *testing.T) {
-	t.Parallel()
+func TestBitcoinCashAddress_Basic(t *testing.T) {
 
 	var tests = []struct {
 		name     string
@@ -223,8 +218,7 @@ func ExampleBitcoinCashAddress() {
 }
 
 // TestCustom tests the custom sanitize method
-func TestCustom(t *testing.T) {
-	t.Parallel()
+func TestCustom_Basic(t *testing.T) {
 
 	var tests = []struct {
 		input    string
@@ -262,8 +256,7 @@ func ExampleCustom_numeric() {
 }
 
 // TestDecimal tests the decimal sanitize method
-func TestDecimal(t *testing.T) {
-	t.Parallel()
+func TestDecimal_Basic(t *testing.T) {
 
 	var tests = []struct {
 		input    string
@@ -302,8 +295,7 @@ func ExampleDecimal_negative() {
 }
 
 // TestDomain tests the domain sanitize method
-func TestDomain(t *testing.T) {
-	t.Parallel()
+func TestDomain_Basic(t *testing.T) {
 
 	t.Run("valid cases", func(t *testing.T) {
 
@@ -461,8 +453,7 @@ func ExampleDomain_removeWww() {
 }
 
 // TestEmail tests the email sanitize method
-func TestEmail(t *testing.T) {
-	t.Parallel()
+func TestEmail_Basic(t *testing.T) {
 
 	var tests = []struct {
 		input        string
@@ -512,8 +503,7 @@ func ExampleEmail_preserveCase() {
 }
 
 // TestFirstToUpper tests the first to upper method
-func TestFirstToUpper(t *testing.T) {
-	t.Parallel()
+func TestFirstToUpper_Basic(t *testing.T) {
 
 	var tests = []struct {
 		input    string
@@ -546,8 +536,7 @@ func ExampleFirstToUpper() {
 }
 
 // TestFormalName tests the formal name method
-func TestFormalName(t *testing.T) {
-	t.Parallel()
+func TestFormalName_Basic(t *testing.T) {
 
 	var tests = []struct {
 		input    string
@@ -580,8 +569,7 @@ func ExampleFormalName() {
 }
 
 // TestHTML tests the HTML sanitize method
-func TestHTML(t *testing.T) {
-	t.Parallel()
+func TestHTML_Basic(t *testing.T) {
 
 	var tests = []struct {
 		input    string
@@ -612,8 +600,7 @@ func ExampleHTML() {
 }
 
 // TestIPAddress tests the ip address sanitize method
-func TestIPAddress(t *testing.T) {
-	t.Parallel()
+func TestIPAddress_Basic(t *testing.T) {
 
 	var tests = []struct {
 		input    string
@@ -674,8 +661,7 @@ func ExampleIPAddress_ipv6() {
 }
 
 // TestNumeric tests the numeric sanitize method
-func TestNumeric(t *testing.T) {
-	t.Parallel()
+func TestNumeric_Basic(t *testing.T) {
 
 	var tests = []struct {
 		input    string
@@ -705,8 +691,7 @@ func ExampleNumeric() {
 }
 
 // TestPathName tests the path name sanitize method
-func TestPathName(t *testing.T) {
-	t.Parallel()
+func TestPathName_Basic(t *testing.T) {
 
 	var tests = []struct {
 		input    string
@@ -737,8 +722,7 @@ func ExamplePathName() {
 }
 
 // TestPunctuation tests the punctuation method
-func TestPunctuation(t *testing.T) {
-	t.Parallel()
+func TestPunctuation_Basic(t *testing.T) {
 
 	var tests = []struct {
 		input    string
@@ -773,8 +757,7 @@ func ExamplePunctuation() {
 }
 
 // TestScientificNotation tests the scientific notation sanitize method
-func TestScientificNotation(t *testing.T) {
-	t.Parallel()
+func TestScientificNotation_Basic(t *testing.T) {
 
 	var tests = []struct {
 		input    string
@@ -809,8 +792,7 @@ func ExampleScientificNotation() {
 }
 
 // TestScripts tests the script removal
-func TestScripts(t *testing.T) {
-	t.Parallel()
+func TestScripts_Basic(t *testing.T) {
 
 	var tests = []struct {
 		input    string
@@ -844,8 +826,7 @@ func ExampleScripts() {
 }
 
 // TestSingleLine test the single line sanitize method
-func TestSingleLine(t *testing.T) {
-	t.Parallel()
+func TestSingleLine_Basic(t *testing.T) {
 
 	var tests = []struct {
 		input    string
@@ -886,8 +867,7 @@ Work?`))
 }
 
 // TestTime tests the time sanitize method
-func TestTime(t *testing.T) {
-	t.Parallel()
+func TestTime_Basic(t *testing.T) {
 
 	var tests = []struct {
 		input    string
@@ -918,8 +898,7 @@ func ExampleTime() {
 }
 
 // TestURI tests the URI sanitize method
-func TestURI(t *testing.T) {
-	t.Parallel()
+func TestURI_Basic(t *testing.T) {
 
 	var tests = []struct {
 		input    string
@@ -950,8 +929,7 @@ func ExampleURI() {
 }
 
 // TestURL tests the URL sanitize method
-func TestURL(t *testing.T) {
-	t.Parallel()
+func TestURL_Basic(t *testing.T) {
 
 	var tests = []struct {
 		name     string
@@ -988,8 +966,7 @@ func ExampleURL() {
 }
 
 // TestXML tests the XML sanitize method
-func TestXML(t *testing.T) {
-	t.Parallel()
+func TestXML_Basic(t *testing.T) {
 
 	var tests = []struct {
 		input    string
@@ -1019,8 +996,7 @@ func ExampleXML() {
 }
 
 // TestXSS tests the XSS sanitize method
-func TestXSS(t *testing.T) {
-	t.Parallel()
+func TestXSS_Basic(t *testing.T) {
 
 	tests := []struct {
 		name     string
@@ -1067,7 +1043,6 @@ func TestXSS(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt // pin variable for parallel sub-tests
 		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
 			output := sanitize.XSS(tt.input)
 			assert.Equal(t, tt.expected, output)
 		})
