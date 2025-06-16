@@ -81,7 +81,7 @@ func ExampleAlpha() {
 	// Output: ExampleString
 }
 
-// ExampleAlpha_withSpaces example using Alpha with space flag
+// ExampleAlpha_withSpaces example using Alpha with a space flag
 func ExampleAlpha_withSpaces() {
 	fmt.Println(sanitize.Alpha("Example String!", true))
 	// Output: Example String
@@ -360,6 +360,13 @@ func TestDomain_Basic(t *testing.T) {
 				"WwW.DOMAIN.COM",
 				"domain.com",
 				false,
+				true,
+			},
+			{
+				"mixed caps domain, remove www",
+				"wwW.DOMAIN.COM",
+				"DOMAIN.COM",
+				true,
 				true,
 			},
 			{
@@ -785,7 +792,7 @@ func BenchmarkScientificNotation(b *testing.B) {
 	}
 }
 
-// ExampleDecimal example using Decimal() for a positive number
+// ExampleScientificNotation example using ScientificNotation() for a positive number
 func ExampleScientificNotation() {
 	fmt.Println(sanitize.ScientificNotation("$ 1.096e-3!"))
 	// Output: 1.096e-3
@@ -1042,6 +1049,36 @@ func TestXSS_Basic(t *testing.T) {
 
 	for _, tt := range tests {
 		tt := tt // pin variable for parallel sub-tests
+		t.Run(tt.name, func(t *testing.T) {
+			output := sanitize.XSS(tt.input)
+			assert.Equal(t, tt.expected, output)
+		})
+	}
+}
+
+// TestXSS_AdditionalCases tests additional cases for the XSS sanitize method
+func TestXSS_AdditionalCases(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		// Multiple patterns
+		{"Multiple patterns", "<script>eval(javascript:alert(1))</script>", ">alert(1))</"},
+		// Embedded in text
+		{"Pattern in text", "Hello<script>alert(1)</script>World", "Hello>alert(1)</World"},
+		// Mixed case
+		{"Mixed case script", "<ScRiPt>alert(1)</sCrIpT>", "<ScRiPt>alert(1)</sCrIpT>"},
+		// Encoded/obfuscated
+		{"HTML entity encoded", "&#x3C;script&#x3E;alert(1)&#x3C;/script&#x3E;", "&#x3C;script&#x3E;alert(1)&#x3C;/script&#x3E;"},
+		// Whitespace in tag
+		{"Whitespace in tag", "<scr ipt>alert(1)</scr ipt>", "<scr ipt>alert(1)</scr ipt>"},
+		// Inline event handler in tag
+		{"Inline event handler", "<img src=x onerror=alert(1)>", "<img src=x alert(1)>"},
+		// Obfuscated event handler
+		{"Obfuscated event handler", "<img src=x oNclIck=alert(1)>", "<img src=x oNclIck=alert(1)>"},
+	}
+	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			output := sanitize.XSS(tt.input)
 			assert.Equal(t, tt.expected, output)
