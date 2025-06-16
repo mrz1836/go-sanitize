@@ -1,0 +1,87 @@
+# ------------------------------------------------------------------------------
+#  Dependabot Auto-merge Workflow
+#
+#  Purpose: Automatically merge Dependabot minor version updates after all
+#              required checks pass. Major version updates will trigger an alert
+#              comment for manual review.
+#
+#  Triggers: Pull request events and completed check runs.
+#
+#  Maintainer: @mrz1836
+# ------------------------------------------------------------------------------
+
+name: dependabot-auto-merge
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened, ready_for_review]
+  pull_request_review:
+    types: [submitted]
+  check_suite:
+    types: [completed]
+  status: {}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+# Cancel older runs of the same PR if a new commit is pushed
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ------------------------------------------------------------------------------
+  # Auto-merge: Dependabot PR Automation
+  #
+  # This job automatically approves and merges minor/patch version bump PRs from
+  # Dependabot. For major version bumps, it alerts @mrz1836 for manual review.
+  # ------------------------------------------------------------------------------
+  automerge:
+    if: github.actor == 'dependabot[bot]' || github.actor == 'dependabot-preview[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      # --- Check if the PR is a minor/patch version bump ---
+      - name: Check version bump
+        id: bump
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const title = context.payload.pull_request.title;
+            const minor = /^Bump[^"]+ from ([\d]+)\..+ to \1\./.test(title);
+            core.setOutput('is_minor', minor);
+
+      # --- Alert on major version bump (requires manual review) ---
+      - name: Alert on major version bump
+        if: steps.bump.outputs.is_minor != 'true'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              body: '⚠️ @mrz1836: this is a major version bump and requires your attention'
+            });
+
+      # --- Auto approve minor/patch version bump PRs ---
+      - name: Auto approve minor update
+        if: steps.bump.outputs.is_minor == 'true'
+        uses: hmarr/auto-approve-action@v4
+        with:
+          review-message: Automatically approving dependabot pull request
+
+      # --- Auto-merge minor/patch version bump PRs ---
+      - name: Auto-merge minor update
+        if: steps.bump.outputs.is_minor == 'true'
+        uses: pascalgn/automerge-action@v0.16.4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MERGE_LABELS: ""
+          MERGE_FILTER_AUTHOR: "dependabot[bot],dependabot-preview[bot]"
+          MERGE_METHOD: merge
+          MERGE_COMMIT_MESSAGE: pull-request-title
+          MERGE_RETRIES: "30"
+          MERGE_RETRY_SLEEP: "60000"

@@ -1,5 +1,13 @@
-# Workflow Name: release
-# Purpose: Build & publish releases via GoReleaser whenever a semver tag is pushed.
+# ------------------------------------------------------------------------------------
+#  Release Workflow
+#
+#  Purpose   : Build & publish releases via GoReleaser whenever a semver tag is pushed.
+#
+#  Triggers  : On push of tags that start with "v" (e.g., v1.2.3)
+#
+#  Maintainer: @mrz1836
+# ------------------------------------------------------------------------------------
+
 name: release
 
 env:
@@ -63,3 +71,9 @@ jobs:
           args: release --clean --verbose
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # ———————————————————————————————————————————————
+      # 5. Publish GoDocs
+      # ———————————————————————————————————————————————
+      - name: Publish GoDocs
+        run: make godocs

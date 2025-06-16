@@ -1,19 +1,83 @@
-# Workflow: https://github.com/micnncim/action-label-syncer
-# Export your labels: https://github.com/micnncim/label-exporter
+# ------------------------------------------------------------------------------------
+#  Sync-Labels Workflow
+#
+#  Purpose: Keeps GitHub labels in sync with the declarative manifest at
+#           `.github/labels.yml`.  Any push that modifies that file on the
+#           default branch will trigger a reconciliation.
+#
+#  Docs: - Action → https://github.com/micnncim/action-label-syncer
+#        - Exporter → https://github.com/micnncim/label-exporter
+#
+#  Maintainer: @mrz1836
+# ------------------------------------------------------------------------------------
+
 name: sync-labels
+
+#######################################################################################
+# EVENT TRIGGERS
+#
+# • Only fires when `.github/labels.yml` is changed on the default branch.
+#   This avoids unnecessary CI runs when the rest of the repo changes.
+#
+#   NOTE: If you rename the default branch (e.g., to "main"), update both the
+#   `branches:` filter here and the DEFAULT_BRANCH env var below.
+#######################################################################################
 on:
   push:
-    branches:
-      - master
+    branches: [master]           # Update if your default branch is "main"
     paths:
-      - .github/labels.yml
+      - .github/labels.yml       # Runs *only* when this file changes
+
+#######################################################################################
+# GLOBAL PERMISSIONS
+#
+# • Label management requires write access to the Issues scope.
+# • We keep everything else read-only for the least privilege.
+#######################################################################################
+permissions:
+  contents: read
+  issues: write
+
 jobs:
   sync-labels:
+    # -------------------------------------------------------------------------------
+    #  RUNTIME
+    #
+    # • ubuntu-latest maps to the latest LTS runner image.
+    # -------------------------------------------------------------------------------
     runs-on: ubuntu-latest
+
+    # -------------------------------------------------------------------------------
+    #  CONCURRENCY
+    #
+    # • Cancel any in-flight label-sync job for the same branch.  This prevents
+    #   collisions if multiple commits land in quick succession.
+    # -------------------------------------------------------------------------------
+    concurrency:
+      group: sync-labels-${{ github.ref }}
+      cancel-in-progress: true
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: micnncim/action-label-syncer@v1.3.0
+      # ---------------------------------------------------------------------------
+      # 1) Checkout repository
+      #
+      # • We only need the single commit that triggered the workflow, so the default
+      #   shallow clone (fetch-depth: 1) is fine.
+      # ---------------------------------------------------------------------------
+      - name: 🚚  Checkout code
+        uses: actions/checkout@v4
+
+      # ---------------------------------------------------------------------------
+      # 2) Synchronize labels
+      #
+      # • The action compares the current repo labels against the manifest and
+      #   creates/updates/deletes as necessary.
+      #
+      # • GITHUB_TOKEN is required, so the action can call the Labels API.
+      # ---------------------------------------------------------------------------
+      - name: 🏷️  Sync labels from manifest
+        uses: micnncim/action-label-syncer@v1.3.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          manifest: .github/labels.yml
+          manifest: .github/labels.yml      # Path to the label manifest

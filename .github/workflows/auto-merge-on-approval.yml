@@ -1,0 +1,178 @@
+# ------------------------------------------------------------------------------
+#  Auto Merge on Approval Workflow
+#
+#  Purpose: Automatically merge PRs once all approval and CI conditions pass.
+#
+#  Triggers: Pull‑request events, review submissions, and completed checks.
+#
+#  Maintainer: @mrz1836
+#
+#  Rules for Auto‑Merge:
+#    • ≥1 approval review
+#    • No requested reviewers remaining
+#    • No "Changes Requested" reviews
+#    • All required status checks pass:
+#        - test (1.18.x, ubuntu-latest)
+#        - test (1.19.x, ubuntu-latest)
+#        - test (1.23.x, ubuntu-latest)
+#        - test (1.24.x, ubuntu-latest)
+#        - Analyze (go)
+#    • Title must not contain "WIP"
+#    • PR must not have the "work-in-progress" label
+#    • PR must not be a draft
+# ------------------------------------------------------------------------------
+
+name: auto-merge-on-approval
+
+on:
+    pull_request:
+        types:
+          [opened, synchronize, reopened, ready_for_review, labeled, unlabeled, edited]
+    pull_request_review:
+        types: [submitted]
+    check_suite:
+        types: [completed]
+    status: {}
+
+# Cancel older runs of the same PR if a new commit is pushed
+concurrency:
+    group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+    cancel-in-progress: true
+
+permissions:
+    contents: write
+    pull-requests: write
+
+jobs:
+    automerge:
+        # ← no job‑level bot filter anymore
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Attempt auto‑merge
+              uses: actions/github-script@v7
+              with:
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  script: |
+                      // core and github are already available in github-script
+
+                      // ------------------------------------------------------------------
+                      // Locate the pull request (handles pull_request, check_suite, status)
+                      // ------------------------------------------------------------------
+                      const owner = context.payload.repository.owner.login;
+                      const repo = context.payload.repository.name;
+                      let pr = context.payload.pull_request;
+                      if (!pr) {
+                        // check_suite/status → find PR by HEAD SHA
+                        const sha = context.payload.check_suite?.head_sha || context.payload.sha;
+                        if (sha) {
+                          const { data: prs } = await github.rest.pulls.list({
+                            owner,
+                            repo,
+                            head:  `${owner}:${sha}`,
+                            state: 'open',
+                          });
+                          pr = prs[0];
+                        }
+                      }
+                      if (!pr) {
+                        core.info('PR not found (may be closed), skipping.');
+                        return;
+                      }
+
+                      // ------------------------------------------------------------------
+                      // Skip PRs authored by bots (Dependabot / Codecov / etc.)
+                      // ------------------------------------------------------------------
+                      //const botLogins = [
+                      //  'dependabot[bot]',
+                      //  'dependabot-preview[bot]',
+                      //  'codecov[bot]',
+                      //];
+                      //if (botLogins.includes(pr.user.login)) {
+                      //  core.info(`Skipping auto‑merge for bot‑authored PR (#${pr.number})`);
+                      //  return;
+                      //}
+
+                      // ------------------------------------------------------------------
+                      // Gather PR metadata
+                      // ------------------------------------------------------------------
+                      const prNumber = pr.number;
+                      const title    = pr.title || '';
+                      const labels   = pr.labels.map(l => l.name);
+                      const isDraft  = pr.draft;
+
+                      // Reviews
+                      const { data: reviews } = await github.rest.pulls.listReviews({
+                        owner,
+                        repo,
+                        pull_number: prNumber,
+                      });
+                      const approvals        = reviews.filter(r => r.state === 'APPROVED').length;
+                      const changesRequested = reviews.filter(r => r.state === 'CHANGES_REQUESTED').length;
+
+                      // Requested reviewers
+                      const requestedReviewers = pr.requested_reviewers || [];
+
+                      // Required checks
+                      const requiredChecks = [
+                        'test (1.18.x, ubuntu-latest)',
+                        'test (1.19.x, ubuntu-latest)',
+                        'test (1.23.x, ubuntu-latest)',
+                        'test (1.24.x, ubuntu-latest)',
+                        'Analyze (go)',
+                      ];
+                      const sha = pr.head.sha;
+                      const { data: checks } = await github.rest.checks.listForRef({
+                        owner,
+                        repo,
+                        ref: sha,
+                      });
+                      const checkRuns = checks.check_runs || [];
+                      const checksPass = requiredChecks.every(name => {
+                        const run = checkRuns.find(c => c.name === name);
+                        return run && run.conclusion === 'success';
+                      });
+
+                      // WIP indicators
+                      const titleHasWip = /wip/i.test(title);
+                      const hasWipLabel = labels.includes('work-in-progress');
+
+                      // ------------------------------------------------------------------
+                      // Merge or explain why not
+                      // ------------------------------------------------------------------
+                      if (
+                        approvals >= 1 &&
+                        requestedReviewers.length === 0 &&
+                        changesRequested === 0 &&
+                        checksPass &&
+                        !titleHasWip &&
+                        !hasWipLabel &&
+                        !isDraft
+                      ) {
+                        try {
+                          await github.rest.pulls.merge({
+                            owner,
+                            repo,
+                            pull_number: prNumber,
+                            merge_method: 'merge',
+                          });
+                          console.log(`✅ Pull request #${prNumber} merged.`);
+                        } catch (error) {
+                          core.setFailed(`❌ Failed to merge PR #${prNumber}: ${error.message}`);
+                        }
+                      } else {
+                        if (approvals < 1)           console.log('⏭  Less than 1 approval.');
+                        if (requestedReviewers.length)
+                                                     console.log('⏭  Still has requested reviewers.');
+                        if (changesRequested)        console.log('⏭   "Changes Requested" reviews present.');
+                        if (!checksPass) {
+                          const failed = requiredChecks.filter(name => {
+                            const run = checkRuns.find(c => c.name === name);
+                            return !(run && run.conclusion === 'success');
+                          });
+                          console.log(`⏭  Required checks failed: ${failed.join(', ')}`);
+                        }
+                        if (titleHasWip)             console.log('⏭  Title contains  "WIP".');
+                        if (hasWipLabel)             console.log('⏭  Has  "work-in-progress" label.');
+                        if (isDraft)                 console.log('⏭  PR is a draft.');
+                      }

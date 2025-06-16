@@ -1,0 +1,62 @@
+# ------------------------------------------------------------------------------------
+#  Stale Check Workflow
+#
+#  Purpose: Warn about (and optionally close) inactive issues and PRs.
+#           Runs every weekday at 08:32 UTC and can be triggered manually.
+#
+#  Triggers  : Scheduled (Mon-Fri at 08:32 UTC) and manual dispatch.
+#
+#  Maintainer: @mrz1836
+# ------------------------------------------------------------------------------------
+
+name: stale-check
+
+on:
+  schedule:
+    # ┌─ min  ─┬─ hour ─┬─ dom ─┬─ mon ─┬─ dow ─┐
+    - cron: '32 8 * * 1-5'         # Mon‑Fri at 08:32 UTC
+  workflow_dispatch:               # allow a manual run
+
+permissions:
+  # Both scopes are required even if you only stale one object type.
+  # See https://github.com/actions/stale/issues/840
+  issues: write
+  pull-requests: write
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Close stale issues & PRs
+        uses: actions/stale@v9.1.0   # pin the exact tag for reproducibility
+        with:
+          # —————————————————— Core behaviour ——————————————————
+          days-before-stale: 60                 # warn after 60 days
+          days-before-close: 14                 # close 14 days later
+          stale-issue-label: stale
+          stale-pr-label: stale
+          close-issue-message: >
+            This issue was automatically closed after **{{ days }} days** of
+            inactivity. If this is still relevant, feel free to re‑open.
+          close-pr-message: >
+            This PR was automatically closed after **{{ days }} days** of
+            inactivity. If you plan to resume work, please re‑open.
+          stale-issue-message: >
+            This issue has been inactive for **{{ days }} days** and will be
+            closed in {{ daysUntilClose }} days if no further activity occurs.
+          stale-pr-message: >
+            This pull request has been inactive for **{{ days }} days** and will
+            be closed in {{ daysUntilClose }} days if no further activity occurs.
+
+          # —————————————————— Quality‑of‑life filters ——————————————————
+          exempt-issue-labels: pinned,never-stale
+          exempt-pr-labels: work-in-progress,never-stale
+          exempt-draft-pr: true             # ignore draft PRs
+          remove-stale-when-updated: true   # clear label on any activity
+          only-labels: ''                   # process everything (override if needed)
+
+          # —————————————————— API‑usage optimization ——————————————————
+          # Avoid hitting secondary‑rate limits on large repos.
+          operations-per-run: 300
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
