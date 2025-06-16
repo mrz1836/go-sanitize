@@ -1,30 +1,91 @@
 # go-sanitize
 > Simple library of sanitation methods for data sanitation and reduction
 
-[![Release](https://img.shields.io/github/release-pre/mrz1836/go-sanitize.svg?logo=github&style=flat)](https://github.com/mrz1836/go-sanitize/releases)
-[![Build Status](https://img.shields.io/github/actions/workflow/status/mrz1836/go-sanitize/run-tests.yml?branch=master&logo=github&v=3)](https://github.com/mrz1836/go-sanitize/actions)
-[![Report](https://goreportcard.com/badge/github.com/mrz1836/go-sanitize?style=flat)](https://goreportcard.com/report/github.com/mrz1836/go-sanitize)
-[![codecov](https://codecov.io/gh/mrz1836/go-sanitize/branch/master/graph/badge.svg)](https://codecov.io/gh/mrz1836/go-sanitize)
-[![Go](https://img.shields.io/github/go-mod/go-version/mrz1836/go-sanitize)](https://golang.org/)
-[![Sponsor](https://img.shields.io/badge/sponsor-MrZ-181717.svg?logo=github&style=flat&v=3)](https://github.com/sponsors/mrz1836)
-[![Donate](https://img.shields.io/badge/donate-bitcoin-ff9900.svg?logo=bitcoin&style=flat)](https://mrz1818.com/?tab=tips&utm_source=github&utm_medium=sponsor-link&utm_campaign=go-sanitize&utm_term=go-sanitize&utm_content=go-sanitize)
+<table>
+  <thead>
+    <tr>
+      <th>CI&nbsp;/&nbsp;CD</th>
+      <th>Quality&nbsp;&amp;&nbsp;Security</th>
+      <th>Docs&nbsp;&amp;&nbsp;Meta</th>
+      <th>Community</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td valign="top" align="left">
+        <a href="https://github.com/mrz1836/go-sanitize/releases">
+          <img src="https://img.shields.io/github/release-pre/mrz1836/go-sanitize?logo=github&style=flat" alt="Latest release">
+        </a><br/>
+        <a href="https://github.com/mrz1836/go-sanitize/actions">
+          <img src="https://img.shields.io/github/actions/workflow/status/mrz1836/go-sanitize/run-tests.yml?branch=master&logo=github&style=flat" alt="Build status">
+        </a><br/>
+        <a href="https://github.com/mrz1836/go-sanitize/commits/master">
+		  <img src="https://img.shields.io/github/last-commit/mrz1836/go-sanitize?style=flat&logo=clockify&logoColor=white" alt="Last commit">
+		</a>
+      </td>
+      <td valign="top" align="left">
+        <a href="https://goreportcard.com/report/github.com/mrz1836/go-sanitize">
+          <img src="https://goreportcard.com/badge/github.com/mrz1836/go-sanitize?style=flat" alt="Go Report Card">
+        </a><br/>
+		<a href="https://codecov.io/gh/mrz1836/go-sanitize">
+          <img src="https://codecov.io/gh/mrz1836/go-sanitize/branch/master/graph/badge.svg?style=flat" alt="Code coverage">
+        </a><br/>
+        <a href="https://github.com/mrz1836/go-sanitize/actions">
+          <img src="https://github.com/mrz1836/go-sanitize/actions/workflows/codeql-analysis.yml/badge.svg?style=flat" alt="CodeQL">
+        </a><br/>
+        <a href=".github/SECURITY.md">
+          <img src="https://img.shields.io/badge/security-policy-blue?style=flat&logo=springsecurity&logoColor=white" alt="Security policy">
+        </a><br/>
+        <a href=".github/dependabot.yml">
+          <img src="https://img.shields.io/badge/dependencies-automatic-blue?logo=dependabot&style=flat" alt="Dependabot">
+        </a>
+      </td>
+      <td valign="top" align="left">
+        <a href="https://golang.org/">
+          <img src="https://img.shields.io/github/go-mod/go-version/mrz1836/go-sanitize?style=flat" alt="Go version">
+        </a><br/>
+        <a href="https://pkg.go.dev/github.com/mrz1836/go-sanitize?tab=doc">
+          <img src="https://pkg.go.dev/badge/github.com/mrz1836/go-sanitize.svg?style=flat" alt="Go docs">
+        </a><br/>
+        <a href=".github/AGENTS.md">
+          <img src="https://img.shields.io/badge/AGENTS.md-found-40b814?style=flat&logo=openai" alt="AGENTS.md rules">
+        </a><br/>
+        <a href="Makefile">
+          <img src="https://img.shields.io/badge/Makefile-supported-brightgreen?style=flat&logo=probot&logoColor=white" alt="Makefile Supported">
+        </a>
+      </td>
+      <td valign="top" align="left">
+        <a href="https://github.com/mrz1836/go-sanitize/graphs/contributors">
+          <img src="https://img.shields.io/github/contributors/mrz1836/go-sanitize?style=flat&logo=contentful&logoColor=white" alt="Contributors">
+        </a><br/>
+        <a href="https://github.com/sponsors/mrz1836">
+          <img src="https://img.shields.io/badge/sponsor-MrZ-181717.svg?logo=github&style=flat" alt="Sponsor">
+        </a><br/>
+        <a href="https://mrz1818.com/?tab=tips&utm_source=github&utm_medium=sponsor-link&utm_campaign=go-sanitize&utm_term=go-sanitize&utm_content=go-sanitize">
+          <img src="https://img.shields.io/badge/donate-bitcoin-ff9900.svg?logo=bitcoin&style=flat" alt="Donate Bitcoin">
+        </a>
+      </td>
+    </tr>
+  </tbody>
+</table>
 
 <br/>
 
-## Table of Contents
-- [Installation](#installation)
-- [Documentation](#documentation)
-- [Examples & Tests](#examples--tests)
-- [Benchmarks](#benchmarks)
-- [Code Standards](#code-standards)
-- [Usage](#usage)
-- [Maintainers](#maintainers)
-- [Contributing](#contributing)
-- [License](#license)
+## 🗂️ Table of Contents
+* [Installation](#-installation)
+* [Usage](#-usage)
+* [Documentation](#-documentation)
+* [Examples & Tests](#-examples--tests)
+* [Benchmarks](#-benchmarks)
+* [Code Standards](#-code-standards)
+* [AI Compliance](#-ai-compliance)
+* [Maintainers](#-maintainers)
+* [Contributing](#-contributing)
+* [License](#-license)
 
 <br/>
 
-## Installation
+## 📦 Installation
 
 **go-sanitize** requires a [supported release of Go](https://golang.org/doc/devel/release.html#policy).
 ```shell script
@@ -33,20 +94,79 @@ go get -u github.com/mrz1836/go-sanitize
 
 <br/>
 
-## Documentation
+## 💡 Usage
+
+Here is a basic example of how to use go-sanitize in your Go project:
+
+```go
+package main
+
+import (
+    "fmt"
+    "github.com/mrz1836/go-sanitize"
+)
+
+func main() {
+    // Sanitize a string to remove unwanted characters
+	input := "Hello, World! @2023"
+	sanitized := sanitize.AlphaNumeric(input)
+	fmt.Println("Sanitized String:", sanitized) // Output: "HelloWorld2023"
+}
+```
+
+- Explore additional [usage examples](examples) for practical integration patterns
+- Review [benchmark results](sanitize_test.go) to assess performance characteristics
+- Examine the comprehensive [test suite](sanitize_test.go) for validation and coverage
+
+<br/>
+
+## 📚 Documentation
+
 View the generated [documentation](https://pkg.go.dev/github.com/mrz1836/go-sanitize?tab=doc)
 
-[![GoDoc](https://godoc.org/github.com/mrz1836/go-sanitize?status.svg&style=flat)](https://pkg.go.dev/github.com/mrz1836/go-sanitize?tab=doc)
+<br/>
+
+### Features
+- TODO:
+
+### Functions
+- [`Func()`](sanitize.go): Brief description of the function.
+
+
+### Additional Documentation & Repository Management
 
 <details>
 <summary><strong><code>Library Deployment</code></strong></summary>
 <br/>
 
-[goreleaser](https://github.com/goreleaser/goreleaser) for easy binary or library deployment to GitHub and can be installed via: `brew install goreleaser`.
+This project uses [goreleaser](https://github.com/goreleaser/goreleaser) for streamlined binary and library deployment to GitHub. To get started, install it via:
 
-The [.goreleaser.yml](.goreleaser.yml) file is used to configure [goreleaser](https://github.com/goreleaser/goreleaser).
+```bash
+brew install goreleaser
+```
 
-Use `make release-snap` to create a snapshot version of the release, and finally `make release` to ship to production.
+The release process is defined in the [.goreleaser.yml](.goreleaser.yml) configuration file.
+
+To generate a snapshot (non-versioned) release for testing purposes, run:
+
+```bash
+make release-snap
+```
+
+Before tagging a new version, update the release metadata in the `CITATION.cff` file:
+
+```bash
+make citation version=0.2.1
+```
+
+Then create and push a new Git tag using:
+
+```bash
+make tag version=x.y.z
+```
+
+This process ensures consistent, repeatable releases with properly versioned artifacts and citation metadata.
+
 </details>
 
 <details>
@@ -54,126 +174,184 @@ Use `make release-snap` to create a snapshot version of the release, and finally
 <br/>
 
 View all `makefile` commands
-```shell script
+
+```bash script
 make help
 ```
 
 List of all current commands:
+
+<!-- make-help-start -->
 ```text
-all                  Runs multiple commands
-clean                Remove previous builds and any test cache data
-clean-mods           Remove all the Go mod cache
-coverage             Shows the test coverage
-godocs               Sync the latest tag with GoDocs
-help                 Show this help message
-install              Install the application
-install-go           Install the application (Using Native Go)
-lint                 Run the golangci-lint application (install if not found)
-release              Full production release (creates release in Github)
-release              Runs common.release then runs godocs
-release-snap         Test the full release (build binaries)
-release-test         Full production test release (everything except deploy)
-replace-version      Replaces the version in HTML/JS (pre-deploy)
-tag                  Generate a new tag and push (tag version=0.0.0)
-tag-remove           Remove a tag if found (tag-remove version=0.0.0)
-tag-update           Update an existing tag to current commit (tag-update version=0.0.0)
-test                 Runs vet, lint and ALL tests
-test-ci              Runs all tests via CI (exports coverage)
-test-ci-no-race      Runs all tests via CI (no race) (exports coverage)
-test-ci-short        Runs unit tests via CI (exports coverage)
-test-short           Runs vet, lint and tests (excludes integration tests)
-uninstall            Uninstall the application (and remove files)
-update-linter        Update the golangci-lint package (macOS only)
-vet                  Run the Go vet application
+all                      Runs multiple commands
+citation                 Update version in CITATION.cff (citation version=X.Y.Z)
+clean-mods               Remove all the Go mod cache
+coverage                 Shows the test coverage
+diff                     Show the git diff
+generate                 Runs the go generate command in the base of the repo
+godocs                   Sync the latest tag with GoDocs
+govulncheck-install      Install govulncheck for vulnerability scanning
+help                     Show this help message
+install-go               Install the application (Using Native Go)
+install-releaser         Install the GoReleaser application
+install                  Install the application
+lint                     Run the golangci-lint application (install if not found)
+release-snap             Test the full release (build binaries)
+release-test             Full production test release (everything except deploy)
+release                  Full production release (creates release in GitHub)
+tag-remove               Remove a tag if found (tag-remove version=0.0.0)
+tag-update               Update an existing tag to current commit (tag-update version=0.0.0)
+tag                      Generate a new tag and push (tag version=0.0.0)
+test-ci-no-race          Runs all tests via CI (no race) (exports coverage)
+test-ci-short            Runs unit tests via CI (exports coverage)
+test-ci                  Runs all tests via CI (exports coverage)
+test-no-lint             Runs just tests
+test-short               Runs vet, lint and tests (excludes integration tests)
+test-unit                Runs tests and outputs coverage
+test                     Runs lint and ALL tests
+uninstall                Uninstall the application (and remove files)
+update-linter            Update the golangci-lint package (macOS only)
+update-readme            Update the README.md with the make commands
+vet                      Run the Go vet application
 ```
+<!-- make-help-end -->
+
+</details>
+
+<details>
+<summary><strong><code>GitHub Workflows</code></strong></summary>
+<br/>
+
+| Workflow Name                                                                | Description                                                                                                            |
+|------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------|
+| [auto-merge-on-approval.yml](.github/workflows/auto-merge-on-approval.yml)   | Automatically merges PRs after approval and all required checks, following strict rules.                               |
+| [codeql-analysis.yml](.github/workflows/codeql-analysis.yml)                 | Analyzes code for security vulnerabilities using GitHub CodeQL.                                                        |
+| [delete-merged-branches.yml](.github/workflows/delete-merged-branches.yml)   | Deletes feature branches after their pull requests are merged.                                                         |
+| [dependabot-auto-merge.yml](.github/workflows/dependabot-auto-merge.yml)     | Automatically merges Dependabot PRs that meet all requirements.                                                        |
+| [pull-request-management.yml](.github/workflows/pull-request-management.yml) | Labels PRs by branch prefix, assigns a default user if none is assigned, and welcomes new contributors with a comment. |
+| [release.yml](.github/workflows/release.yml)                                 | Builds and publishes releases via GoReleaser when a semver tag is pushed.                                              |
+| [run-tests.yml](.github/workflows/run-tests.yml)                             | Runs all Go tests and dependency checks on every push and pull request.                                                |
+| [stale.yml](.github/workflows/stale.yml)                                     | Warns about (and optionally closes) inactive issues and PRs on a schedule or manual trigger.                           |
+| [sync-labels.yml](.github/workflows/sync-labels.yml)                         | Keeps GitHub labels in sync with the declarative manifest at `.github/labels.yml`.                                     |
+
+</details>
+
+<details>
+<summary><strong><code>Updating Dependencies</code></strong></summary>
+<br/>
+
+To update all dependencies (Go modules, linters, and related tools), run:
+
+```bash
+make update
+```
+
+This command ensures all dependencies are brought up to date in a single step, including Go modules and any tools managed by the Makefile. It is the recommended way to keep your development environment and CI in sync with the latest versions.
+
 </details>
 
 <br/>
 
-## Examples & Tests
-All unit tests and [examples](examples) run via [GitHub Actions](https://github.com/mrz1836/go-sanitize/actions) and
-uses [Go version 1.18.x](https://golang.org/doc/go1.18). View the [configuration file](.github/workflows/run-tests.yml).
+## 🧪 Examples & Tests
 
-Run all tests (including any integration tests)
-```shell script
+All unit tests and [examples](examples) run via [GitHub Actions](https://github.com/mrz1836/go-sanitize/actions) and use [Go version 1.18.x](https://go.dev/doc/go1.18). View the [configuration file](.github/workflows/run-tests.yml).
+
+Run all tests:
+
+```bash script
 make test
 ```
 
 <br/>
 
-## Benchmarks
+## ⚡ Benchmarks
+
 Run the Go [benchmarks](sanitize_test.go):
-```shell script
+
+```bash script
 make bench
 ```
 
+<br/>
+
+Performance benchmarks for the core functions in this library, executed on an Apple M1 Max (ARM64):
+
 ### Benchmark Results
 
-| Benchmark                        | Iterations |   ns/op | B/op | allocs/op |
-|----------------------------------|------------|--------:|-----:|----------:|
-| BenchmarkAlpha                   | 1,879,712  |   635.2 |  120 |         6 |
-| BenchmarkAlpha_WithSpaces        | 2,388,141  |   502.9 |   88 |         4 |
-| BenchmarkAlphaNumeric            | 1,587,366  |   757.7 |  128 |         6 |
-| BenchmarkAlphaNumeric_WithSpaces | 1,911,022  |   634.4 |  112 |         4 |
-| BenchmarkBitcoinAddress          | 2,156,088  |   555.2 |  160 |         4 |
-| BenchmarkBitcoinCashAddress      | 1,619,050  |   744.5 |  160 |         4 |
-| BenchmarkCustom                  | 879,280    | 1,279.0 |  943 |        17 |
-| BenchmarkDecimal                 | 2,035,514  |   595.4 |   56 |         3 |
-| BenchmarkDomain                  | 2,493,144  |   473.0 |  225 |         6 |
-| BenchmarkDomain_PreserveCase     | 2,879,966  |   420.9 |  209 |         5 |
-| BenchmarkDomain_RemoveWww        | 1,673,802  |   719.2 |  274 |         9 |
-| BenchmarkEmail                   | 2,140,860  |   560.2 |  136 |         6 |
-| BenchmarkEmail_PreserveCase      | 2,634,862  |   458.5 |  112 |         5 |
-| BenchmarkFirstToUpper            | 13,146,956 |    90.7 |   24 |         1 |
-| BenchmarkFormalName              | 3,300,636  |   360.5 |   64 |         3 |
-| BenchmarkHTML                    | 2,541,874  |   473.1 |   64 |         3 |
-| BenchmarkIPAddress               | 2,895,540  |   408.4 |   80 |         5 |
-| BenchmarkIPAddress_IPV6          | 1,000,000  | 1,074.0 |  225 |         6 |
-| BenchmarkNumeric                 | 2,908,365  |   414.4 |   40 |         3 |
-| BenchmarkPathName                | 2,348,728  |   510.1 |   64 |         3 |
-| BenchmarkPunctuation             | 1,929,290  |   624.6 |  160 |         4 |
-| BenchmarkScientificNotation      | 1,955,768  |   614.5 |   56 |         3 |
-| BenchmarkScripts                 | 2,020,128  |   598.1 |   64 |         2 |
-| BenchmarkSingleLine              | 536,860    | 2,146.0 |   96 |         4 |
-| BenchmarkTime                    | 2,159,088  |   556.3 |   40 |         3 |
-| BenchmarkURI                     | 2,309,937  |   518.2 |   80 |         3 |
-| BenchmarkURL                     | 2,329,815  |   514.4 |   80 |         3 |
-| BenchmarkXML                     | 4,123,827  |   290.3 |   56 |         3 |
-| BenchmarkXSS                     | 3,485,330  |   344.7 |   40 |         2 |
+| Benchmark                                             | Iterations |   ns/op | B/op | allocs/op |
+|-------------------------------------------------------|------------|--------:|-----:|----------:|
+| [BenchmarkAlpha](sanitize_test.go)                    | 1,879,712  |   635.2 |  120 |         6 |
+| [BenchmarkAlpha\_WithSpaces](sanitize_test.go)        | 2,388,141  |   502.9 |   88 |         4 |
+| [BenchmarkAlphaNumeric](sanitize_test.go)             | 1,587,366  |   757.7 |  128 |         6 |
+| [BenchmarkAlphaNumeric\_WithSpaces](sanitize_test.go) | 1,911,022  |   634.4 |  112 |         4 |
+| [BenchmarkBitcoinAddress](sanitize_test.go)           | 2,156,088  |   555.2 |  160 |         4 |
+| [BenchmarkBitcoinCashAddress](sanitize_test.go)       | 1,619,050  |   744.5 |  160 |         4 |
+| [BenchmarkCustom](sanitize_test.go)                   | 879,280    | 1,279.0 |  943 |        17 |
+| [BenchmarkDecimal](sanitize_test.go)                  | 2,035,514  |   595.4 |   56 |         3 |
+| [BenchmarkDomain](sanitize_test.go)                   | 2,493,144  |   473.0 |  225 |         6 |
+| [BenchmarkDomain\_PreserveCase](sanitize_test.go)     | 2,879,966  |   420.9 |  209 |         5 |
+| [BenchmarkDomain\_RemoveWww](sanitize_test.go)        | 1,673,802  |   719.2 |  274 |         9 |
+| [BenchmarkEmail](sanitize_test.go)                    | 2,140,860  |   560.2 |  136 |         6 |
+| [BenchmarkEmail\_PreserveCase](sanitize_test.go)      | 2,634,862  |   458.5 |  112 |         5 |
+| [BenchmarkFirstToUpper](sanitize_test.go)             | 13,146,956 |    90.7 |   24 |         1 |
+| [BenchmarkFormalName](sanitize_test.go)               | 3,300,636  |   360.5 |   64 |         3 |
+| [BenchmarkHTML](sanitize_test.go)                     | 2,541,874  |   473.1 |   64 |         3 |
+| [BenchmarkIPAddress](sanitize_test.go)                | 2,895,540  |   408.4 |   80 |         5 |
+| [BenchmarkIPAddress\_IPV6](sanitize_test.go)          | 1,000,000  | 1,074.0 |  225 |         6 |
+| [BenchmarkNumeric](sanitize_test.go)                  | 2,908,365  |   414.4 |   40 |         3 |
+| [BenchmarkPathName](sanitize_test.go)                 | 2,348,728  |   510.1 |   64 |         3 |
+| [BenchmarkPunctuation](sanitize_test.go)              | 1,929,290  |   624.6 |  160 |         4 |
+| [BenchmarkScientificNotation](sanitize_test.go)       | 1,955,768  |   614.5 |   56 |         3 |
+| [BenchmarkScripts](sanitize_test.go)                  | 2,020,128  |   598.1 |   64 |         2 |
+| [BenchmarkSingleLine](sanitize_test.go)               | 536,860    | 2,146.0 |   96 |         4 |
+| [BenchmarkTime](sanitize_test.go)                     | 2,159,088  |   556.3 |   40 |         3 |
+| [BenchmarkURI](sanitize_test.go)                      | 2,309,937  |   518.2 |   80 |         3 |
+| [BenchmarkURL](sanitize_test.go)                      | 2,329,815  |   514.4 |   80 |         3 |
+| [BenchmarkXML](sanitize_test.go)                      | 4,123,827  |   290.3 |   56 |         3 |
+| [BenchmarkXSS](sanitize_test.go)                      | 3,485,330  |   344.7 |   40 |         2 |
 
+> These benchmarks reflect fast, allocation-free lookups for most retrieval functions, ensuring optimal performance in production environments.
 
 <br/>
 
-## Code Standards
+## 🛠️ Code Standards
 Read more about this Go project's [code standards](.github/CODE_STANDARDS.md).
 
 <br/>
 
-## Usage
-- View the [examples](examples)
-- View the [benchmarks](sanitize_test.go)
-- View the [tests](sanitize_test.go)
+## 🤖 AI Compliance
+This project documents expectations for AI assistants using a few dedicated files:
+
+- [AGENTS.md](.github/AGENTS.md) — canonical rules for coding style, workflows, and pull requests used by [Codex](https://chatgpt.com/codex).
+- [CLAUDE.md](.github/CLAUDE.md) — quick checklist for the [Claude](https://www.anthropic.com/product) agent.
+- [.cursorrules](.cursorrules) — machine-readable subset of the policies for [Cursor](https://www.cursor.so/) and similar tools.
+- [sweep.yaml](.github/sweep.yaml) — rules for [Sweep](https://github.com/sweepai/sweep), a tool for code review and pull request management.
+
+Edit `AGENTS.md` first when adjusting these policies, and keep the other files in sync within the same pull request.
 
 <br/>
 
-## Maintainers
+## 👥 Maintainers
 | [<img src="https://github.com/mrz1836.png" height="50" alt="MrZ" />](https://github.com/mrz1836) |
 |:------------------------------------------------------------------------------------------------:|
 |                                [MrZ](https://github.com/mrz1836)                                 |
 
 <br/>
 
-## Contributing
+## 🤝 Contributing
 View the [contributing guidelines](.github/CONTRIBUTING.md) and please follow the [code of conduct](.github/CODE_OF_CONDUCT.md).
 
 ### How can I help?
-All kinds of contributions are welcome :raised_hands:! 
-The most basic way to show your support is to star :star2: the project, or to raise issues :speech_balloon:. 
-You can also support this project by [becoming a sponsor on GitHub](https://github.com/sponsors/mrz1836) :clap: 
+All kinds of contributions are welcome :raised_hands:!
+The most basic way to show your support is to star :star2: the project, or to raise issues :speech_balloon:.
+You can also support this project by [becoming a sponsor on GitHub](https://github.com/sponsors/mrz1836) :clap:
 or by making a [**bitcoin donation**](https://mrz1818.com/?tab=tips&utm_source=github&utm_medium=sponsor-link&utm_campaign=go-sanitize&utm_term=go-sanitize&utm_content=go-sanitize) to ensure this journey continues indefinitely! :rocket:
+
+
+[![Stars](https://img.shields.io/github/stars/mrz1836/go-sanitize?label=Please%20like%20us&style=social)](https://github.com/mrz1836/go-sanitize/stargazers)
 
 <br/>
 
-## License
+## 📝 License
 
 [![License](https://img.shields.io/github/license/mrz1836/go-sanitize.svg?style=flat)](LICENSE)
