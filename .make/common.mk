@@ -31,33 +31,51 @@ ifndef DISTRIBUTIONS_DIR
 endif
 export DISTRIBUTIONS_DIR
 
-.PHONY: diff
+.PHONY: citation
+citation: ## Update version in CITATION.cff (citation version=X.Y.Z)
+	@echo "updating CITATION.cff version..."
+	@if [ -z "$(version)" ]; then \
+	    echo "Error: 'version' variable is not set. Please set the 'version' variable before running this target."; \
+	    exit 1; \
+	fi
+	@if [ "$(shell uname)" = "Darwin" ]; then \
+	        sed -i '' -e 's/^version: \".*\"/version: \"$(version)\"/' CITATION.cff; \
+	else \
+	        sed -i -e 's/^version: \".*\"/version: \"$(version)\"/' CITATION.cff; \
+	fi
 
+.PHONY: diff
 diff: ## Show the git diff
 	$(call print-target)
 	git diff --exit-code
 	RES=$$(git status --porcelain) ; if [ -n "$$RES" ]; then echo $$RES && exit 1 ; fi
 
+.PHONY: help
 help: ## Show this help message
 	@egrep -h '^(.+)\:\ ##\ (.+)' ${MAKEFILE_LIST} | column -t -c 2 -s ':#'
 
+.PHONY: install-releaser
 install-releaser: ## Install the GoReleaser application
 	@echo "installing GoReleaser..."
 	@curl -sfL https://install.goreleaser.com/github.com/goreleaser/goreleaser.sh | sh
 
-release:: ## Full production release (creates release in Github)
+.PHONY: release
+release:: ## Full production release (creates release in GitHub)
 	@echo "releasing..."
 	@test $(github_token)
 	@export GITHUB_TOKEN=$(github_token) && goreleaser --rm-dist
 
+.PHONY: release-test
 release-test: ## Full production test release (everything except deploy)
 	@echo "creating a release test..."
 	@goreleaser --skip-publish --rm-dist
 
+.PHONY: release-snap
 release-snap: ## Test the full release (build binaries)
 	@echo "creating a release snapshot..."
 	@goreleaser --snapshot --skip-publish --rm-dist
 
+.PHONY: replace-version
 replace-version: ## Replaces the version in HTML/JS (pre-deploy)
 	@echo "replacing version..."
 	@test $(version)
@@ -65,6 +83,7 @@ replace-version: ## Replaces the version in HTML/JS (pre-deploy)
 	@find $(path) -name "*.html" -type f -exec sed -i '' -e "s/{{version}}/$(version)/g" {} \;
 	@find $(path) -name "*.js" -type f -exec sed -i '' -e "s/{{version}}/$(version)/g" {} \;
 
+.PHONY: tag
 tag: ## Generate a new tag and push (tag version=0.0.0)
 	@echo "creating new tag..."
 	@test $(version)
@@ -72,6 +91,7 @@ tag: ## Generate a new tag and push (tag version=0.0.0)
 	@git push origin v$(version)
 	@git fetch --tags -f
 
+.PHONY: tag-remove
 tag-remove: ## Remove a tag if found (tag-remove version=0.0.0)
 	@echo "removing tag..."
 	@test $(version)
@@ -79,12 +99,14 @@ tag-remove: ## Remove a tag if found (tag-remove version=0.0.0)
 	@git push --delete origin v$(version)
 	@git fetch --tags
 
+.PHONY: tag-update
 tag-update: ## Update an existing tag to current commit (tag-update version=0.0.0)
 	@echo "updating tag to new commit..."
 	@test $(version)
 	@git push --force origin HEAD:refs/tags/v$(version)
 	@git fetch --tags -f
 
+.PHONY: update-releaser
 update-releaser:  ## Update the goreleaser application
 	@echo "updating GoReleaser application..."
 	@$(MAKE) install-releaser
