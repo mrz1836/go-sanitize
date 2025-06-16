@@ -107,10 +107,12 @@ import (
 )
 
 func main() {
-    // Sanitize a string to remove unwanted characters
-	input := "Hello, World! @2023"
+	// Sanitize a string to remove unwanted characters
+	input := "Hello, World! @2025"
 	sanitized := sanitize.AlphaNumeric(input)
-	fmt.Println("Sanitized String:", sanitized) // Output: "HelloWorld2023"
+
+	// Output: "Sanitized String: HelloWorld2025"
+	fmt.Println("Sanitized String: ", sanitized) 
 }
 ```
 
