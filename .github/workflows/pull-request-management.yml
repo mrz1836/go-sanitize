@@ -115,7 +115,7 @@ jobs:
             // 3. Welcome new contributors with a friendly comment
             // ──────────────────────────────────────────────────────────────
             const author = context.payload.pull_request.user.login;
-            const knownBots = ['dependabot[bot]', 'mergify[bot]', 'copilot[bot]', 'Copilot', DEFAULT_ASSIGNEE, rohenaz];
+            const knownBots = ['dependabot[bot]', 'mergify[bot]', 'copilot[bot]', 'Copilot', DEFAULT_ASSIGNEE];
             if (!knownBots.includes(author) && context.payload.action === 'opened') {
               try {
                 await github.rest.issues.createComment({
