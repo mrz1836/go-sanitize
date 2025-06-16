@@ -1,4 +1,4 @@
-# Basic dependabot.yml to update gomod and Github Actions
+# Basic dependabot.yml to update gomod and GitHub Actions dependencies
 
 version: 2
 updates:
@@ -9,8 +9,6 @@ updates:
       interval: "weekly"
       # Check for npm updates at 9am UTC (5am EST)
       time: "10:00"
-    reviewers:
-      - "mrz1836"
     assignees:
       - "mrz1836"
     # Labels must be created first
@@ -24,8 +22,6 @@ updates:
     schedule:
       interval: "weekly"
       day: "monday"
-    reviewers:
-      - "mrz1836"
     assignees:
       - "mrz1836"
     labels:
