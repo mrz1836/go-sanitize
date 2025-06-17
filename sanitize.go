@@ -39,7 +39,6 @@ var (
 	ipAddressRegExp       = regexp.MustCompile(`[^a-zA-Z0-9:.]`)                                                           // IPV4 and IPV6 characters only
 	scriptRegExp          = regexp.MustCompile(`(?i)<(script|iframe|embed|object)[^>]*>.*</(script|iframe|embed|object)>`) // Scripts and embeds
 	singleLineRegExp      = regexp.MustCompile(`(\r)|(\n)|(\t)|(\v)|(\f)`)                                                 // Carriage returns, line feeds, tabs, for single line transition
-	urlRegExp             = regexp.MustCompile(`[^a-zA-Z0-9-_/:.,?&@=#%]`)                                                 // URL allowed characters
 	wwwRegExp             = regexp.MustCompile(`(?i)www.`)                                                                 // For removing www
 )
 
@@ -673,7 +672,17 @@ func URI(original string) string {
 //
 // See more usage examples in the `sanitize_test.go` file.
 func URL(original string) string {
-	return string(urlRegExp.ReplaceAll([]byte(original), emptySpace))
+	var b strings.Builder
+	b.Grow(len(original))
+	for _, r := range original {
+		if unicode.IsLetter(r) || unicode.IsDigit(r) ||
+			r == '-' || r == '_' || r == '/' || r == ':' ||
+			r == '.' || r == ',' || r == '?' || r == '&' ||
+			r == '@' || r == '=' || r == '#' || r == '%' {
+			b.WriteRune(r)
+		}
+	}
+	return b.String()
 }
 
 // XML returns a string without any XML tags.
