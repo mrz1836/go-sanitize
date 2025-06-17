@@ -109,7 +109,7 @@ import (
 func main() {
 	// Sanitize a string to remove unwanted characters
 	input := "Hello, World! @2025"
-	sanitized := sanitize.AlphaNumeric(input)
+	sanitized := sanitize.AlphaNumeric(input, false) // true to keep spaces
 
 	// Output: "Sanitized String: HelloWorld2025"
 	fmt.Println("Sanitized String:", sanitized) 
