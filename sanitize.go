@@ -26,6 +26,7 @@ import (
 	"regexp"
 	"strings"
 	"unicode"
+	"unicode/utf8"
 )
 
 // Set all the regular expressions
@@ -336,6 +337,49 @@ func FirstToUpper(original string) string {
 	runes := []rune(original)
 	runes[0] = unicode.ToUpper(runes[0])
 	return string(runes)
+}
+
+// FirstToUpperBuilder overwrites the first letter as an uppercase letter
+// using a strings.Builder and preserves the rest of the string.
+//
+// This function mirrors the behavior of FirstToUpper but aims to reduce
+// allocations by building the output string using strings.Builder.
+//
+// Parameters:
+// - original: The input string to be formatted.
+//
+// Returns:
+// - A string with the first letter converted to uppercase.
+//
+// Example:
+//
+//	input := "hello world"
+//	result := sanitize.FirstToUpperBuilder(input)
+//	fmt.Println(result) // Output: "Hello world"
+//
+// View more examples in the `sanitize_test.go` file.
+func FirstToUpperBuilder(original string) string {
+
+	// Avoid extra work if string is empty
+	if len(original) == 0 {
+		return original
+	}
+
+	// Fast-path for single character strings
+	if len(original) == 1 {
+		return strings.ToUpper(original)
+	}
+
+	// Decode and uppercase the first rune to support multibyte characters
+	r, size := utf8.DecodeRuneInString(original)
+	r = unicode.ToUpper(r)
+
+	var b strings.Builder
+	b.Grow(len(original))
+	b.WriteRune(r)
+	b.WriteString(original[size:])
+
+	return b.String()
 }
 
 // FormalName returns a sanitized string containing only characters recognized in formal names or surnames.
