@@ -36,7 +36,6 @@ var (
 	htmlRegExp       = regexp.MustCompile(`(?i)<[^>]*>`)                                                              // HTML/XML tags or any alligator open/close tags
 	ipAddressRegExp  = regexp.MustCompile(`[^a-zA-Z0-9:.]`)                                                           // IPV4 and IPV6 characters only
 	scriptRegExp     = regexp.MustCompile(`(?i)<(script|iframe|embed|object)[^>]*>.*</(script|iframe|embed|object)>`) // Scripts and embeds
-	singleLineRegExp = regexp.MustCompile(`(\r)|(\n)|(\t)|(\v)|(\f)`)                                                 // Carriage returns, line feeds, tabs, for single line transition
 	wwwRegExp        = regexp.MustCompile(`(?i)www.`)                                                                 // For removing www
 )
 
@@ -487,15 +486,17 @@ func Numeric(original string) string {
 	return b.String()
 }
 
-// PathName returns a formatted path-compliant name.
-// This function removes any characters that are not valid in file or directory names,
-// ensuring the resulting string is safe to use as a path component.
+// PathName returns a sanitized string suitable for use as a file or directory name.
+// It removes any characters that are not ASCII letters (a-z, A-Z), digits (0-9),
+// hyphens (-), or underscores (_), ensuring the result is safe for use as a path component
+// on most filesystems. This function is useful for normalizing user input, generating
+// safe filenames, or cleaning up strings for use in file paths.
 //
 // Parameters:
-// - original: The input string to be sanitized.
+//   - original: The input string to be sanitized.
 //
 // Returns:
-// - A sanitized string containing only valid path name characters.
+//   - A sanitized string containing only valid path name characters.
 //
 // Example:
 //
@@ -522,21 +523,23 @@ func PathName(original string) string {
 	return b.String()
 }
 
-// Punctuation returns a string with basic punctuation preserved.
-// This function removes any characters that are not standard punctuation or alphanumeric characters,
-// ensuring the resulting string contains only valid punctuation and alphanumeric characters.
+// Punctuation returns a sanitized string containing only alphanumeric characters and common punctuation.
+// It removes any characters that are not Unicode letters, digits, or standard punctuation marks such as
+// hyphens (-), apostrophes ('), double quotes ("), hash (#), ampersand (&), exclamation mark (!),
+// question mark (?), comma (,), period (.), or whitespace. This function is useful for cleaning user input,
+// preserving readable punctuation in sentences, or preparing text for display where only basic punctuation is allowed.
 //
 // Parameters:
-// - original: The input string to be sanitized.
+//   - original: The input string to be sanitized.
 //
 // Returns:
-// - A sanitized string containing only valid punctuation and alphanumeric characters.
+//   - A sanitized string containing only alphanumeric characters and common punctuation.
 //
 // Example:
 //
-//	input := "Hello, World! How's it going? (Good, I hope.)"
+//	input := "Hello, World! How's it going? (Good, I hope.) @2024"
 //	result := sanitize.Punctuation(input)
-//	fmt.Println(result) // Output: "Hello, World! How's it going? (Good, I hope.)"
+//	fmt.Println(result) // Output: "Hello, World! How's it going? Good, I hope."
 //
 // See more usage examples in the `sanitize_test.go` file.
 func Punctuation(original string) string {
@@ -601,15 +604,17 @@ func Scripts(original string) string {
 	return string(scriptRegExp.ReplaceAll([]byte(original), emptySpace))
 }
 
-// SingleLine returns a single line string by removing all carriage returns, line feeds, tabs, vertical tabs, and form feeds.
-// This function is useful for sanitizing input that should be represented as a single line of text, ensuring that
-// any multi-line or formatted input is condensed into a single line.
+// SingleLine returns a sanitized version of the input string as a single line of text.
+// It replaces all carriage returns (`\r`), line feeds (`\n`), tabs (`\t`), vertical tabs (`\v`),
+// and form feeds (`\f`) with a single space character, effectively flattening multi-line or
+// formatted input into a single line. This is useful for normalizing user input, log entries,
+// or any text that should not contain line breaks or special whitespace.
 //
 // Parameters:
 // - original: The input string to be sanitized.
 //
 // Returns:
-// - A sanitized string with all line breaks and whitespace characters replaced by a single space.
+// - A single-line string with all line breaks and special whitespace replaced by spaces.
 //
 // Example:
 //
@@ -619,7 +624,17 @@ func Scripts(original string) string {
 //
 // See more usage examples in the `sanitize_test.go` file.
 func SingleLine(original string) string {
-	return singleLineRegExp.ReplaceAllString(original, " ")
+	var b strings.Builder
+	b.Grow(len(original))
+	for _, r := range original {
+		switch r {
+		case '\r', '\n', '\t', '\v', '\f':
+			b.WriteRune(' ')
+		default:
+			b.WriteRune(r)
+		}
+	}
+	return b.String()
 }
 
 // Time returns just the time part of the string.
@@ -650,15 +665,17 @@ func Time(original string) string {
 	return b.String()
 }
 
-// URI returns a sanitized string containing only valid URI characters.
-// This function removes any characters that are not part of the accepted URI format,
-// including alphanumeric characters, dashes, underscores, slashes, question marks, ampersands, equals signs, hashes, and percent signs.
+// URI returns a sanitized string containing only valid URI characters from the input.
+// It removes any characters that are not allowed in URIs, including only Unicode letters, digits,
+// dashes (-), underscores (_), slashes (/), question marks (?), ampersands (&), equals signs (=),
+// hashes (#), and percent signs (%). This function is useful for cleaning user input, query strings,
+// or any text that should conform to URI formatting rules.
 //
 // Parameters:
-// - original: The input string to be sanitized.
+//   - original: The input string to be sanitized.
 //
 // Returns:
-// - A sanitized string containing only valid URI characters.
+//   - A sanitized string containing only valid URI characters.
 //
 // Example:
 //
@@ -680,15 +697,18 @@ func URI(original string) string {
 	return b.String()
 }
 
-// URL returns a formatted URL-friendly string.
-// This function removes any characters that are not part of the accepted URL format,
-// including alphanumeric characters, dashes, underscores, slashes, colons, periods, question marks, ampersands, at signs, equals signs, hashes, and percent signs.
+// URL returns a sanitized, URL-friendly string containing only valid URL characters.
+// It removes any characters that are not allowed in URLs, preserving only Unicode letters, digits,
+// dashes (-), underscores (_), slashes (/), colons (:), periods (.), commas (,), question marks (?),
+// ampersands (&), at signs (@), equals signs (=), hashes (#), and percent signs (%).
+// This function is useful for cleaning user input, constructing safe URLs, or normalizing
+// strings for use in web addresses, query parameters, or file paths.
 //
 // Parameters:
-// - original: The input string to be sanitized.
+//   - original: The input string to be sanitized.
 //
 // Returns:
-// - A sanitized string containing only valid URL characters.
+//   - A sanitized string containing only valid URL characters.
 //
 // Example:
 //
@@ -735,6 +755,17 @@ func XML(original string) string {
 // XSS removes known XSS attack strings or script strings.
 // This function sanitizes the input string by removing common XSS attack vectors,
 // such as script tags, eval functions, and JavaScript protocol handlers.
+//
+// NOTE: this is NOT a comprehensive XSS prevention solution.
+//
+// For a more improved approach, use a library like `github.com/microcosm-cc/bluemonday`
+//
+// import "github.com/microcosm-cc/bluemonday"
+//
+//	func SafeHTML(unsafe string) string {
+//		p := bluemonday.UGCPolicy() // or build your own allow-list
+//		return p.Sanitize(unsafe)
+//	}
 //
 // Parameters:
 // - original: The input string to be sanitized.

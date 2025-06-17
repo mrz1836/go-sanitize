@@ -1123,6 +1123,28 @@ Work?`))
 	// Output: Does This Work?
 }
 
+// TestSingleLine_EdgeCases tests additional edge cases for SingleLine
+func TestSingleLine_EdgeCases(t *testing.T) {
+
+	var tests = []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{"empty string", "", ""},
+		{"only whitespace", "\n\r\t\v\f", "     "},
+		{"mixed whitespace", "Line1\r\nLine2\tLine3\vLine4\f", "Line1  Line2 Line3 Line4 "},
+		{"leading and trailing", "\nStart\t\n", " Start  "},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			output := sanitize.SingleLine(test.input)
+			assert.Equal(t, test.expected, output)
+		})
+	}
+}
+
 // TestTime tests the time sanitize method
 func TestTime_Basic(t *testing.T) {
 

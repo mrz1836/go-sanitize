@@ -318,7 +318,7 @@ Performance benchmarks for the core functions in this library, executed on an Ap
 | [AlphaNumeric_WithSpaces](sanitize_test.go) | 10,005,721 |   118.9 |   32 |         1 |
 | [BitcoinAddress](sanitize_test.go)          | 2,151,312  |   552.5 |  161 |         4 |
 | [BitcoinCashAddress](sanitize_test.go)      | 1,615,339  |   738.0 |  160 |         4 |
-| [Custom](sanitize_test.go)                  | 920,336    | 1,277.0 |  944 |        17 |
+| [Custom](sanitize_test.go) _(Legacy)_       | 920,336    | 1,277.0 |  944 |        17 |
 | [CustomCompiled](sanitize_test.go)          | 1,638,974  |   730.6 |   96 |         5 |
 | [Decimal](sanitize_test.go)                 | 18,779,281 |   62.74 |   24 |         1 |
 | [Domain](sanitize_test.go)                  | 2,537,883  |   470.8 |  226 |         6 |
