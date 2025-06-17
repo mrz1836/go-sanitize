@@ -12,14 +12,14 @@ import (
 )
 
 // TestAlpha tests the alpha sanitize method
-func TestAlpha_Basic(t *testing.T) {
-
-	var tests = []struct {
+func TestAlpha(t *testing.T) {
+	tests := []struct {
 		name     string
 		input    string
 		expected string
 		typeCase bool
 	}{
+		// Basic cases
 		{"regular string", "Test This String-!123", "TestThisString", false},
 		{"various symbols", `~!@#$%^&*()-_Symbols=+[{]};:'"<>,./?`, "Symbols", false},
 		{"carriage returns", "\nThis\nThat", "ThisThat", false},
@@ -27,26 +27,9 @@ func TestAlpha_Basic(t *testing.T) {
 		{"spaces", "Test This String-!123", "Test This String", true},
 		{"symbols and spaces", `~!@#$%^&*()-_Symbols=+[{]};:'"<>,./?`, "Symbols", true},
 		{"quotes and spaces", "“This is a quote with tick`s … ” ☺ ", "This is a quote with ticks    ", true},
-		{"carriage returns", "\nThis\nThat", `ThisThat`, true},
-	}
+		{"carriage returns with spaces", "\nThis\nThat", `ThisThat`, true},
 
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			output := sanitize.Alpha(test.input, test.typeCase)
-			assert.Equal(t, test.expected, output)
-		})
-	}
-}
-
-// TestAlphaEdgeCases tests the alpha sanitize method with edge cases
-func TestAlpha_EdgeCases(t *testing.T) {
-
-	var tests = []struct {
-		name     string
-		input    string
-		expected string
-		typeCase bool
-	}{
+		// Edge cases
 		{"empty string", "", "", false},
 		{"only special characters", "!@#$%^&*()", "", false},
 		{"very long string", strings.Repeat("a", 1000), strings.Repeat("a", 1000), false},
@@ -95,14 +78,14 @@ func ExampleAlpha_withSpaces() {
 }
 
 // TestAlphaNumeric tests the alphanumeric sanitize method
-func TestAlphaNumeric_Basic(t *testing.T) {
-
-	var tests = []struct {
+func TestAlphaNumeric(t *testing.T) {
+	tests := []struct {
 		name     string
 		input    string
 		expected string
 		typeCase bool
 	}{
+		// Basic cases
 		{"regular string", "Test This String-!123", "TestThisString123", false},
 		{"symbols", `~!@#$%^&*()-_Symbols=+[{]};:'"<>,./?`, "Symbols", false},
 		{"carriage returns", "\nThis1\nThat2", "This1That2", false},
@@ -113,25 +96,8 @@ func TestAlphaNumeric_Basic(t *testing.T) {
 		{"carriage returns with n", "\nThis1\nThat2", `This1That2`, true},
 		{"carriage returns with r", "\rThis1\rThat2", `This1That2`, true},
 		{"tabs", "\tThis1\tThat2", `This1That2`, true},
-	}
 
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			output := sanitize.AlphaNumeric(test.input, test.typeCase)
-			assert.Equal(t, test.expected, output)
-		})
-	}
-}
-
-// TestAlphaNumeric_EdgeCases tests AlphaNumeric with additional edge cases
-func TestAlphaNumeric_EdgeCases(t *testing.T) {
-
-	var tests = []struct {
-		name     string
-		input    string
-		expected string
-		typeCase bool
-	}{
+		// Edge cases
 		{"empty string", "", "", false},
 		{"spaces only", "   ", "   ", true},
 		{"accents and numbers", "éclair123", "éclair123", false},
@@ -249,7 +215,7 @@ func ExampleBitcoinCashAddress() {
 }
 
 // TestCustom tests the custom sanitize method
-func TestCustom_Basic(t *testing.T) {
+func TestCustom(t *testing.T) {
 
 	var tests = []struct {
 		input    string
@@ -287,7 +253,7 @@ func ExampleCustom_numeric() {
 }
 
 // TestCustomCompiled verifies CustomCompiled using a precompiled regex
-func TestCustomCompiled_Basic(t *testing.T) {
+func TestCustomCompiled(t *testing.T) {
 	tests := []struct {
 		name     string
 		input    string
@@ -330,33 +296,20 @@ func ExampleCustomCompiled() {
 }
 
 // TestDecimal tests the decimal sanitize method
-func TestDecimal_Basic(t *testing.T) {
-
-	var tests = []struct {
-		input    string
-		expected string
-	}{
-		{" String: 1.23 ", "1.23"},
-		{" String: 001.2300 ", "001.2300"},
-		{"  $-1.034234  Price", "-1.034234"},
-		{"  $-1%.034234e  Price", "-1.034234"},
-		{"/n<<  $-1.034234  >>/n", "-1.034234"},
-	}
-
-	for _, test := range tests {
-		output := sanitize.Decimal(test.input)
-		assert.Equal(t, test.expected, output)
-	}
-}
-
-// TestDecimal_EdgeCases tests Decimal with additional edge cases
-func TestDecimal_EdgeCases(t *testing.T) {
-
-	var tests = []struct {
+func TestDecimal(t *testing.T) {
+	tests := []struct {
 		name     string
 		input    string
 		expected string
 	}{
+		// Basic cases
+		{"basic 1", " String: 1.23 ", "1.23"},
+		{"basic 2", " String: 001.2300 ", "001.2300"},
+		{"basic 3", "  $-1.034234  Price", "-1.034234"},
+		{"basic 4", "  $-1%.034234e  Price", "-1.034234"},
+		{"basic 5", "/n<<  $-1.034234  >>/n", "-1.034234"},
+
+		// Edge cases
 		{"empty string", "", ""},
 		{"letters only", "abc", ""},
 		{"plus sign", "+100.50", "100.50"},
@@ -394,7 +347,7 @@ func ExampleDecimal_negative() {
 }
 
 // TestDomain tests the domain sanitize method
-func TestDomain_Basic(t *testing.T) {
+func TestDomain(t *testing.T) {
 
 	t.Run("valid cases", func(t *testing.T) {
 
@@ -559,7 +512,7 @@ func ExampleDomain_removeWww() {
 }
 
 // TestEmail tests the email sanitize method
-func TestEmail_Basic(t *testing.T) {
+func TestEmail(t *testing.T) {
 
 	var tests = []struct {
 		input        string
@@ -609,7 +562,7 @@ func ExampleEmail_preserveCase() {
 }
 
 // TestFirstToUpper tests the first to upper method
-func TestFirstToUpper_Basic(t *testing.T) {
+func TestFirstToUpper(t *testing.T) {
 
 	var tests = []struct {
 		input    string
@@ -654,34 +607,21 @@ func ExampleFirstToUpper() {
 	// Output: This works
 }
 
-// TestFormalName tests the formal name method
-func TestFormalName_Basic(t *testing.T) {
-
-	var tests = []struct {
-		input    string
-		expected string
-	}{
-		{"Mark Mc'Cuban-Host", "Mark Mc'Cuban-Host"},
-		{"Mark Mc'Cuban-Host the SR.", "Mark Mc'Cuban-Host the SR."},
-		{"Mark Mc'Cuban-Host the Second.", "Mark Mc'Cuban-Host the Second."},
-		{"Johnny Apple.Seed, Martin", "Johnny Apple.Seed, Martin"},
-		{"Does #Not Work!", "Does Not Work"},
-	}
-
-	for _, test := range tests {
-		output := sanitize.FormalName(test.input)
-		assert.Equal(t, test.expected, output)
-	}
-}
-
-// TestFormalName_EdgeCases tests FormalName with additional edge cases
-func TestFormalName_EdgeCases(t *testing.T) {
-
-	var tests = []struct {
+// TestFormalName tests the FormalName sanitize method
+func TestFormalName(t *testing.T) {
+	tests := []struct {
 		name     string
 		input    string
 		expected string
 	}{
+		// Basic cases
+		{"basic 1", "Mark Mc'Cuban-Host", "Mark Mc'Cuban-Host"},
+		{"basic 2", "Mark Mc'Cuban-Host the SR.", "Mark Mc'Cuban-Host the SR."},
+		{"basic 3", "Mark Mc'Cuban-Host the Second.", "Mark Mc'Cuban-Host the Second."},
+		{"basic 4", "Johnny Apple.Seed, Martin", "Johnny Apple.Seed, Martin"},
+		{"basic 5", "Does #Not Work!", "Does Not Work"},
+
+		// Edge cases
 		{"empty string", "", ""},
 		{"accented characters", "José María", "Jos Mara"},
 		{"underscores", "Name_With_Underscore", "NameWithUnderscore"},
@@ -718,7 +658,7 @@ func ExampleFormalName() {
 }
 
 // TestHTML tests the HTML sanitize method
-func TestHTML_Basic(t *testing.T) {
+func TestHTML(t *testing.T) {
 
 	var tests = []struct {
 		input    string
@@ -810,30 +750,17 @@ func ExampleIPAddress_ipv6() {
 }
 
 // TestNumeric tests the numeric sanitize method
-func TestNumeric_Basic(t *testing.T) {
-
-	var tests = []struct {
-		input    string
-		expected string
-	}{
-		{" > Test This String-!1234", "1234"},
-		{" $1.00 Price!", "100"},
-	}
-
-	for _, test := range tests {
-		output := sanitize.Numeric(test.input)
-		assert.Equal(t, test.expected, output)
-	}
-}
-
-// TestNumeric_EdgeCases tests Numeric with additional edge cases
-func TestNumeric_EdgeCases(t *testing.T) {
-
-	var tests = []struct {
+func TestNumeric(t *testing.T) {
+	tests := []struct {
 		name     string
 		input    string
 		expected string
 	}{
+		// Basic cases
+		{"basic 1", " > Test This String-!1234", "1234"},
+		{"basic 2", " $1.00 Price!", "100"},
+
+		// Edge cases
 		{"empty string", "", ""},
 		{"letters only", "abcd", ""},
 		{"negative decimal", "-123.45", "12345"},
@@ -863,32 +790,19 @@ func ExampleNumeric() {
 	// Output: 12390
 }
 
-// TestPathName tests the path name sanitize method
-func TestPathName_Basic(t *testing.T) {
-
-	var tests = []struct {
-		input    string
-		expected string
-	}{
-		{"My BadPath (10)", "MyBadPath10"},
-		{"My BadPath (10)[]()!$", "MyBadPath10"},
-		{"My_Folder-Path-123_TEST", "My_Folder-Path-123_TEST"},
-	}
-
-	for _, test := range tests {
-		output := sanitize.PathName(test.input)
-		assert.Equal(t, test.expected, output)
-	}
-}
-
-// TestPathName_EdgeCases tests PathName with additional edge cases
-func TestPathName_EdgeCases(t *testing.T) {
-
-	var tests = []struct {
+// TestPathName tests the PathName sanitize method
+func TestPathName(t *testing.T) {
+	tests := []struct {
 		name     string
 		input    string
 		expected string
 	}{
+		// Basic cases
+		{"basic 1", "My BadPath (10)", "MyBadPath10"},
+		{"basic 2", "My BadPath (10)[]()!$", "MyBadPath10"},
+		{"basic 3", "My_Folder-Path-123_TEST", "My_Folder-Path-123_TEST"},
+
+		// Edge cases
 		{"empty string", "", ""},
 		{"file extension", "myfile.txt", "myfiletxt"},
 		{"windows path", "C:\\temp\\file.txt", "Ctempfiletxt"},
@@ -918,49 +832,23 @@ func ExamplePathName() {
 	// Output: This-Works_Now-123
 }
 
-// TestPunctuation tests the punctuation method
-func TestPunctuation_Basic(t *testing.T) {
-
-	var tests = []struct {
-		input    string
-		expected string
-	}{
-		{"Mark Mc'Cuban-Host", "Mark Mc'Cuban-Host"},
-		{"Johnny Apple.Seed, Martin", "Johnny Apple.Seed, Martin"},
-		{"Does #Not Work!", "Does #Not Work!"},
-		{"Does #Not Work!?", "Does #Not Work!?"},
-		{"Does #Not Work! & this", "Does #Not Work! & this"},
-		{`[@"Does" 'this' work?@]this`, `"Does" 'this' work?this`},
-		{"Does, 123^* Not & Work!?", "Does, 123 Not & Work!?"},
-	}
-
-	for _, test := range tests {
-		output := sanitize.Punctuation(test.input)
-		assert.Equal(t, test.expected, output)
-	}
-}
-
-// BenchmarkPunctuation benchmarks the Punctuation method
-func BenchmarkPunctuation(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		_ = sanitize.Punctuation("Does this work? They're doing it?")
-	}
-}
-
-// ExamplePunctuation example using Punctuation()
-func ExamplePunctuation() {
-	fmt.Println(sanitize.Punctuation(`[@"Does" 'this' work?@] this too`))
-	// Output: "Does" 'this' work? this too
-}
-
-// TestPunctuation_EdgeCases tests Punctuation with various edge cases
-func TestPunctuation_EdgeCases(t *testing.T) {
-
-	var tests = []struct {
+// TestPunctuation tests the punctuation sanitize method
+func TestPunctuation(t *testing.T) {
+	tests := []struct {
 		name     string
 		input    string
 		expected string
 	}{
+		// Basic cases
+		{"basic 1", "Mark Mc'Cuban-Host", "Mark Mc'Cuban-Host"},
+		{"basic 2", "Johnny Apple.Seed, Martin", "Johnny Apple.Seed, Martin"},
+		{"basic 3", "Does #Not Work!", "Does #Not Work!"},
+		{"basic 4", "Does #Not Work!?", "Does #Not Work!?"},
+		{"basic 5", "Does #Not Work! & this", "Does #Not Work! & this"},
+		{"basic 6", `[@"Does" 'this' work?@]this`, `"Does" 'this' work?this`},
+		{"basic 7", "Does, 123^* Not & Work!?", "Does, 123 Not & Work!?"},
+
+		// Edge cases
 		{"empty string", "", ""},
 		{"spaces only", "   ", "   "},
 		{"tabs and newlines", "line1\nline2\tend", "line1\nline2\tend"},
@@ -984,36 +872,36 @@ func TestPunctuation_EdgeCases(t *testing.T) {
 	}
 }
 
-// TestScientificNotation tests the scientific notation sanitize method
-func TestScientificNotation_Basic(t *testing.T) {
-
-	var tests = []struct {
-		input    string
-		expected string
-	}{
-		{" String: 1.23 ", "1.23"},
-		{" String: 1.23e-3 ", "1.23e-3"},
-		{" String: -1.23e-3 ", "-1.23e-3"},
-		{" String: 001.2300 ", "001.2300"},
-		{"  $-1.034234  word", "-1.034234"},
-		{"  $-1%.034234e  word", "-1.034234e"},
-		{"/n<<  $-1.034234  >>/n", "-1.034234"},
-	}
-
-	for _, test := range tests {
-		output := sanitize.ScientificNotation(test.input)
-		assert.Equal(t, test.expected, output)
+// BenchmarkPunctuation benchmarks the Punctuation method
+func BenchmarkPunctuation(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_ = sanitize.Punctuation("Does this work? They're doing it?")
 	}
 }
 
-// TestScientificNotation_EdgeCases tests ScientificNotation with various edge cases
-func TestScientificNotation_EdgeCases(t *testing.T) {
+// ExamplePunctuation example using Punctuation()
+func ExamplePunctuation() {
+	fmt.Println(sanitize.Punctuation(`[@"Does" 'this' work?@] this too`))
+	// Output: "Does" 'this' work? this too
+}
 
-	var tests = []struct {
+// TestScientificNotation tests the scientific notation sanitize method
+func TestScientificNotation(t *testing.T) {
+	tests := []struct {
 		name     string
 		input    string
 		expected string
 	}{
+		// Standard cases
+		{"simple float", " String: 1.23 ", "1.23"},
+		{"with exponent", " String: 1.23e-3 ", "1.23e-3"},
+		{"negative exponent", " String: -1.23e-3 ", "-1.23e-3"},
+		{"leading zeros", " String: 001.2300 ", "001.2300"},
+		{"prefixed with dollar and word", "  $-1.034234  word", "-1.034234"},
+		{"prefixed with symbols and word", "  $-1%.034234e  word", "-1.034234e"},
+		{"wrapped in symbols", "/n<<  $-1.034234  >>/n", "-1.034234"},
+
+		// Edge cases
 		{"empty string", "", ""},
 		{"letters only", "abcde", "e"},
 		{"uppercase exponent", "1.2E+3", "1.2E+3"},
@@ -1049,7 +937,7 @@ func ExampleScientificNotation() {
 }
 
 // TestScripts tests the script removal
-func TestScripts_Basic(t *testing.T) {
+func TestScripts(t *testing.T) {
 
 	var tests = []struct {
 		input    string
@@ -1082,26 +970,30 @@ func ExampleScripts() {
 	// Output: DoesWork?
 }
 
-// TestSingleLine test the single line sanitize method
-func TestSingleLine_Basic(t *testing.T) {
-
-	var tests = []struct {
+// TestSingleLine tests the SingleLine method
+func TestSingleLine(t *testing.T) {
+	tests := []struct {
+		name     string
 		input    string
 		expected string
 	}{
-		{`Mark
-Mc'Cuban-Host`, "Mark Mc'Cuban-Host"},
-		{`Mark
-Mc'Cuban-Host
-something else`, "Mark Mc'Cuban-Host something else"},
-		{`	Mark
-Mc'Cuban-Host
-something else`, " Mark Mc'Cuban-Host something else"},
+		// Regular cases
+		{"basic multiline", "Mark\nMc'Cuban-Host", "Mark Mc'Cuban-Host"},
+		{"multiline with extra line", "Mark\nMc'Cuban-Host\nsomething else", "Mark Mc'Cuban-Host something else"},
+		{"leading tab with newlines", "\tMark\nMc'Cuban-Host\nsomething else", " Mark Mc'Cuban-Host something else"},
+
+		// Edge cases
+		{"empty string", "", ""},
+		{"only whitespace", "\n\r\t\v\f", "     "},
+		{"mixed whitespace", "Line1\r\nLine2\tLine3\vLine4\f", "Line1  Line2 Line3 Line4 "},
+		{"leading and trailing", "\nStart\t\n", " Start  "},
 	}
 
 	for _, test := range tests {
-		output := sanitize.SingleLine(test.input)
-		assert.Equal(t, test.expected, output)
+		t.Run(test.name, func(t *testing.T) {
+			output := sanitize.SingleLine(test.input)
+			assert.Equal(t, test.expected, output)
+		})
 	}
 }
 
@@ -1123,43 +1015,32 @@ Work?`))
 	// Output: Does This Work?
 }
 
-// TestSingleLine_EdgeCases tests additional edge cases for SingleLine
-func TestSingleLine_EdgeCases(t *testing.T) {
-
-	var tests = []struct {
+// TestTime tests the time sanitize method
+func TestTime(t *testing.T) {
+	tests := []struct {
 		name     string
 		input    string
 		expected string
 	}{
+		// Basic cases
+		{"basic t00:00d", "t00:00d -EST", "00:00"},
+		{"basic t00:00:00d", "t00:00:00d -EST", "00:00:00"},
+		{"embedded time", "SOMETHING t00:00:00d -EST DAY", "00:00:00"},
+
+		// Edge cases
 		{"empty string", "", ""},
-		{"only whitespace", "\n\r\t\v\f", "     "},
-		{"mixed whitespace", "Line1\r\nLine2\tLine3\vLine4\f", "Line1  Line2 Line3 Line4 "},
-		{"leading and trailing", "\nStart\t\n", " Start  "},
+		{"nonsense string", "abc", ""},
+		{"time with AM/PM", "10:20PM", "10:20"},
+		{"negative time prefix", "-10:20", "10:20"},
+		{"subsecond time", "12:34:56.789", "12:34:56789"},
+		{"whitespace in time", "10\n:20\t:30", "10:20:30"},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			output := sanitize.SingleLine(test.input)
+			output := sanitize.Time(test.input)
 			assert.Equal(t, test.expected, output)
 		})
-	}
-}
-
-// TestTime tests the time sanitize method
-func TestTime_Basic(t *testing.T) {
-
-	var tests = []struct {
-		input    string
-		expected string
-	}{
-		{"t00:00d -EST", "00:00"},
-		{"t00:00:00d -EST", "00:00:00"},
-		{"SOMETHING t00:00:00d -EST DAY", "00:00:00"},
-	}
-
-	for _, test := range tests {
-		output := sanitize.Time(test.input)
-		assert.Equal(t, test.expected, output)
 	}
 }
 
@@ -1176,56 +1057,22 @@ func ExampleTime() {
 	// Output: 01:02:03
 }
 
-// TestTime_EdgeCases tests additional edge cases for the Time sanitize method
-func TestTime_EdgeCases(t *testing.T) {
-
-	var tests = []struct {
-		input    string
-		expected string
-	}{
-		{"", ""},
-		{"abc", ""},
-		{"10:20PM", "10:20"},
-		{"-10:20", "10:20"},
-		{"12:34:56.789", "12:34:56789"},
-		{"10\n:20\t:30", "10:20:30"},
-	}
-
-	for _, test := range tests {
-		output := sanitize.Time(test.input)
-		assert.Equal(t, test.expected, output)
-	}
-}
-
 // TestURI tests the URI sanitize method
-func TestURI_Basic(t *testing.T) {
-
-	var tests = []struct {
-		input    string
-		expected string
-	}{
-		{"Test?=what! &this=that", "Test?=what&this=that"},
-		{"Test?=what! &this=/that/!()*^", "Test?=what&this=/that/"},
-		{"/This/Works/?that=123&this#page10%", "/This/Works/?that=123&this#page10%"},
-	}
-
-	for _, test := range tests {
-		output := sanitize.URI(test.input)
-		assert.Equal(t, test.expected, output)
-	}
-}
-
-// TestURI_EdgeCases tests the URI sanitize method with various edge cases
-func TestURI_EdgeCases(t *testing.T) {
-
-	var tests = []struct {
+func TestURI(t *testing.T) {
+	tests := []struct {
 		name     string
 		input    string
 		expected string
 	}{
+		// Basic cases
+		{"basic 1", "Test?=what! &this=that", "Test?=what&this=that"},
+		{"basic 2", "Test?=what! &this=/that/!()*^", "Test?=what&this=/that/"},
+		{"basic 3", "/This/Works/?that=123&this#page10%", "/This/Works/?that=123&this#page10%"},
+
+		// Edge cases
 		{"encoded spaces", "path%20with%20space", "path%20with%20space"},
 		{"remove colon", "path:to/resource", "pathto/resource"},
-		{"unicode characters", "/世界/привет", "/世界/привет"}, //nolint:gosmopolitan // validating removal of non-Latin runes
+		{"unicode characters", "/世界/привет", "/世界/привет"}, //nolint:gosmopolitan // Unicode characters are valid in URIs
 		{"plus sign in query", "/query?name=foo+bar", "/query?name=foobar"},
 		{"mixed invalid characters", "/path/../to/;evil?x=1^&y=2", "/path//to/evil?x=1&y=2"},
 		{"trim spaces", "  /something ", "/something"},
@@ -1253,37 +1100,21 @@ func ExampleURI() {
 }
 
 // TestURL tests the URL sanitize method
-func TestURL_Basic(t *testing.T) {
-
-	var tests = []struct {
+func TestURL(t *testing.T) {
+	tests := []struct {
 		name     string
 		input    string
 		expected string
 	}{
+		// Basic cases
 		{"remove spaces", "Test?=what! &this=that#works", "Test?=what&this=that#works"},
 		{"no dollar signs", "/this/test?param$", "/this/test?param"},
 		{"using at sign", "https://medium.com/@username/some-title-that-is-a-article", "https://medium.com/@username/some-title-that-is-a-article"},
 		{"removing symbols", "https://domain.com/this/test?param$!@()[]{}'<>", "https://domain.com/this/test?param@"},
 		{"params and anchors", "https://domain.com/this/test?this=value&another=123%#page", "https://domain.com/this/test?this=value&another=123%#page"},
 		{"allow commas", "https://domain.com/this/test,this,value", "https://domain.com/this/test,this,value"},
-	}
 
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			output := sanitize.URL(test.input)
-			assert.Equal(t, test.expected, output)
-		})
-	}
-}
-
-// TestURL_EdgeCases tests the URL sanitize method with various edge cases
-func TestURL_EdgeCases(t *testing.T) {
-
-	var tests = []struct {
-		name     string
-		input    string
-		expected string
-	}{
+		// Edge cases
 		{"with port", "https://example.com:8080/path", "https://example.com:8080/path"},
 		{"ipv6 address", "https://[2001:db8::1]/path", "https://2001:db8::1/path"},
 		{"plus sign in query", "https://example.com?q=foo+bar", "https://example.com?q=foobar"},
@@ -1315,7 +1146,7 @@ func ExampleURL() {
 }
 
 // TestXML tests the XML sanitize method
-func TestXML_Basic(t *testing.T) {
+func TestXML(t *testing.T) {
 
 	var tests = []struct {
 		input    string
@@ -1345,14 +1176,13 @@ func ExampleXML() {
 }
 
 // TestXSS tests the XSS sanitize method
-func TestXSS_Basic(t *testing.T) {
-
+func TestXSS(t *testing.T) {
 	tests := []struct {
 		name     string
 		input    string
 		expected string
 	}{
-		// Lines 1-11: Common script injection vectors
+		// Common script injection vectors
 		{"Remove <script", "<script", ""},
 		{"Remove script>", "script>", ""},
 		{"Remove eval(", "eval(", ""},
@@ -1365,7 +1195,7 @@ func TestXSS_Basic(t *testing.T) {
 		{"Remove &lt;", "&lt;", ""},
 		{"Remove &rt;", "&rt;", ""},
 
-		// Lines 12-21: Inline event handlers
+		// Inline event handlers
 		{"Remove onclick=", "onclick=", ""},
 		{"Remove onerror=", "onerror=", ""},
 		{"Remove onload=", "onload=", ""},
@@ -1377,49 +1207,27 @@ func TestXSS_Basic(t *testing.T) {
 		{"Remove onkeyup=", "onkeyup=", ""},
 		{"Remove onkeypress=", "onkeypress=", ""},
 
-		// Line 22: Potential CSS/Style-based attacks
+		// Potential CSS/Style-based attacks
 		{"Remove expression(", "expression(", ""},
 
-		// Line 23: Potentially malicious protocols
+		// Potentially malicious protocols
 		{"Remove data:", "data:", ""},
 
-		// Lines 24-26: References to dangerous objects/functions
+		// Dangerous objects/functions
 		{"Remove document.cookie", "document.cookie", ""},
 		{"Remove document.write", "document.write", ""},
 		{"Remove window.location", "window.location", ""},
-	}
 
-	for _, tt := range tests {
-		tt := tt // pin variable for parallel sub-tests
-		t.Run(tt.name, func(t *testing.T) {
-			output := sanitize.XSS(tt.input)
-			assert.Equal(t, tt.expected, output)
-		})
-	}
-}
-
-// TestXSS_AdditionalCases tests additional cases for the XSS sanitize method
-func TestXSS_AdditionalCases(t *testing.T) {
-	tests := []struct {
-		name     string
-		input    string
-		expected string
-	}{
-		// Multiple patterns
+		// Additional cases
 		{"Multiple patterns", "<script>eval(javascript:alert(1))</script>", ">alert(1))</"},
-		// Embedded in text
 		{"Pattern in text", "Hello<script>alert(1)</script>World", "Hello>alert(1)</World"},
-		// Mixed case
 		{"Mixed case script", "<ScRiPt>alert(1)</sCrIpT>", "<ScRiPt>alert(1)</sCrIpT>"},
-		// Encoded/obfuscated
 		{"HTML entity encoded", "&#x3C;script&#x3E;alert(1)&#x3C;/script&#x3E;", "&#x3C;script&#x3E;alert(1)&#x3C;/script&#x3E;"},
-		// Whitespace in tag
 		{"Whitespace in tag", "<scr ipt>alert(1)</scr ipt>", "<scr ipt>alert(1)</scr ipt>"},
-		// Inline event handler in tag
 		{"Inline event handler", "<img src=x onerror=alert(1)>", "<img src=x alert(1)>"},
-		// Obfuscated event handler
 		{"Obfuscated event handler", "<img src=x oNclIck=alert(1)>", "<img src=x oNclIck=alert(1)>"},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			output := sanitize.XSS(tt.input)
