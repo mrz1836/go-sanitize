@@ -13,12 +13,6 @@ func ExampleAlpha() {
 	// Output: ExampleString
 }
 
-// ExampleAlpha_withSpaces example using Alpha with a space flag
-func ExampleAlpha_withSpaces() {
-	fmt.Println(sanitize.Alpha("Example String!", true))
-	// Output: Example String
-}
-
 // ExampleAlphaNumeric example using AlphaNumeric() with no spaces
 func ExampleAlphaNumeric() {
 	fmt.Println(sanitize.AlphaNumeric("Example String 2!", false))
@@ -29,6 +23,12 @@ func ExampleAlphaNumeric() {
 func ExampleAlphaNumeric_withSpaces() {
 	fmt.Println(sanitize.AlphaNumeric("Example String 2!", true))
 	// Output: Example String 2
+}
+
+// ExampleAlpha_withSpaces example using Alpha with a space flag
+func ExampleAlpha_withSpaces() {
+	fmt.Println(sanitize.Alpha("Example String!", true))
+	// Output: Example String
 }
 
 // ExampleBitcoinAddress example using BitcoinAddress()
@@ -49,17 +49,17 @@ func ExampleCustom() {
 	// Output: ExampleString
 }
 
-// ExampleCustom_numeric example using Custom() using a numeric regex
-func ExampleCustom_numeric() {
-	fmt.Println(sanitize.Custom("Example String 2!", `[^0-9]`))
-	// Output: 2
-}
-
 // ExampleCustomCompiled example using CustomCompiled with an alpha regex
 func ExampleCustomCompiled() {
 	re := regexp.MustCompile(`[^a-zA-Z]`)
 	fmt.Println(sanitize.CustomCompiled("Example String 2!", re))
 	// Output: ExampleString
+}
+
+// ExampleCustom_numeric example using Custom() using a numeric regex
+func ExampleCustom_numeric() {
+	fmt.Println(sanitize.Custom("Example String 2!", `[^0-9]`))
+	// Output: 2
 }
 
 // ExampleDecimal example using Decimal() for a positive number

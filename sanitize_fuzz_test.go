@@ -10,30 +10,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// FuzzAlphaNumeric validates that AlphaNumeric only returns letters, digits, and optional spaces.
-func FuzzAlphaNumeric(f *testing.F) {
-	seed := []struct {
-		input  string
-		spaces bool
-	}{
-		{"Example 123!", false},
-		{"Another Example 456?", true},
-	}
-	for _, tc := range seed {
-		f.Add(tc.input, tc.spaces)
-	}
-	f.Fuzz(func(t *testing.T, input string, spaces bool) {
-		out := sanitize.AlphaNumeric(input, spaces)
-		for _, r := range out {
-			if spaces && r == ' ' {
-				continue
-			}
-			require.Truef(t, unicode.IsLetter(r) || unicode.IsDigit(r),
-				"invalid rune %q in %q (input: %q, spaces: %v)", r, out, input, spaces)
-		}
-	})
-}
-
 // FuzzAlpha validates that Alpha only returns letters and optional spaces.
 func FuzzAlpha(f *testing.F) {
 	seed := []struct {
@@ -53,6 +29,30 @@ func FuzzAlpha(f *testing.F) {
 				continue
 			}
 			require.Truef(t, unicode.IsLetter(r),
+				"invalid rune %q in %q (input: %q, spaces: %v)", r, out, input, spaces)
+		}
+	})
+}
+
+// FuzzAlphaNumeric validates that AlphaNumeric only returns letters, digits, and optional spaces.
+func FuzzAlphaNumeric(f *testing.F) {
+	seed := []struct {
+		input  string
+		spaces bool
+	}{
+		{"Example 123!", false},
+		{"Another Example 456?", true},
+	}
+	for _, tc := range seed {
+		f.Add(tc.input, tc.spaces)
+	}
+	f.Fuzz(func(t *testing.T, input string, spaces bool) {
+		out := sanitize.AlphaNumeric(input, spaces)
+		for _, r := range out {
+			if spaces && r == ' ' {
+				continue
+			}
+			require.Truef(t, unicode.IsLetter(r) || unicode.IsDigit(r),
 				"invalid rune %q in %q (input: %q, spaces: %v)", r, out, input, spaces)
 		}
 	})
@@ -178,7 +178,6 @@ func FuzzEmail(f *testing.F) {
 	})
 }
 
-// FuzzFirstToUpper validates that FirstToUpper capitalizes the first
 // character while leaving the rest untouched.
 func FuzzFirstToUpper(f *testing.F) {
 	seed := []string{"example", "Already Upper", ""}
@@ -199,7 +198,6 @@ func FuzzFirstToUpper(f *testing.F) {
 	})
 }
 
-// FuzzFormalName validates that FormalName only returns characters
 // typically allowed in proper names.
 func FuzzFormalName(f *testing.F) {
 	seed := []string{
@@ -226,7 +224,22 @@ func FuzzFormalName(f *testing.F) {
 	})
 }
 
-// FuzzIPAddress validates that IPAddress returns a canonical IP string
+// FuzzHTML validates that HTML removes all HTML tags.
+func FuzzHTML(f *testing.F) {
+	seed := []string{
+		"<div>Hello <b>World</b></div>",
+		"Plain <b>text</b>",
+	}
+	for _, tc := range seed {
+		f.Add(tc)
+	}
+	htmlPattern := regexp.MustCompile(`(?i)<[^>]*>`)
+	f.Fuzz(func(t *testing.T, input string) {
+		out := sanitize.HTML(input)
+		require.False(t, htmlPattern.MatchString(out), "output %q still contains HTML tags", out)
+	})
+}
+
 // when input contains a valid address.
 func FuzzIPAddress(f *testing.F) {
 	seed := []string{"192.168.0.1", "2602:305:bceb:1bd0:44ef:fedb:4f8f:da4f", "bad"}
@@ -321,6 +334,22 @@ func FuzzScientificNotation(f *testing.F) {
 	})
 }
 
+// FuzzScripts validates that Scripts removes script and embed tags.
+func FuzzScripts(f *testing.F) {
+	seed := []string{
+		"<script>alert('x')</script>",
+		"<iframe src='t'></iframe>",
+	}
+	for _, tc := range seed {
+		f.Add(tc)
+	}
+	scriptPattern := regexp.MustCompile(`(?i)<(script|iframe|embed|object)[^>]*>.*</(script|iframe|embed|object)>`)
+	f.Fuzz(func(t *testing.T, input string) {
+		out := sanitize.Scripts(input)
+		require.False(t, scriptPattern.MatchString(out), "output %q still contains script tags", out)
+	})
+}
+
 // FuzzSingleLine validates that SingleLine removes all newline characters.
 func FuzzSingleLine(f *testing.F) {
 	seed := []string{
@@ -397,37 +426,5 @@ func FuzzURL(f *testing.F) {
 			require.Truef(t, valid,
 				"invalid rune %q in %q (input: %q)", r, out, input)
 		}
-	})
-}
-
-// FuzzHTML validates that HTML removes all HTML tags.
-func FuzzHTML(f *testing.F) {
-	seed := []string{
-		"<div>Hello <b>World</b></div>",
-		"Plain <b>text</b>",
-	}
-	for _, tc := range seed {
-		f.Add(tc)
-	}
-	htmlPattern := regexp.MustCompile(`(?i)<[^>]*>`)
-	f.Fuzz(func(t *testing.T, input string) {
-		out := sanitize.HTML(input)
-		require.False(t, htmlPattern.MatchString(out), "output %q still contains HTML tags", out)
-	})
-}
-
-// FuzzScripts validates that Scripts removes script and embed tags.
-func FuzzScripts(f *testing.F) {
-	seed := []string{
-		"<script>alert('x')</script>",
-		"<iframe src='t'></iframe>",
-	}
-	for _, tc := range seed {
-		f.Add(tc)
-	}
-	scriptPattern := regexp.MustCompile(`(?i)<(script|iframe|embed|object)[^>]*>.*</(script|iframe|embed|object)>`)
-	f.Fuzz(func(t *testing.T, input string) {
-		out := sanitize.Scripts(input)
-		require.False(t, scriptPattern.MatchString(out), "output %q still contains script tags", out)
 	})
 }
