@@ -399,7 +399,7 @@ func TestEmail(t *testing.T) {
 		{"email with leading/trailing spaces", "  user@domain.com  ", "user@domain.com", false},
 		{"email with mixed case and preserve", "Test@Domain.COM", "Test@Domain.COM", true},
 		{"email with mixed case and no preserve", "Test@Domain.COM", "test@domain.com", false},
-		{"email with mailto and preserve", "MailTo:Test@Domain.COM", "MailToTest@Domain.COM", true},
+		{"email with mailto and preserve", "MailTo:Test@Domain.COM", "Test@Domain.COM", true},
 		{"email with special chars in local", "user!#$%&'*+/=?^_`{|}~@domain.com", "user+_@domain.com", false},
 		{"email with special chars in domain", "user@do!main.com", "user@domain.com", false},
 		{"email with multiple dots", "user..name@domain.com", "user..name@domain.com", false},
