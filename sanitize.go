@@ -39,7 +39,6 @@ var (
 	formalNameRegExp         = regexp.MustCompile(`[^a-zA-Z0-9-',.\s]`)                                                       // Characters recognized in surnames and proper names
 	htmlRegExp               = regexp.MustCompile(`(?i)<[^>]*>`)                                                              // HTML/XML tags or any alligator open/close tags
 	ipAddressRegExp          = regexp.MustCompile(`[^a-zA-Z0-9:.]`)                                                           // IPV4 and IPV6 characters only
-	numericRegExp            = regexp.MustCompile(`[^0-9]`)                                                                   // Numbers only
 	pathNameRegExp           = regexp.MustCompile(`[^a-zA-Z0-9-_]`)                                                           // Path name (file name, seo)
 	punctuationRegExp        = regexp.MustCompile(`[^a-zA-Z0-9-'"#&!?,.\s]+`)                                                 // Standard accepted punctuation characters
 	scientificNotationRegExp = regexp.MustCompile(`[^0-9.eE+-]`)                                                              // Scientific Notation (float) (positive and negative)
@@ -131,7 +130,7 @@ func AlphaNumeric(original string, spaces bool) string {
 //	result := sanitize.BitcoinAddress(input)
 //	fmt.Println(result) // Output: "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa"
 //
-// View more examples in the `sanitize_test.go` file.
+// See more usage examples in the `sanitize_test.go` file.
 func BitcoinAddress(original string) string {
 	return string(bitcoinRegExp.ReplaceAll([]byte(original), emptySpace))
 }
@@ -151,7 +150,7 @@ func BitcoinAddress(original string) string {
 //	result := sanitize.BitcoinCashAddress(input)
 //	fmt.Println(result) // Output: "bitcoincash:qpm2qsznhks23z7629mms6s4cwef74vcwvy22gdx6a"
 //
-// View more examples in the `sanitize_test.go` file.
+// See more usage examples in the `sanitize_test.go` file.
 func BitcoinCashAddress(original string) string {
 	return string(bitcoinCashAddrRegExp.ReplaceAll([]byte(original), emptySpace))
 }
@@ -173,7 +172,7 @@ func BitcoinCashAddress(original string) string {
 //	result := sanitize.Custom(input, customRegExp)
 //	fmt.Println(result) // Output: "Hello World"
 //
-// View more examples in the `sanitize_test.go` file.
+// See more usage examples in the `sanitize_test.go` file.
 func Custom(original string, regExp string) string {
 
 	// Return the processed string or panic if regex fails
@@ -198,7 +197,7 @@ func Custom(original string, regExp string) string {
 //	result := sanitize.CustomCompiled(input, customRegExp)
 //	fmt.Println(result) // Output: "Hello World"
 //
-// View more examples in the `sanitize_test.go` file.
+// See more usage examples in the `sanitize_test.go` file.
 func CustomCompiled(original string, re *regexp.Regexp) string {
 	return re.ReplaceAllString(original, "")
 }
@@ -218,7 +217,7 @@ func CustomCompiled(original string, re *regexp.Regexp) string {
 //	result := sanitize.Decimal(input)
 //	fmt.Println(result) // Output: "-123.45"
 //
-// View more examples in the `sanitize_test.go` file.
+// See more usage examples in the `sanitize_test.go` file.
 func Decimal(original string) string {
 	return string(decimalRegExp.ReplaceAll([]byte(original), emptySpace))
 }
@@ -245,7 +244,7 @@ func Decimal(original string) string {
 //	}
 //	fmt.Println(result) // Output: "example.com"
 //
-// View more examples in the `sanitize_test.go` file.
+// See more usage examples in the `sanitize_test.go` file.
 func Domain(original string, preserveCase bool, removeWww bool) (string, error) {
 
 	// Try to see if we have a host
@@ -294,7 +293,7 @@ func Domain(original string, preserveCase bool, removeWww bool) (string, error) 
 //	result := sanitize.Email(input, false)
 //	fmt.Println(result) // Output: "example@domain.com"
 //
-// View more examples in the `sanitize_test.go` file.
+// See more usage examples in the `sanitize_test.go` file.
 func Email(original string, preserveCase bool) string {
 
 	// Leave the email address in its original case
@@ -329,7 +328,7 @@ func Email(original string, preserveCase bool) string {
 //	result := sanitize.FirstToUpper(input)
 //	fmt.Println(result) // Output: "Hello world"
 //
-// View more examples in the `sanitize_test.go` file.
+// See more usage examples in the `sanitize_test.go` file.
 func FirstToUpper(original string) string {
 
 	// Avoid extra work if string is empty
@@ -369,7 +368,7 @@ func FirstToUpper(original string) string {
 //	result := sanitize.FormalName(input)
 //	fmt.Println(result) // Output: "John Doe Jr"
 //
-// View more examples in the `sanitize_test.go` file.
+// See more usage examples in the `sanitize_test.go` file.
 func FormalName(original string) string {
 	return string(formalNameRegExp.ReplaceAll([]byte(original), emptySpace))
 }
@@ -389,7 +388,7 @@ func FormalName(original string) string {
 //	result := sanitize.HTML(input)
 //	fmt.Println(result) // Output: "Hello World!"
 //
-// View more examples in the `sanitize_test.go` file.
+// See more usage examples in the `sanitize_test.go` file.
 func HTML(original string) string {
 	return string(htmlRegExp.ReplaceAll([]byte(original), emptySpace))
 }
@@ -410,7 +409,7 @@ func HTML(original string) string {
 //	result := sanitize.IPAddress(input)
 //	fmt.Println(result) // Output: "192.168.1.1"
 //
-// View more examples in the `sanitize_test.go` file.
+// See more usage examples in the `sanitize_test.go` file.
 func IPAddress(original string) string {
 	// Parse the IP - Remove any invalid characters first
 	ipAddress := net.ParseIP(
@@ -423,24 +422,33 @@ func IPAddress(original string) string {
 	return ipAddress.String()
 }
 
-// Numeric returns a string containing only numeric characters (0-9).
-// This function removes any characters that are not digits from the input string.
+// Numeric returns a string containing only numeric characters (0-9) from the input.
+// All non-digit characters are removed. This function supports Unicode digit runes
+// and is useful for extracting numbers from user input, phone numbers, IDs, or any
+// text where only digits should be retained.
 //
 // Parameters:
-// - original: The input string to be sanitized.
+//   - original: The input string to be sanitized.
 //
 // Returns:
-// - A sanitized string containing only numeric characters.
+//   - A string containing only numeric characters.
 //
 // Example:
 //
-//	input := "Phone: 123-456-7890"
+//	input := "Phone: 123-456-7890 ext. 42"
 //	result := sanitize.Numeric(input)
-//	fmt.Println(result) // Output: "1234567890"
+//	fmt.Println(result) // Output: "123456789042"
 //
-// View more examples in the `sanitize_test.go` file.
+// See more usage examples in the `sanitize_test.go` file.
 func Numeric(original string) string {
-	return string(numericRegExp.ReplaceAll([]byte(original), emptySpace))
+	var b strings.Builder
+	b.Grow(len(original))
+	for _, r := range original {
+		if unicode.IsDigit(r) {
+			b.WriteRune(r)
+		}
+	}
+	return b.String()
 }
 
 // PathName returns a formatted path-compliant name.
@@ -459,7 +467,7 @@ func Numeric(original string) string {
 //	result := sanitize.PathName(input)
 //	fmt.Println(result) // Output: "filenamewithinvalidchars"
 //
-// View more examples in the `sanitize_test.go` file.
+// See more usage examples in the `sanitize_test.go` file.
 func PathName(original string) string {
 	return string(pathNameRegExp.ReplaceAll([]byte(original), emptySpace))
 }
@@ -480,7 +488,7 @@ func PathName(original string) string {
 //	result := sanitize.Punctuation(input)
 //	fmt.Println(result) // Output: "Hello, World! How's it going? (Good, I hope.)"
 //
-// View more examples in the `sanitize_test.go` file.
+// See more usage examples in the `sanitize_test.go` file.
 func Punctuation(original string) string {
 	return string(punctuationRegExp.ReplaceAll([]byte(original), emptySpace))
 }
@@ -501,7 +509,7 @@ func Punctuation(original string) string {
 //	result := sanitize.ScientificNotation(input)
 //	fmt.Println(result) // Output: "1.23e+104.56E-7"
 //
-// View more examples in the `sanitize_test.go` file.
+// See more usage examples in the `sanitize_test.go` file.
 func ScientificNotation(original string) string {
 	return string(scientificNotationRegExp.ReplaceAll([]byte(original), emptySpace))
 }
@@ -522,7 +530,7 @@ func ScientificNotation(original string) string {
 //	result := sanitize.Scripts(input)
 //	fmt.Println(result) // Output: "alert('test');"
 //
-// View more examples in the `sanitize_test.go` file.
+// See more usage examples in the `sanitize_test.go` file.
 func Scripts(original string) string {
 	return string(scriptRegExp.ReplaceAll([]byte(original), emptySpace))
 }
@@ -543,7 +551,7 @@ func Scripts(original string) string {
 //	result := sanitize.SingleLine(input)
 //	fmt.Println(result) // Output: "This is a multi-line string."
 //
-// View more examples in the `sanitize_test.go` file.
+// See more usage examples in the `sanitize_test.go` file.
 func SingleLine(original string) string {
 	return singleLineRegExp.ReplaceAllString(original, " ")
 }
@@ -564,7 +572,7 @@ func SingleLine(original string) string {
 //	result := sanitize.Time(input)
 //	fmt.Println(result) // Output: "00:00"
 //
-// View more examples in the `sanitize_test.go` file.
+// See more usage examples in the `sanitize_test.go` file.
 func Time(original string) string {
 	return string(timeRegExp.ReplaceAll([]byte(original), emptySpace))
 }
@@ -585,7 +593,7 @@ func Time(original string) string {
 //	result := sanitize.URI(input)
 //	fmt.Println(result) // Output: "Test?=what&this=that"
 //
-// View more examples in the `sanitize_test.go` file.
+// See more usage examples in the `sanitize_test.go` file.
 func URI(original string) string {
 	return string(uriRegExp.ReplaceAll([]byte(original), emptySpace))
 }
@@ -606,7 +614,7 @@ func URI(original string) string {
 //	result := sanitize.URL(input)
 //	fmt.Println(result) // Output: "https://Example.com/This/Works?No&this"
 //
-// View more examples in the `sanitize_test.go` file.
+// See more usage examples in the `sanitize_test.go` file.
 func URL(original string) string {
 	return string(urlRegExp.ReplaceAll([]byte(original), emptySpace))
 }
@@ -627,7 +635,7 @@ func URL(original string) string {
 //	result := sanitize.XML(input)
 //	fmt.Println(result) // Output: "Something"
 //
-// View more examples in the `sanitize_test.go` file.
+// See more usage examples in the `sanitize_test.go` file.
 func XML(original string) string {
 	return HTML(original)
 }
@@ -648,7 +656,7 @@ func XML(original string) string {
 //	result := sanitize.XSS(input)
 //	fmt.Println(result) // Output: ">alert('test');</"
 //
-// View more examples in the `sanitize_test.go` file.
+// See more usage examples in the `sanitize_test.go` file.
 func XSS(original string) string {
 	original = strings.ReplaceAll(original, "<script", "")
 	original = strings.ReplaceAll(original, "script>", "")

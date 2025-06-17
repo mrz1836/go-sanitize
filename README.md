@@ -331,7 +331,7 @@ Performance benchmarks for the core functions in this library, executed on an Ap
 | [HTML](sanitize_test.go)                    | 2,557,639  |   469.4 |   64 |         3 |
 | [IPAddress](sanitize_test.go)               | 2,936,395  |   407.8 |   80 |         5 |
 | [IPAddress_IPV6](sanitize_test.go)          | 1,000,000  | 1,066.0 |  225 |         6 |
-| [Numeric](sanitize_test.go)                 | 2,952,349  |   410.1 |   40 |         3 |
+| [Numeric](sanitize_test.go)                 | 27,050,888 |    44.0 |   16 |         1 |
 | [PathName](sanitize_test.go)                | 2,336,929  |   510.0 |   64 |         3 |
 | [Punctuation](sanitize_test.go)             | 1,895,738  |   621.8 |  160 |         4 |
 | [ScientificNotation](sanitize_test.go)      | 1,956,897  |   612.8 |   56 |         3 |
