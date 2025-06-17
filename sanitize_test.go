@@ -524,6 +524,33 @@ func TestIPAddress(t *testing.T) {
 		{`2001:db8:0000:1:1:1:1:1`, "2001:db8:0:1:1:1:1:1"},                         // Gets parsed and changes the display, see: https://en.wikipedia.org/wiki/IPv6_address
 		{`0:0:0:0:0:0:0:1`, "::1"},                                                  // Gets parsed and changes the display, see: https://en.wikipedia.org/wiki/IPv6_address
 		{`0:0:0:0:0:0:0:0`, "::"},                                                   // Gets parsed and changes the display, see: https://en.wikipedia.org/wiki/IPv6_address
+
+		// Additional edge cases
+		{"empty string", "", ""},
+		{"spaces only", "   ", ""},
+		{"symbols only", "!@#$%^&*()", ""},
+		{"letters only", "abcdef", ""},
+		{"ipv4 with leading zeros", "192.168.001.001", "192.168.1.1"},
+		{"ipv4 with trailing dot", "192.168.1.1.", "192.168.1.1"},
+		{"ipv4 with internal spaces", "192. 168. 1. 1", "192.168.1.1"},
+		{"ipv4 with tabs and newlines", "\t192.168.1.1\n", "192.168.1.1"},
+		{"ipv6 with uppercase", "2001:DB8:0:0:8:800:200C:417A", "2001:db8::8:800:200c:417a"},
+		{"ipv6 with brackets", "[2001:db8::1]", "2001:db8::1"},
+		{"ipv6 with zone index", "fe80::1%lo0", "fe80::1"},
+		{"ipv6 with internal spaces", "2001: db8:: 1", "2001:db8::1"},
+		{"ipv6 with tabs and newlines", "\t2001:db8::1\n", "2001:db8::1"},
+		{"ipv4-mapped ipv6", "::ffff:192.0.2.128", "::ffff:192.0.2.128"},
+		{"ipv6 with embedded ipv4", "::ffff:192.168.1.1", "::ffff:192.168.1.1"},
+		{"ipv6 with all zeros", "::", "::"},
+		{"ipv6 loopback", "::1", "::1"},
+		{"ipv4 loopback", "127.0.0.1", "127.0.0.1"},
+		{"ipv4 broadcast", "255.255.255.255", "255.255.255.255"},
+		{"ipv4 with port", "192.168.1.1:8080", "192.168.1.1"},
+		{"ipv6 with port", "[2001:db8::1]:443", "2001:db8::1"},
+		{"ipv4 with subnet", "192.168.1.1/24", "192.168.1.1"},
+		{"ipv6 with subnet", "2001:db8::1/64", "2001:db8::1"},
+		{"ipv4 with prefix text", "IP:192.168.1.1", "192.168.1.1"},
+		{"ipv6 with prefix text", "IPv6:2001:db8::1", "2001:db8::1"},
 	}
 
 	for _, test := range tests {

@@ -31,12 +31,11 @@ import (
 
 // Set all the regular expressions
 var (
-	domainRegExp    = regexp.MustCompile(`[^a-zA-Z0-9-.]`)                                                           // Domain accepted characters
-	emailRegExp     = regexp.MustCompile(`[^a-zA-Z0-9-_.@+]`)                                                        // Email address characters
-	htmlRegExp      = regexp.MustCompile(`(?i)<[^>]*>`)                                                              // HTML/XML tags or any alligator open/close tags
-	ipAddressRegExp = regexp.MustCompile(`[^a-zA-Z0-9:.]`)                                                           // IPV4 and IPV6 characters only
-	scriptRegExp    = regexp.MustCompile(`(?i)<(script|iframe|embed|object)[^>]*>.*</(script|iframe|embed|object)>`) // Scripts and embeds
-	wwwRegExp       = regexp.MustCompile(`(?i)www.`)                                                                 // For removing www
+	domainRegExp = regexp.MustCompile(`[^a-zA-Z0-9-.]`)                                                           // Domain accepted characters
+	emailRegExp  = regexp.MustCompile(`[^a-zA-Z0-9-_.@+]`)                                                        // Email address characters
+	htmlRegExp   = regexp.MustCompile(`(?i)<[^>]*>`)                                                              // HTML/XML tags or any alligator open/close tags
+	scriptRegExp = regexp.MustCompile(`(?i)<(script|iframe|embed|object)[^>]*>.*</(script|iframe|embed|object)>`) // Scripts and embeds
+	wwwRegExp    = regexp.MustCompile(`(?i)www.`)                                                                 // For removing www
 )
 
 // emptySpace is an empty space for replacing
@@ -61,7 +60,9 @@ var emptySpace = []byte("")
 //	result := sanitize.Alpha(input, true)
 //	fmt.Println(result) // Output: "Hello 世界"
 //
-// See more usage examples in the `sanitize_test.go` file.
+// See more usage examples in the `sanitize_example_test.go` file.
+// See the benchmarks in the `sanitize_benchmark_test.go` file.
+// See the fuzz tests in the `sanitize_fuzz_test.go` file.
 func Alpha(original string, spaces bool) string {
 	var b strings.Builder
 	b.Grow(len(original))
@@ -92,7 +93,9 @@ func Alpha(original string, spaces bool) string {
 //	result := sanitize.AlphaNumeric(input, true)
 //	fmt.Println(result) // Output: "Hello 世界 123"
 //
-// See more usage examples in the `sanitize_test.go` file.
+// See more usage examples in the `sanitize_example_test.go` file.
+// See the benchmarks in the `sanitize_benchmark_test.go` file.
+// See the fuzz tests in the `sanitize_fuzz_test.go` file.
 func AlphaNumeric(original string, spaces bool) string {
 	var b strings.Builder
 	b.Grow(len(original))
@@ -119,7 +122,9 @@ func AlphaNumeric(original string, spaces bool) string {
 //	result := sanitize.BitcoinAddress(input)
 //	fmt.Println(result) // Output: "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa"
 //
-// See more usage examples in the `sanitize_test.go` file.
+// See more usage examples in the `sanitize_example_test.go` file.
+// See the benchmarks in the `sanitize_benchmark_test.go` file.
+// See the fuzz tests in the `sanitize_fuzz_test.go` file.
 func BitcoinAddress(original string) string {
 	var b strings.Builder
 	b.Grow(len(original))
@@ -151,7 +156,9 @@ func BitcoinAddress(original string) string {
 //	result := sanitize.BitcoinCashAddress(input)
 //	fmt.Println(result) // Output: "bitcoincash:qpm2qsznhks23z7629mms6s4cwef74vcwvy22gdx6a"
 //
-// See more usage examples in the `sanitize_test.go` file.
+// See more usage examples in the `sanitize_example_test.go` file.
+// See the benchmarks in the `sanitize_benchmark_test.go` file.
+// See the fuzz tests in the `sanitize_fuzz_test.go` file.
 func BitcoinCashAddress(original string) string {
 	var b strings.Builder
 	b.Grow(len(original))
@@ -193,7 +200,9 @@ func BitcoinCashAddress(original string) string {
 //	result := sanitize.Custom(input, customRegExp)
 //	fmt.Println(result) // Output: "Hello World"
 //
-// See more usage examples in the `sanitize_test.go` file.
+// See more usage examples in the `sanitize_example_test.go` file.
+// See the benchmarks in the `sanitize_benchmark_test.go` file.
+// See the fuzz tests in the `sanitize_fuzz_test.go` file.
 func Custom(original string, regExp string) string {
 
 	// Return the processed string or panic if regex fails
@@ -219,7 +228,9 @@ func Custom(original string, regExp string) string {
 //	result := sanitize.CustomCompiled(input, customRegExp)
 //	fmt.Println(result) // Output: "Hello World"
 //
-// See more usage examples in the `sanitize_test.go` file.
+// See more usage examples in the `sanitize_example_test.go` file.
+// See the benchmarks in the `sanitize_benchmark_test.go` file.
+// See the fuzz tests in the `sanitize_fuzz_test.go` file.
 func CustomCompiled(original string, re *regexp.Regexp) string {
 	return re.ReplaceAllString(original, "")
 }
@@ -239,7 +250,9 @@ func CustomCompiled(original string, re *regexp.Regexp) string {
 //	result := sanitize.Decimal(input)
 //	fmt.Println(result) // Output: "-123.45"
 //
-// See more usage examples in the `sanitize_test.go` file.
+// See more usage examples in the `sanitize_example_test.go` file.
+// See the benchmarks in the `sanitize_benchmark_test.go` file.
+// See the fuzz tests in the `sanitize_fuzz_test.go` file.
 func Decimal(original string) string {
 	var b strings.Builder
 	b.Grow(len(original))
@@ -273,7 +286,9 @@ func Decimal(original string) string {
 //	}
 //	fmt.Println(result) // Output: "example.com"
 //
-// See more usage examples in the `sanitize_test.go` file.
+// See more usage examples in the `sanitize_example_test.go` file.
+// See the benchmarks in the `sanitize_benchmark_test.go` file.
+// See the fuzz tests in the `sanitize_fuzz_test.go` file.
 func Domain(original string, preserveCase bool, removeWww bool) (string, error) {
 
 	// Try to see if we have a host
@@ -322,7 +337,9 @@ func Domain(original string, preserveCase bool, removeWww bool) (string, error) 
 //	result := sanitize.Email(input, false)
 //	fmt.Println(result) // Output: "example@domain.com"
 //
-// See more usage examples in the `sanitize_test.go` file.
+// See more usage examples in the `sanitize_example_test.go` file.
+// See the benchmarks in the `sanitize_benchmark_test.go` file.
+// See the fuzz tests in the `sanitize_fuzz_test.go` file.
 func Email(original string, preserveCase bool) string {
 
 	// Leave the email address in its original case
@@ -357,7 +374,9 @@ func Email(original string, preserveCase bool) string {
 //	result := sanitize.FirstToUpper(input)
 //	fmt.Println(result) // Output: "Hello world"
 //
-// See more usage examples in the `sanitize_test.go` file.
+// See more usage examples in the `sanitize_example_test.go` file.
+// See the benchmarks in the `sanitize_benchmark_test.go` file.
+// See the fuzz tests in the `sanitize_fuzz_test.go` file.
 func FirstToUpper(original string) string {
 
 	// Avoid extra work if string is empty
@@ -397,7 +416,9 @@ func FirstToUpper(original string) string {
 //	result := sanitize.FormalName(input)
 //	fmt.Println(result) // Output: "John Doe Jr"
 //
-// See more usage examples in the `sanitize_test.go` file.
+// See more usage examples in the `sanitize_example_test.go` file.
+// See the benchmarks in the `sanitize_benchmark_test.go` file.
+// See the fuzz tests in the `sanitize_fuzz_test.go` file.
 func FormalName(original string) string {
 	var b strings.Builder
 	b.Grow(len(original))
@@ -428,7 +449,9 @@ func FormalName(original string) string {
 //	result := sanitize.HTML(input)
 //	fmt.Println(result) // Output: "Hello World!"
 //
-// See more usage examples in the `sanitize_test.go` file.
+// See more usage examples in the `sanitize_example_test.go` file.
+// See the benchmarks in the `sanitize_benchmark_test.go` file.
+// See the fuzz tests in the `sanitize_fuzz_test.go` file.
 func HTML(original string) string {
 	return string(htmlRegExp.ReplaceAll([]byte(original), emptySpace))
 }
@@ -449,17 +472,23 @@ func HTML(original string) string {
 //	result := sanitize.IPAddress(input)
 //	fmt.Println(result) // Output: "192.168.1.1"
 //
-// See more usage examples in the `sanitize_test.go` file.
+// See more usage examples in the `sanitize_example_test.go` file.
+// See the benchmarks in the `sanitize_benchmark_test.go` file.
+// See the fuzz tests in the `sanitize_fuzz_test.go` file.
 func IPAddress(original string) string {
-	// Parse the IP - Remove any invalid characters first
-	ipAddress := net.ParseIP(
-		string(ipAddressRegExp.ReplaceAll([]byte(original), emptySpace)),
-	)
-	if ipAddress == nil {
+	var b strings.Builder
+	b.Grow(len(original))
+	for _, r := range original {
+		if (r >= 'a' && r <= 'z') || (r >= 'A' && r <= 'Z') || (r >= '0' && r <= '9') || r == ':' || r == '.' {
+			b.WriteRune(r)
+		}
+	}
+	ip := net.ParseIP(b.String())
+	if ip == nil {
 		return ""
 	}
 
-	return ipAddress.String()
+	return ip.String()
 }
 
 // Numeric returns a string containing only numeric characters (0-9) from the input.
@@ -479,7 +508,9 @@ func IPAddress(original string) string {
 //	result := sanitize.Numeric(input)
 //	fmt.Println(result) // Output: "123456789042"
 //
-// See more usage examples in the `sanitize_test.go` file.
+// See more usage examples in the `sanitize_example_test.go` file.
+// See the benchmarks in the `sanitize_benchmark_test.go` file.
+// See the fuzz tests in the `sanitize_fuzz_test.go` file.
 func Numeric(original string) string {
 	var b strings.Builder
 	b.Grow(len(original))
@@ -509,7 +540,9 @@ func Numeric(original string) string {
 //	result := sanitize.PathName(input)
 //	fmt.Println(result) // Output: "filenamewithinvalidchars"
 //
-// See more usage examples in the `sanitize_test.go` file.
+// See more usage examples in the `sanitize_example_test.go` file.
+// See the benchmarks in the `sanitize_benchmark_test.go` file.
+// See the fuzz tests in the `sanitize_fuzz_test.go` file.
 func PathName(original string) string {
 	var b strings.Builder
 	b.Grow(len(original))
@@ -546,7 +579,9 @@ func PathName(original string) string {
 //	result := sanitize.Punctuation(input)
 //	fmt.Println(result) // Output: "Hello, World! How's it going? Good, I hope."
 //
-// See more usage examples in the `sanitize_test.go` file.
+// See more usage examples in the `sanitize_example_test.go` file.
+// See the benchmarks in the `sanitize_benchmark_test.go` file.
+// See the fuzz tests in the `sanitize_fuzz_test.go` file.
 func Punctuation(original string) string {
 	var b strings.Builder
 	b.Grow(len(original))
@@ -576,7 +611,9 @@ func Punctuation(original string) string {
 //	result := sanitize.ScientificNotation(input)
 //	fmt.Println(result) // Output: "1.23e+104.56E-7"
 //
-// See more usage examples in the `sanitize_test.go` file.
+// See more usage examples in the `sanitize_example_test.go` file.
+// See the benchmarks in the `sanitize_benchmark_test.go` file.
+// See the fuzz tests in the `sanitize_fuzz_test.go` file.
 func ScientificNotation(original string) string {
 	var b strings.Builder
 	b.Grow(len(original))
@@ -604,7 +641,9 @@ func ScientificNotation(original string) string {
 //	result := sanitize.Scripts(input)
 //	fmt.Println(result) // Output: "alert('test');"
 //
-// See more usage examples in the `sanitize_test.go` file.
+// See more usage examples in the `sanitize_example_test.go` file.
+// See the benchmarks in the `sanitize_benchmark_test.go` file.
+// See the fuzz tests in the `sanitize_fuzz_test.go` file.
 func Scripts(original string) string {
 	return string(scriptRegExp.ReplaceAll([]byte(original), emptySpace))
 }
@@ -627,7 +666,9 @@ func Scripts(original string) string {
 //	result := sanitize.SingleLine(input)
 //	fmt.Println(result) // Output: "This is a multi-line string."
 //
-// See more usage examples in the `sanitize_test.go` file.
+// See more usage examples in the `sanitize_example_test.go` file.
+// See the benchmarks in the `sanitize_benchmark_test.go` file.
+// See the fuzz tests in the `sanitize_fuzz_test.go` file.
 func SingleLine(original string) string {
 	var b strings.Builder
 	b.Grow(len(original))
@@ -658,7 +699,9 @@ func SingleLine(original string) string {
 //	result := sanitize.Time(input)
 //	fmt.Println(result) // Output: "00:00"
 //
-// See more usage examples in the `sanitize_test.go` file.
+// See more usage examples in the `sanitize_example_test.go` file.
+// See the benchmarks in the `sanitize_benchmark_test.go` file.
+// See the fuzz tests in the `sanitize_fuzz_test.go` file.
 func Time(original string) string {
 	var b strings.Builder
 	b.Grow(len(original))
@@ -688,7 +731,9 @@ func Time(original string) string {
 //	result := sanitize.URI(input)
 //	fmt.Println(result) // Output: "Test?=what&this=that"
 //
-// See more usage examples in the `sanitize_test.go` file.
+// See more usage examples in the `sanitize_example_test.go` file.
+// See the benchmarks in the `sanitize_benchmark_test.go` file.
+// See the fuzz tests in the `sanitize_fuzz_test.go` file.
 func URI(original string) string {
 	var b strings.Builder
 	b.Grow(len(original))
@@ -721,7 +766,9 @@ func URI(original string) string {
 //	result := sanitize.URL(input)
 //	fmt.Println(result) // Output: "https://Example.com/This/Works?No&this"
 //
-// See more usage examples in the `sanitize_test.go` file.
+// See more usage examples in the `sanitize_example_test.go` file.
+// See the benchmarks in the `sanitize_benchmark_test.go` file.
+// See the fuzz tests in the `sanitize_fuzz_test.go` file.
 func URL(original string) string {
 	var b strings.Builder
 	b.Grow(len(original))
@@ -752,7 +799,9 @@ func URL(original string) string {
 //	result := sanitize.XML(input)
 //	fmt.Println(result) // Output: "Something"
 //
-// See more usage examples in the `sanitize_test.go` file.
+// See more usage examples in the `sanitize_example_test.go` file.
+// See the benchmarks in the `sanitize_benchmark_test.go` file.
+// See the fuzz tests in the `sanitize_fuzz_test.go` file.
 func XML(original string) string {
 	return HTML(original)
 }
@@ -784,7 +833,9 @@ func XML(original string) string {
 //	result := sanitize.XSS(input)
 //	fmt.Println(result) // Output: ">alert('test');</"
 //
-// See more usage examples in the `sanitize_test.go` file.
+// See more usage examples in the `sanitize_example_test.go` file.
+// See the benchmarks in the `sanitize_benchmark_test.go` file.
+// See the fuzz tests in the `sanitize_fuzz_test.go` file.
 func XSS(original string) string {
 	original = strings.ReplaceAll(original, "<script", "")
 	original = strings.ReplaceAll(original, "script>", "")
