@@ -55,3 +55,27 @@ func FuzzAlpha_General(f *testing.F) {
 		}
 	})
 }
+
+// FuzzBitcoinAddress_General validates that BitcoinAddress only returns valid Bitcoin address characters.
+func FuzzBitcoinAddress_General(f *testing.F) {
+	seed := []string{
+		":1K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs!",
+		"OIl01K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs!",
+	}
+	for _, tc := range seed {
+		f.Add(tc)
+	}
+	f.Fuzz(func(t *testing.T, input string) {
+		out := sanitize.BitcoinAddress(input)
+		for _, r := range out {
+			valid := (r >= 'a' && r <= 'k') ||
+				(r >= 'm' && r <= 'z') ||
+				(r >= 'A' && r <= 'H') ||
+				(r >= 'J' && r <= 'N') ||
+				(r >= 'P' && r <= 'Z') ||
+				(r >= '1' && r <= '9')
+			require.Truef(t, valid,
+				"invalid rune %q in %q (input: %q)", r, out, input)
+		}
+	})
+}
