@@ -163,6 +163,8 @@ func FuzzEmail(f *testing.F) {
 	}{
 		{"mailto:Person@Example.COM", false},
 		{"test+1@EXAMPLE.com", true},
+		{"user.name+tag+sorting@example.co.uk", false},
+		{"UPPER_lower-123@sub.domain.com", true},
 	}
 	for _, tc := range seed {
 		f.Add(tc.input, tc.preserveCase)
