@@ -316,8 +316,8 @@ Performance benchmarks for the core functions in this library, executed on an Ap
 | [Alpha_WithSpaces](sanitize_test.go)        | 13,972,903 |    83.2 |   24 |         1 |
 | [AlphaNumeric](sanitize_test.go)            | 10,619,542 |    112. |   32 |         1 |
 | [AlphaNumeric_WithSpaces](sanitize_test.go) | 10,005,721 |   118.9 |   32 |         1 |
-| [BitcoinAddress](sanitize_test.go)          | 2,151,312  |   552.5 |  161 |         4 |
-| [BitcoinCashAddress](sanitize_test.go)      | 1,615,339  |   738.0 |  160 |         4 |
+| [BitcoinAddress](sanitize_test.go)          | 10,766,221 |  112..0 |   48 |         1 |
+| [BitcoinCashAddress](sanitize_test.go)      | 7,910,431  |   151.6 |   48 |         1 |
 | [Custom](sanitize_test.go) _(Legacy)_       | 920,336    | 1,277.0 |  944 |        17 |
 | [CustomCompiled](sanitize_test.go)          | 1,638,974  |   730.6 |   96 |         5 |
 | [Decimal](sanitize_test.go)                 | 18,779,281 |   62.74 |   24 |         1 |
@@ -336,7 +336,7 @@ Performance benchmarks for the core functions in this library, executed on an Ap
 | [Punctuation](sanitize_test.go)             | 9,166,885  |   130.7 |   48 |         1 |
 | [ScientificNotation](sanitize_test.go)      | 19,580,979 |   61.32 |   24 |         1 |
 | [Scripts](sanitize_test.go)                 | 2,025,324  |   594.6 |   64 |         2 |
-| [SingleLine](sanitize_test.go)              | 555,826    | 2,141.0 |   96 |         4 |
+| [SingleLine](sanitize_test.go)              | 12,599,416 |   95.94 |   32 |         1 |
 | [Time](sanitize_test.go)                    | 24,114,907 |   48.93 |   16 |         1 |
 | [URI](sanitize_test.go)                     | 11,414,026 |   104.7 |   32 |         1 |
 | [URL](sanitize_test.go)                     | 11,462,407 |   105.1 |   32 |         1 |
