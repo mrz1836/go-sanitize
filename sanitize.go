@@ -35,7 +35,6 @@ var (
 	bitcoinRegExp            = regexp.MustCompile(`[^a-km-zA-HJ-NP-Z1-9]`)                                                    // Bitcoin address accepted characters
 	domainRegExp             = regexp.MustCompile(`[^a-zA-Z0-9-.]`)                                                           // Domain accepted characters
 	emailRegExp              = regexp.MustCompile(`[^a-zA-Z0-9-_.@+]`)                                                        // Email address characters
-	formalNameRegExp         = regexp.MustCompile(`[^a-zA-Z0-9-',.\s]`)                                                       // Characters recognized in surnames and proper names
 	htmlRegExp               = regexp.MustCompile(`(?i)<[^>]*>`)                                                              // HTML/XML tags or any alligator open/close tags
 	ipAddressRegExp          = regexp.MustCompile(`[^a-zA-Z0-9:.]`)                                                           // IPV4 and IPV6 characters only
 	pathNameRegExp           = regexp.MustCompile(`[^a-zA-Z0-9-_]`)                                                           // Path name (file name, seo)
@@ -376,7 +375,18 @@ func FirstToUpper(original string) string {
 //
 // See more usage examples in the `sanitize_test.go` file.
 func FormalName(original string) string {
-	return string(formalNameRegExp.ReplaceAll([]byte(original), emptySpace))
+	var b strings.Builder
+	b.Grow(len(original))
+	for _, r := range original {
+		if (r >= 'a' && r <= 'z') ||
+			(r >= 'A' && r <= 'Z') ||
+			unicode.IsDigit(r) ||
+			r == '-' || r == '\'' || r == ',' || r == '.' ||
+			unicode.IsSpace(r) {
+			b.WriteRune(r)
+		}
+	}
+	return b.String()
 }
 
 // HTML returns a string without any HTML tags.
