@@ -41,7 +41,6 @@ var (
 	scientificNotationRegExp = regexp.MustCompile(`[^0-9.eE+-]`)                                                              // Scientific Notation (float) (positive and negative)
 	scriptRegExp             = regexp.MustCompile(`(?i)<(script|iframe|embed|object)[^>]*>.*</(script|iframe|embed|object)>`) // Scripts and embeds
 	singleLineRegExp         = regexp.MustCompile(`(\r)|(\n)|(\t)|(\v)|(\f)`)                                                 // Carriage returns, line feeds, tabs, for single line transition
-	timeRegExp               = regexp.MustCompile(`[^0-9:]`)                                                                  // Time allowed characters
 	uriRegExp                = regexp.MustCompile(`[^a-zA-Z0-9-_/?&=#%]`)                                                     // URI allowed characters
 	urlRegExp                = regexp.MustCompile(`[^a-zA-Z0-9-_/:.,?&@=#%]`)                                                 // URL allowed characters
 	wwwRegExp                = regexp.MustCompile(`(?i)www.`)                                                                 // For removing www
@@ -603,7 +602,14 @@ func SingleLine(original string) string {
 //
 // See more usage examples in the `sanitize_test.go` file.
 func Time(original string) string {
-	return string(timeRegExp.ReplaceAll([]byte(original), emptySpace))
+	var b strings.Builder
+	b.Grow(len(original))
+	for _, r := range original {
+		if unicode.IsDigit(r) || r == ':' {
+			b.WriteRune(r)
+		}
+	}
+	return b.String()
 }
 
 // URI returns a sanitized string containing only valid URI characters.
