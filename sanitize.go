@@ -33,7 +33,6 @@ import (
 var (
 	bitcoinCashAddrRegExp    = regexp.MustCompile(`[^ac-hj-np-zAC-HJ-NP-Z02-9]`)                                              // Bitcoin `cashaddr` address accepted characters
 	bitcoinRegExp            = regexp.MustCompile(`[^a-km-zA-HJ-NP-Z1-9]`)                                                    // Bitcoin address accepted characters
-	decimalRegExp            = regexp.MustCompile(`[^0-9.-]`)                                                                 // Decimals (positive and negative)
 	domainRegExp             = regexp.MustCompile(`[^a-zA-Z0-9-.]`)                                                           // Domain accepted characters
 	emailRegExp              = regexp.MustCompile(`[^a-zA-Z0-9-_.@+]`)                                                        // Email address characters
 	formalNameRegExp         = regexp.MustCompile(`[^a-zA-Z0-9-',.\s]`)                                                       // Characters recognized in surnames and proper names
@@ -219,7 +218,14 @@ func CustomCompiled(original string, re *regexp.Regexp) string {
 //
 // See more usage examples in the `sanitize_test.go` file.
 func Decimal(original string) string {
-	return string(decimalRegExp.ReplaceAll([]byte(original), emptySpace))
+	var b strings.Builder
+	b.Grow(len(original))
+	for _, r := range original {
+		if unicode.IsDigit(r) || r == '.' || r == '-' {
+			b.WriteRune(r)
+		}
+	}
+	return b.String()
 }
 
 // Domain returns a properly formatted hostname or domain name.
