@@ -175,6 +175,10 @@ func BitcoinCashAddress(original string) string {
 // Custom uses a custom regex string and returns the sanitized result.
 // This function allows for flexible sanitization based on user-defined regular expressions.
 //
+// This function allows for flexible sanitization based on user-defined regular
+// expressions. It panics if the provided regular expression cannot be compiled
+// successfully.
+//
 // Parameters:
 // - original: The input string to be sanitized.
 // - regExp: A string representing the custom regular expression to be used for sanitization.
@@ -198,7 +202,8 @@ func Custom(original string, regExp string) string {
 
 // CustomCompiled returns a sanitized string using a pre-compiled regular
 // expression. This function provides better performance when the same pattern is
-// reused across multiple calls.
+// reused across multiple calls. Passing a nil regular expression will cause a
+// panic.
 //
 // Parameters:
 // - original: The input string to be sanitized.
