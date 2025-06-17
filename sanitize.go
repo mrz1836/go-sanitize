@@ -26,6 +26,7 @@ import (
 	"regexp"
 	"strings"
 	"unicode"
+	"unicode/utf8"
 )
 
 // Set all the regular expressions
@@ -335,17 +336,18 @@ func Email(original string, preserveCase bool) string {
 	)
 }
 
-// FirstToUpper overwrites the first letter as an uppercase letter
-// and preserves the rest of the string.
-//
-// This function is useful for formatting strings where the first character
-// needs to be capitalized, such as names or titles.
+// FirstToUpper returns a copy of the input string with the first Unicode letter
+// converted to its uppercase form, leaving the rest of the string unchanged.
+// If the input is empty, it returns an empty string. If the input is a single
+// character, it returns the uppercase version of that character. This function
+// supports multibyte (UTF-8) characters and is useful for capitalizing names,
+// titles, or any string where only the first character should be uppercased.
 //
 // Parameters:
-// - original: The input string to be formatted.
+// - original: The input string to be processed.
 //
 // Returns:
-// - A string with the first letter converted to uppercase.
+// - A string with the first character uppercased and the remainder unchanged.
 //
 // Example:
 //
@@ -356,14 +358,26 @@ func Email(original string, preserveCase bool) string {
 // View more examples in the `sanitize_test.go` file.
 func FirstToUpper(original string) string {
 
-	// Handle empty and 1 character strings
-	if len(original) < 2 {
+	// Avoid extra work if string is empty
+	if len(original) == 0 {
+		return original
+	}
+
+	// Fast-path for single character strings
+	if len(original) == 1 {
 		return strings.ToUpper(original)
 	}
 
-	runes := []rune(original)
-	runes[0] = unicode.ToUpper(runes[0])
-	return string(runes)
+	// Decode and uppercase the first rune to support multibyte characters
+	r, size := utf8.DecodeRuneInString(original)
+	r = unicode.ToUpper(r)
+
+	var b strings.Builder
+	b.Grow(len(original))
+	b.WriteRune(r)
+	b.WriteString(original[size:])
+
+	return b.String()
 }
 
 // FormalName returns a sanitized string containing only characters recognized in formal names or surnames.
