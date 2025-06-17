@@ -7,7 +7,7 @@ import (
 	"github.com/mrz1836/go-sanitize"
 )
 
-// BenchmarkAlphaNoSpaces benchmarks the Alpha method
+// BenchmarkAlpha benchmarks the Alpha method
 func BenchmarkAlpha(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		_ = sanitize.Alpha("This is the test string.", false)
@@ -162,7 +162,7 @@ func BenchmarkPunctuation(b *testing.B) {
 	}
 }
 
-// BenchmarkDecimal benchmarks the ScientificNotation method
+// BenchmarkScientificNotation benchmarks the ScientificNotation method
 func BenchmarkScientificNotation(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		_ = sanitize.ScientificNotation("String: -1.096e-3")
