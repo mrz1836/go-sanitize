@@ -541,6 +541,7 @@ CI automatically runs on every PR to verify:
 * Formatting (`go fmt` and `goimports`)
 * Linting (`golangci-lint run`)
 * Tests (`go test ./...`)
+* Fuzz tests (if applicable) (`go test -fuzz=. -run=^$`)
 * This codebase uses GitHub Actions; test workflows reside in `.github/workflows/run-tests.yml`
 
 Failing PRs will be blocked. AI agents should iterate until CI passes.
