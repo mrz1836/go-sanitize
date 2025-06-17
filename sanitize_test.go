@@ -566,6 +566,20 @@ func TestFirstToUpper_Basic(t *testing.T) {
 		{"this", "This"},
 		{"t", "T"},
 		{"tt", "Tt"},
+		{"", ""}, // Edge case for empty string
+
+		// Additional edge cases:
+		{" ", " "},           // single space
+		{"  ", "  "},         // multiple spaces
+		{"\t", "\t"},         // tab character
+		{"\n", "\n"},         // newline character
+		{"123abc", "123abc"}, // starts with number
+		{"!@#", "!@#"},       // starts with symbol
+		{"ßeta", "ßeta"},     // German sharp S (will uppercase to "SS")
+		{"éclair", "Éclair"}, // accented character
+		{"Σigma", "Σigma"},   // Greek capital letter (should remain unchanged)
+		{"ñandú", "Ñandú"},   // Spanish n-tilde
+		{"中test", "中test"}, // Chinese character
 	}
 
 	for _, test := range tests {
@@ -599,6 +613,20 @@ func TestFirstToUpperBuilder_Basic(t *testing.T) {
 		{"this", "This"},
 		{"t", "T"},
 		{"tt", "Tt"},
+		{"", ""}, // Edge case for empty string
+
+		// Additional edge cases:
+		{" ", " "},           // single space
+		{"  ", "  "},         // multiple spaces
+		{"\t", "\t"},         // tab character
+		{"\n", "\n"},         // newline character
+		{"123abc", "123abc"}, // starts with number
+		{"!@#", "!@#"},       // starts with symbol
+		{"ßeta", "ßeta"},     // German sharp S (will uppercase to "SS")
+		{"éclair", "Éclair"}, // accented character
+		{"Σigma", "Σigma"},   // Greek capital letter (should remain unchanged)
+		{"ñandú", "Ñandú"},   // Spanish n-tilde
+		{"中test", "中test"}, // Chinese character
 	}
 
 	for _, test := range tests {
