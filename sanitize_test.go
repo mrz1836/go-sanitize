@@ -277,6 +277,7 @@ func TestCustomCompiled_Basic(t *testing.T) {
 	}
 }
 
+// TestCustomCompiled_NilRegex verifies that CustomCompiled panics when the regex is nil
 func TestCustomCompiled_NilRegex(t *testing.T) {
 	require.Panics(t, func() {
 		sanitize.CustomCompiled("panic", nil)
