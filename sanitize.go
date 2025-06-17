@@ -48,7 +48,7 @@ var (
 // emptySpace is an empty space for replacing
 var emptySpace = []byte("")
 
-// Alpha returns a string containing only alphabetic characters (a-z, A-Z) from the input.
+// Alpha returns a string containing only Unicode alphabetic characters from the input.
 // Optionally, it preserves spaces if the `spaces` parameter is set to true.
 // All non-alphabetic characters (and spaces, if not preserved) are removed.
 // This function supports Unicode letters (IsLetter) and is useful for sanitizing names or text fields
@@ -59,7 +59,7 @@ var emptySpace = []byte("")
 //   - spaces: If true, spaces are preserved in the output; otherwise, they are removed.
 //
 // Returns:
-//   - A sanitized string containing only alphabetic characters and, optionally, spaces.
+//   - A sanitized string containing only Unicode alphabetic characters and, optionally, spaces.
 //
 // Example:
 //
@@ -79,7 +79,7 @@ func Alpha(original string, spaces bool) string {
 	return b.String()
 }
 
-// AlphaNumeric returns a string containing only alphanumeric characters (a-z, A-Z, 0-9) from the input.
+// AlphaNumeric returns a string containing only Unicode alphanumeric characters from the input.
 // Optionally, it preserves spaces if the `spaces` parameter is set to true.
 // All non-alphanumeric characters (and spaces, if not preserved) are removed.
 // This function supports Unicode letters and digits, making it suitable for sanitizing user input,
@@ -90,7 +90,7 @@ func Alpha(original string, spaces bool) string {
 //   - spaces: If true, spaces are preserved in the output; otherwise, they are removed.
 //
 // Returns:
-//   - A sanitized string containing only alphanumeric characters and, optionally, spaces.
+//   - A sanitized string containing only Unicode alphanumeric characters and, optionally, spaces.
 //
 // Example:
 //
