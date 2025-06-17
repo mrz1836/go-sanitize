@@ -14,13 +14,6 @@ func BenchmarkAlpha(b *testing.B) {
 	}
 }
 
-// BenchmarkAlpha_WithSpaces benchmarks the Alpha method
-func BenchmarkAlpha_WithSpaces(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		_ = sanitize.Alpha("This is the test string.", true)
-	}
-}
-
 // BenchmarkAlphaNumeric benchmarks the AlphaNumeric method
 func BenchmarkAlphaNumeric(b *testing.B) {
 	for i := 0; i < b.N; i++ {
@@ -32,6 +25,13 @@ func BenchmarkAlphaNumeric(b *testing.B) {
 func BenchmarkAlphaNumeric_WithSpaces(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		_ = sanitize.AlphaNumeric("This is the test string 12345.", true)
+	}
+}
+
+// BenchmarkAlpha_WithSpaces benchmarks the Alpha method
+func BenchmarkAlpha_WithSpaces(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_ = sanitize.Alpha("This is the test string.", true)
 	}
 }
 
