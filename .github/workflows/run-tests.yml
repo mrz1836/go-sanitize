@@ -123,7 +123,7 @@ jobs:
       # Note: issue running <=1.23.x with govulncheck, so we skip it
       # ————————————————————————————————————————————————————————————————
       - name: Run govulncheck
-        if: matrix.go-version == '1.24.x'
+        if: matrix.go-version == '1.24.x' # There is a current issue with govulncheck on <= 1.23.x
         run: make govulncheck
 
       # ————————————————————————————————————————————————————————————————
