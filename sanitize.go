@@ -680,7 +680,7 @@ func URL(original string) string {
 //
 // Example:
 //
-//	input := `<?xml version="1.0" encoding="UTF-8"?><note>Something</note>`
+//	input := `<?XML version="1.0" encoding="UTF-8"?><note>Something</note>`
 //	result := sanitize.XML(input)
 //	fmt.Println(result) // Output: "Something"
 //
