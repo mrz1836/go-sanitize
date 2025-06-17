@@ -314,8 +314,12 @@ Performance benchmarks for the core functions in this library, executed on an Ap
 |-------------------------------------------------------|------------|--------:|-----:|----------:|
 | [BenchmarkAlpha](sanitize_test.go)                    | 1,879,712  |   635.2 |  120 |         6 |
 | [BenchmarkAlpha\_WithSpaces](sanitize_test.go)        | 2,388,141  |   502.9 |   88 |         4 |
+| [BenchmarkAlphaFast](sanitize_test.go)               | 8,835,313  |   123.5 |   24 |         1 |
+| [BenchmarkAlphaFast_WithSpaces](sanitize_test.go)    | 8,913,945  |   130.9 |   24 |         1 |
 | [BenchmarkAlphaNumeric](sanitize_test.go)             | 1,587,366  |   757.7 |  128 |         6 |
 | [BenchmarkAlphaNumeric\_WithSpaces](sanitize_test.go) | 1,911,022  |   634.4 |  112 |         4 |
+| [BenchmarkAlphaNumericFast](sanitize_test.go)        | 7,447,054  |   169.0 |   32 |         1 |
+| [BenchmarkAlphaNumericFast_WithSpaces](sanitize_test.go) | 7,018,612  |   172.0 |   32 |         1 |
 | [BenchmarkBitcoinAddress](sanitize_test.go)           | 2,156,088  |   555.2 |  160 |         4 |
 | [BenchmarkBitcoinCashAddress](sanitize_test.go)       | 1,619,050  |   744.5 |  160 |         4 |
 | [BenchmarkCustom](sanitize_test.go)                   | 879,280    | 1,279.0 |  943 |        17 |
@@ -332,6 +336,7 @@ Performance benchmarks for the core functions in this library, executed on an Ap
 | [BenchmarkIPAddress](sanitize_test.go)                | 2,895,540  |   408.4 |   80 |         5 |
 | [BenchmarkIPAddress\_IPV6](sanitize_test.go)          | 1,000,000  | 1,074.0 |  225 |         6 |
 | [BenchmarkNumeric](sanitize_test.go)                  | 2,908,365  |   414.4 |   40 |         3 |
+| [BenchmarkNumericFast](sanitize_test.go)              | 14,691,679 |    68.2 |   16 |         1 |
 | [BenchmarkPathName](sanitize_test.go)                 | 2,348,728  |   510.1 |   64 |         3 |
 | [BenchmarkPunctuation](sanitize_test.go)              | 1,929,290  |   624.6 |  160 |         4 |
 | [BenchmarkScientificNotation](sanitize_test.go)       | 1,955,768  |   614.5 |   56 |         3 |

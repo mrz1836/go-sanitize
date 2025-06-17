@@ -32,6 +32,30 @@ func FuzzAlphaNumeric_General(f *testing.F) {
 	})
 }
 
+// FuzzAlphaNumericFast_General validates that AlphaNumericFast only returns letters, digits, and optional spaces.
+func FuzzAlphaNumericFast_General(f *testing.F) {
+	seed := []struct {
+		input  string
+		spaces bool
+	}{
+		{"Example 123!", false},
+		{"Another Example 456?", true},
+	}
+	for _, tc := range seed {
+		f.Add(tc.input, tc.spaces)
+	}
+	f.Fuzz(func(t *testing.T, input string, spaces bool) {
+		out := sanitize.AlphaNumericFast(input, spaces)
+		for _, r := range out {
+			if spaces && r == ' ' {
+				continue
+			}
+			require.Truef(t, unicode.IsLetter(r) || unicode.IsDigit(r),
+				"invalid rune %q in %q (input: %q, spaces: %v)", r, out, input, spaces)
+		}
+	})
+}
+
 // FuzzAlpha_General validates that Alpha only returns letters and optional spaces.
 func FuzzAlpha_General(f *testing.F) {
 	seed := []struct {
@@ -46,6 +70,30 @@ func FuzzAlpha_General(f *testing.F) {
 	}
 	f.Fuzz(func(t *testing.T, input string, spaces bool) {
 		out := sanitize.Alpha(input, spaces)
+		for _, r := range out {
+			if spaces && r == ' ' {
+				continue
+			}
+			require.Truef(t, unicode.IsLetter(r),
+				"invalid rune %q in %q (input: %q, spaces: %v)", r, out, input, spaces)
+		}
+	})
+}
+
+// FuzzAlphaFast_General validates that AlphaFast only returns letters and optional spaces.
+func FuzzAlphaFast_General(f *testing.F) {
+	seed := []struct {
+		input  string
+		spaces bool
+	}{
+		{"Example 123!", false},
+		{"Another Example 456?", true},
+	}
+	for _, tc := range seed {
+		f.Add(tc.input, tc.spaces)
+	}
+	f.Fuzz(func(t *testing.T, input string, spaces bool) {
+		out := sanitize.AlphaFast(input, spaces)
 		for _, r := range out {
 			if spaces && r == ' ' {
 				continue

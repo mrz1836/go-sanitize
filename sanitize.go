@@ -113,6 +113,34 @@ func AlphaNumeric(original string, spaces bool) string {
 	return string(alphaNumericRegExp.ReplaceAll([]byte(original), emptySpace))
 }
 
+// AlphaFast returns a string containing only alphabetic characters. It avoids
+// regex by iterating over runes, which can improve performance. If the `spaces`
+// parameter is true, spaces are preserved in the output.
+func AlphaFast(original string, spaces bool) string {
+	var b strings.Builder
+	b.Grow(len(original))
+	for _, r := range original {
+		if unicode.IsLetter(r) || (spaces && r == ' ') {
+			b.WriteRune(r)
+		}
+	}
+	return b.String()
+}
+
+// AlphaNumericFast returns a string containing only alphanumeric characters.
+// Like AlphaFast, it uses a rune loop and optionally preserves spaces when
+// `spaces` is true.
+func AlphaNumericFast(original string, spaces bool) string {
+	var b strings.Builder
+	b.Grow(len(original))
+	for _, r := range original {
+		if unicode.IsLetter(r) || unicode.IsDigit(r) || (spaces && r == ' ') {
+			b.WriteRune(r)
+		}
+	}
+	return b.String()
+}
+
 // BitcoinAddress returns a sanitized string containing only valid characters for a Bitcoin address.
 // This function removes any characters that are not part of the accepted Bitcoin address format.
 //
@@ -425,6 +453,19 @@ func IPAddress(original string) string {
 // View more examples in the `sanitize_test.go` file.
 func Numeric(original string) string {
 	return string(numericRegExp.ReplaceAll([]byte(original), emptySpace))
+}
+
+// NumericFast returns only the numeric characters from the given string. It
+// iterates over runes instead of using regex for better performance.
+func NumericFast(original string) string {
+	var b strings.Builder
+	b.Grow(len(original))
+	for _, r := range original {
+		if unicode.IsDigit(r) {
+			b.WriteRune(r)
+		}
+	}
+	return b.String()
 }
 
 // PathName returns a formatted path-compliant name.

@@ -89,6 +89,84 @@ func ExampleAlpha_withSpaces() {
 	// Output: Example String
 }
 
+// TestAlphaFast_Basic tests the AlphaFast sanitize method
+func TestAlphaFast_Basic(t *testing.T) {
+
+	var tests = []struct {
+		name     string
+		input    string
+		expected string
+		typeCase bool
+	}{
+		{"regular string", "Test This String-!123", "TestThisString", false},
+		{"various symbols", `~!@#$%^&*()-_Symbols=+[{]};:'"<>,./?`, "Symbols", false},
+		{"carriage returns", "\nThis\nThat", "ThisThat", false},
+		{"quotes and ticks", "“This is a quote with tick`s … ” ☺ ", "Thisisaquotewithticks", false},
+		{"spaces", "Test This String-!123", "Test This String", true},
+		{"symbols and spaces", `~!@#$%^&*()-_Symbols=+[{]};:'"<>,./?`, "Symbols", true},
+		{"quotes and spaces", "“This is a quote with tick`s … ” ☺ ", "This is a quote with ticks    ", true},
+		{"carriage returns", "\nThis\nThat", `ThisThat`, true},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			output := sanitize.AlphaFast(test.input, test.typeCase)
+			assert.Equal(t, test.expected, output)
+		})
+	}
+}
+
+// TestAlphaFast_EdgeCases tests the AlphaFast sanitize method with edge cases
+func TestAlphaFast_EdgeCases(t *testing.T) {
+
+	var tests = []struct {
+		name     string
+		input    string
+		expected string
+		typeCase bool
+	}{
+		{"empty string", "", "", false},
+		{"only special characters", "!@#$%^&*()", "", false},
+		{"very long string", strings.Repeat("a", 1000), strings.Repeat("a", 1000), false},
+		{"tabs", "\tThis1\tThat2", `ThisThat`, true},
+		{"carriage returns with n", "\nThis1\nThat2", `ThisThat`, true},
+		{"carriage returns with r", "\rThis1\rThat2", `ThisThat`, true},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			output := sanitize.AlphaFast(test.input, test.typeCase)
+			assert.Equal(t, test.expected, output)
+		})
+	}
+}
+
+// BenchmarkAlphaFast benchmarks the AlphaFast method
+func BenchmarkAlphaFast(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_ = sanitize.AlphaFast("This is the test string.", false)
+	}
+}
+
+// BenchmarkAlphaFast_WithSpaces benchmarks the AlphaFast method
+func BenchmarkAlphaFast_WithSpaces(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_ = sanitize.AlphaFast("This is the test string.", true)
+	}
+}
+
+// ExampleAlphaFast example using AlphaFast() and no spaces flag
+func ExampleAlphaFast() {
+	fmt.Println(sanitize.AlphaFast("Example String!", false))
+	// Output: ExampleString
+}
+
+// ExampleAlphaFast_withSpaces example using AlphaFast with a space flag
+func ExampleAlphaFast_withSpaces() {
+	fmt.Println(sanitize.AlphaFast("Example String!", true))
+	// Output: Example String
+}
+
 // TestAlphaNumeric tests the alphanumeric sanitize method
 func TestAlphaNumeric_Basic(t *testing.T) {
 
@@ -141,6 +219,61 @@ func ExampleAlphaNumeric() {
 // ExampleAlphaNumeric_withSpaces example using AlphaNumeric() with spaces
 func ExampleAlphaNumeric_withSpaces() {
 	fmt.Println(sanitize.AlphaNumeric("Example String 2!", true))
+	// Output: Example String 2
+}
+
+// TestAlphaNumericFast_Basic tests the AlphaNumericFast sanitize method
+func TestAlphaNumericFast_Basic(t *testing.T) {
+
+	var tests = []struct {
+		name     string
+		input    string
+		expected string
+		typeCase bool
+	}{
+		{"regular string", "Test This String-!123", "TestThisString123", false},
+		{"symbols", `~!@#$%^&*()-_Symbols 123=+[{]};:'"<>,./?`, "Symbols 123", true},
+		{"carriage returns", "\nThis1\nThat2", "This1That2", false},
+		{"quotes and ticks", "“This is a quote with tick`s … ” ☺ 342", "Thisisaquotewithticks342", false},
+		{"string with spaces", "Test This String-! 123", "Test This String 123", true},
+		{"symbols and spaces", `~!@#$%^&*()-_Symbols 123=+[{]};:'"<>,./?`, "Symbols 123", true},
+		{"ticks and spaces", "“This is a quote with tick`s…”☺ 123", "This is a quote with ticks 123", true},
+		{"carriage returns with n", "\nThis1\nThat2", `This1That2`, true},
+		{"carriage returns with r", "\rThis1\rThat2", `This1That2`, true},
+		{"tabs", "\tThis1\tThat2", `This1That2`, true},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			output := sanitize.AlphaNumericFast(test.input, test.typeCase)
+			assert.Equal(t, test.expected, output)
+		})
+	}
+}
+
+// BenchmarkAlphaNumericFast benchmarks the AlphaNumericFast method
+func BenchmarkAlphaNumericFast(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_ = sanitize.AlphaNumericFast("This is the test string 12345.", false)
+	}
+}
+
+// BenchmarkAlphaNumericFast_WithSpaces benchmarks the AlphaNumericFast method
+func BenchmarkAlphaNumericFast_WithSpaces(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_ = sanitize.AlphaNumericFast("This is the test string 12345.", true)
+	}
+}
+
+// ExampleAlphaNumericFast example using AlphaNumericFast() with no spaces
+func ExampleAlphaNumericFast() {
+	fmt.Println(sanitize.AlphaNumericFast("Example String 2!", false))
+	// Output: ExampleString2
+}
+
+// ExampleAlphaNumericFast_withSpaces example using AlphaNumericFast() with spaces
+func ExampleAlphaNumericFast_withSpaces() {
+	fmt.Println(sanitize.AlphaNumericFast("Example String 2!", true))
 	// Output: Example String 2
 }
 
@@ -739,6 +872,36 @@ func BenchmarkNumeric(b *testing.B) {
 // ExampleNumeric example using Numeric()
 func ExampleNumeric() {
 	fmt.Println(sanitize.Numeric("This:123 + 90!"))
+	// Output: 12390
+}
+
+// TestNumericFast_Basic tests the NumericFast sanitize method
+func TestNumericFast_Basic(t *testing.T) {
+
+	var tests = []struct {
+		input    string
+		expected string
+	}{
+		{" > Test This String-!1234", "1234"},
+		{" $1.00 Price!", "100"},
+	}
+
+	for _, test := range tests {
+		output := sanitize.NumericFast(test.input)
+		assert.Equal(t, test.expected, output)
+	}
+}
+
+// BenchmarkNumericFast benchmarks the NumericFast method
+func BenchmarkNumericFast(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_ = sanitize.NumericFast(" 192.168.0.1 ")
+	}
+}
+
+// ExampleNumericFast example using NumericFast()
+func ExampleNumericFast() {
+	fmt.Println(sanitize.NumericFast("This:123 + 90!"))
 	// Output: 12390
 }
 
