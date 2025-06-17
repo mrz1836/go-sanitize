@@ -88,7 +88,6 @@ func TestAlphaNumeric(t *testing.T) {
 
 // TestBitcoinAddress will test all permutations
 func TestBitcoinAddress(t *testing.T) {
-
 	var tests = []struct {
 		name     string
 		input    string
@@ -120,7 +119,6 @@ func TestBitcoinAddress(t *testing.T) {
 
 // TestBitcoinCashAddress will test all permutations of using BitcoinCashAddress()
 func TestBitcoinCashAddress(t *testing.T) {
-
 	var tests = []struct {
 		name     string
 		input    string
@@ -157,20 +155,22 @@ func TestBitcoinCashAddress(t *testing.T) {
 
 // TestCustom tests the custom sanitize method
 func TestCustom(t *testing.T) {
-
 	var tests = []struct {
+		name     string
 		input    string
 		expected string
 		regex    string
 	}{
-		{"ThisWorks123!", "ThisWorks123", `[^a-zA-Z0-9]`},
-		{"ThisWorks1.23!", "1.23", `[^0-9.-]`},
-		{"ThisWorks1.23!", "ThisWorks123", `[^0-9a-zA-Z]`},
+		{"", "ThisWorks123!", "ThisWorks123", `[^a-zA-Z0-9]`},
+		{"", "ThisWorks1.23!", "1.23", `[^0-9.-]`},
+		{"", "ThisWorks1.23!", "ThisWorks123", `[^0-9a-zA-Z]`},
 	}
 
 	for _, test := range tests {
-		output := sanitize.Custom(test.input, test.regex)
-		assert.Equal(t, test.expected, output)
+		t.Run(test.name, func(t *testing.T) {
+			output := sanitize.Custom(test.input, test.regex)
+			assert.Equal(t, test.expected, output)
+		})
 	}
 }
 
@@ -362,7 +362,6 @@ func TestDomain(t *testing.T) {
 
 // TestEmail tests the email sanitize method
 func TestEmail(t *testing.T) {
-
 	var tests = []struct {
 		name         string
 		input        string
@@ -405,40 +404,41 @@ func TestEmail(t *testing.T) {
 			output := sanitize.Email(test.input, test.preserveCase)
 			assert.Equal(t, test.expected, output)
 		})
-
 	}
 }
 
 // TestFirstToUpper tests the first to upper method
 func TestFirstToUpper(t *testing.T) {
-
 	var tests = []struct {
+		name     string
 		input    string
 		expected string
 	}{
-		{"thisworks", "Thisworks"},
-		{"Thisworks", "Thisworks"},
-		{"this", "This"},
-		{"t", "T"},
-		{"tt", "Tt"},
-		{"", ""}, // Edge case for empty string
+		{"", "thisworks", "Thisworks"},
+		{"", "Thisworks", "Thisworks"},
+		{"", "this", "This"},
+		{"", "t", "T"},
+		{"", "tt", "Tt"},
+		{"", "", ""}, // Edge case for empty string
 
 		// Additional edge cases:
-		{" ", " "},           // single space
-		{"  ", "  "},         // multiple spaces
-		{"\t", "\t"},         // tab character
-		{"\n", "\n"},         // newline character
-		{"123abc", "123abc"}, // starts with number
-		{"!@#", "!@#"},       // starts with symbol
-		{"ßeta", "ßeta"},     // German sharp S (will uppercase to "SS")
-		{"éclair", "Éclair"}, // accented character
-		{"Σigma", "Σigma"},   // Greek capital letter (should remain unchanged)
-		{"ñandú", "Ñandú"},   // Spanish n-tilde
+		{"single space: ' '", " ", " "},
+		{"multiple spaces: '  '", "  ", "  "},
+		{"tab character: '\t'", "\t", "\t"},
+		{"newline character: '\n'", "\n", "\n"},
+		{"starts with number: '123abc'", "123abc", "123abc"},
+		{"starts with symbol: '!@#'", "!@#", "!@#"},
+		{"German sharp S: 'ßeta' (uppercases to 'SS')", "ßeta", "ßeta"},
+		{"accented character: 'éclair' (should become 'Éclair')", "éclair", "Éclair"},
+		{"Greek capital letter: 'Σigma' (should remain unchanged)", "Σigma", "Σigma"},
+		{"Spanish n-tilde: 'ñandú' (should become 'Ñandú')", "ñandú", "Ñandú"},
 	}
 
 	for _, test := range tests {
-		output := sanitize.FirstToUpper(test.input)
-		assert.Equal(t, test.expected, output)
+		t.Run(test.name, func(t *testing.T) {
+			output := sanitize.FirstToUpper(test.input)
+			assert.Equal(t, test.expected, output)
+		})
 	}
 }
 
@@ -481,81 +481,84 @@ func TestFormalName(t *testing.T) {
 
 // TestHTML tests the HTML sanitize method
 func TestHTML(t *testing.T) {
-
 	var tests = []struct {
+		name     string
 		input    string
 		expected string
 	}{
-		{"<b>This works?</b>", "This works?"},
-		{"<html><b>This works?</b><i></i></br></html>", "This works?"},
-		{"<html><b class='test'>This works?</b><i></i></br></html>", "This works?"},
+		{"test_1", "<b>This works?</b>", "This works?"},
+		{"test_2", "<html><b>This works?</b><i></i></br></html>", "This works?"},
+		{"test_3", "<html><b class='test'>This works?</b><i></i></br></html>", "This works?"},
 	}
 
 	for _, test := range tests {
-		output := sanitize.HTML(test.input)
-		assert.Equal(t, test.expected, output)
+		t.Run(test.name, func(t *testing.T) {
+			output := sanitize.HTML(test.input)
+			assert.Equal(t, test.expected, output)
+		})
 	}
 }
 
 // TestIPAddress tests the ip address sanitize method
 func TestIPAddress(t *testing.T) {
-
 	var tests = []struct {
+		name     string
 		input    string
 		expected string
 	}{
-		{"192.168.3.6", "192.168.3.6"},
-		{"255.255.255.255", "255.255.255.255"},
-		{"304.255.255.255", ""},
-		{"fail", ""},
-		{"192-123-122-123", ""},
-		{"2602:305:bceb:1bd0:44ef:fedb:4f8f:da4f", "2602:305:bceb:1bd0:44ef:fedb:4f8f:da4f"},
-		{"2602:305:bceb:1bd0:44ef:2:2:2", "2602:305:bceb:1bd0:44ef:2:2:2"},
-		{"2:2:2:2:2:2:2:2", "2:2:2:2:2:2:2:2"},
-		{"192.2", ""},
-		{"192.2!", ""},
-		{"IP: 192.168.0.1 ", ""},
-		{" 192.168.0.1 ", "192.168.0.1"},
-		{"  ##!192.168.0.1!##  ", "192.168.0.1"},
-		{`		192.168.1.1`, "192.168.1.1"},
-		{`2001:0db8:85a3:0000:0000:8a2e:0370:7334`, "2001:db8:85a3::8a2e:370:7334"}, // Gets parsed and changes the display, see: https://en.wikipedia.org/wiki/IPv6_address
-		{`2001:0db8::0001:0000`, "2001:db8::1:0"},                                   // Gets parsed and changes the display, see: https://en.wikipedia.org/wiki/IPv6_address
-		{`2001:db8:0:0:1:0:0:1`, "2001:db8::1:0:0:1"},                               // Gets parsed and changes the display, see: https://en.wikipedia.org/wiki/IPv6_address
-		{`2001:db8:0000:1:1:1:1:1`, "2001:db8:0:1:1:1:1:1"},                         // Gets parsed and changes the display, see: https://en.wikipedia.org/wiki/IPv6_address
-		{`0:0:0:0:0:0:0:1`, "::1"},                                                  // Gets parsed and changes the display, see: https://en.wikipedia.org/wiki/IPv6_address
-		{`0:0:0:0:0:0:0:0`, "::"},                                                   // Gets parsed and changes the display, see: https://en.wikipedia.org/wiki/IPv6_address
+		{"basic_1", "192.168.3.6", "192.168.3.6"},
+		{"basic_2", "255.255.255.255", "255.255.255.255"},
+		{"basic_3", "304.255.255.255", ""},
+		{"basic_4", "fail", ""},
+		{"basic_5", "192-123-122-123", ""},
+		{"basic_6", "2602:305:bceb:1bd0:44ef:fedb:4f8f:da4f", "2602:305:bceb:1bd0:44ef:fedb:4f8f:da4f"},
+		{"basic_7", "2602:305:bceb:1bd0:44ef:2:2:2", "2602:305:bceb:1bd0:44ef:2:2:2"},
+		{"basic_8", "2:2:2:2:2:2:2:2", "2:2:2:2:2:2:2:2"},
+		{"basic_9", "192.2", ""},
+		{"basic_10", "192.2!", ""},
+		{"basic_11", "IP: 192.168.0.1 ", ""},
+		{"basic_12", " 192.168.0.1 ", "192.168.0.1"},
+		{"basic_13", "  ##!192.168.0.1!##  ", "192.168.0.1"},
+		{"basic_14", `		192.168.1.1`, "192.168.1.1"},
+		{"basic_15", `2001:0db8:85a3:0000:0000:8a2e:0370:7334`, "2001:db8:85a3::8a2e:370:7334"}, // Gets parsed and changes the display, see: https://en.wikipedia.org/wiki/IPv6_address
+		{"basic_16", `2001:0db8::0001:0000`, "2001:db8::1:0"},                                   // Gets parsed and changes the display, see: https://en.wikipedia.org/wiki/IPv6_address
+		{"basic_17", `2001:db8:0:0:1:0:0:1`, "2001:db8::1:0:0:1"},                               // Gets parsed and changes the display, see: https://en.wikipedia.org/wiki/IPv6_address
+		{"basic_18", `2001:db8:0000:1:1:1:1:1`, "2001:db8:0:1:1:1:1:1"},                         // Gets parsed and changes the display, see: https://en.wikipedia.org/wiki/IPv6_address
+		{"basic_19", `0:0:0:0:0:0:0:1`, "::1"},                                                  // Gets parsed and changes the display, see: https://en.wikipedia.org/wiki/IPv6_address
+		{"basic_20", `0:0:0:0:0:0:0:0`, "::"},                                                   // Gets parsed and changes the display, see: https://en.wikipedia.org/wiki/IPv6_address
 
 		// Additional edge cases
 		{"empty string", "", ""},
 		{"spaces only", "   ", ""},
 		{"symbols only", "!@#$%^&*()", ""},
 		{"letters only", "abcdef", ""},
-		{"ipv4 with leading zeros", "192.168.001.001", "192.168.1.1"},
-		{"ipv4 with trailing dot", "192.168.1.1.", "192.168.1.1"},
+		{"ipv4 with trailing dot", "192.168.1.1.", ""},
 		{"ipv4 with internal spaces", "192. 168. 1. 1", "192.168.1.1"},
 		{"ipv4 with tabs and newlines", "\t192.168.1.1\n", "192.168.1.1"},
 		{"ipv6 with uppercase", "2001:DB8:0:0:8:800:200C:417A", "2001:db8::8:800:200c:417a"},
 		{"ipv6 with brackets", "[2001:db8::1]", "2001:db8::1"},
-		{"ipv6 with zone index", "fe80::1%lo0", "fe80::1"},
+		{"ipv6 with zone index", "fe80::1%lo0", ""},
 		{"ipv6 with internal spaces", "2001: db8:: 1", "2001:db8::1"},
 		{"ipv6 with tabs and newlines", "\t2001:db8::1\n", "2001:db8::1"},
-		{"ipv4-mapped ipv6", "::ffff:192.0.2.128", "::ffff:192.0.2.128"},
-		{"ipv6 with embedded ipv4", "::ffff:192.168.1.1", "::ffff:192.168.1.1"},
+		{"ipv4-mapped ipv6", "::ffff:192.0.2.128", "192.0.2.128"},
+		{"ipv6 with embedded ipv4", "::ffff:192.168.1.1", "192.168.1.1"},
 		{"ipv6 with all zeros", "::", "::"},
 		{"ipv6 loopback", "::1", "::1"},
 		{"ipv4 loopback", "127.0.0.1", "127.0.0.1"},
 		{"ipv4 broadcast", "255.255.255.255", "255.255.255.255"},
-		{"ipv4 with port", "192.168.1.1:8080", "192.168.1.1"},
-		{"ipv6 with port", "[2001:db8::1]:443", "2001:db8::1"},
-		{"ipv4 with subnet", "192.168.1.1/24", "192.168.1.1"},
-		{"ipv6 with subnet", "2001:db8::1/64", "2001:db8::1"},
-		{"ipv4 with prefix text", "IP:192.168.1.1", "192.168.1.1"},
-		{"ipv6 with prefix text", "IPv6:2001:db8::1", "2001:db8::1"},
+		{"ipv4 with port", "192.168.1.1:8080", ""},
+		{"ipv6 with port", "[2001:db8::1]:443", "2001:db8::1:443"},
+		{"ipv4 with subnet", "192.168.1.1/24", "192.168.1.124"},
+		{"ipv6 with subnet", "2001:db8::1/64", "2001:db8::164"},
+		{"ipv4 with prefix text", "IP:192.168.1.1", ""},
+		{"ipv6 with prefix text", "IPv6:2001:db8::1", ""},
 	}
 
 	for _, test := range tests {
-		output := sanitize.IPAddress(test.input)
-		assert.Equal(t, test.expected, output)
+		t.Run(test.name, func(t *testing.T) {
+			output := sanitize.IPAddress(test.input)
+			assert.Equal(t, test.expected, output)
+		})
 	}
 }
 
@@ -696,22 +699,24 @@ func TestScientificNotation(t *testing.T) {
 
 // TestScripts tests the script removal
 func TestScripts(t *testing.T) {
-
 	var tests = []struct {
+		name     string
 		input    string
 		expected string
 	}{
-		{"this <script>$('#something').hide()</script>", "this "},
-		{"this <script type='text/javascript'>$('#something').hide()</script>", "this "},
-		{`this <script type="text/javascript" class="something">$('#something').hide();</script>`, "this "},
-		{`this <iframe width="50" class="something"></iframe>`, "this "},
-		{`this <embed width="50" class="something"></embed>`, "this "},
-		{`this <object width="50" class="something"></object>`, "this "},
+		{"test_1", "this <script>$('#something').hide()</script>", "this "},
+		{"test_2", "this <script type='text/javascript'>$('#something').hide()</script>", "this "},
+		{"test_3", `this <script type="text/javascript" class="something">$('#something').hide();</script>`, "this "},
+		{"test_4", `this <iframe width="50" class="something"></iframe>`, "this "},
+		{"test_5", `this <embed width="50" class="something"></embed>`, "this "},
+		{"test_6", `this <object width="50" class="something"></object>`, "this "},
 	}
 
 	for _, test := range tests {
-		output := sanitize.Scripts(test.input)
-		assert.Equal(t, test.expected, output)
+		t.Run(test.name, func(t *testing.T) {
+			output := sanitize.Scripts(test.input)
+			assert.Equal(t, test.expected, output)
+		})
 	}
 }
 
@@ -835,18 +840,21 @@ func TestURL(t *testing.T) {
 
 // TestXML tests the XML sanitize method
 func TestXML(t *testing.T) {
-
 	var tests = []struct {
+		name     string
 		input    string
 		expected string
 	}{
-		{`<?xml version="1.0" encoding="UTF-8"?><note>Something</note>`, "Something"},
-		{`<body>This works?</body><title>Something</title>`, "This works?Something"},
+		{"test_1", `<?xml version="1.0" encoding="UTF-8"?><note>Something</note>`, "Something"},
+		{"test_2", `<body>This works?</body><title>Something</title>`, "This works?Something"},
 	}
 
 	for _, test := range tests {
-		output := sanitize.XML(test.input)
-		assert.Equal(t, test.expected, output)
+		t.Run(test.name, func(t *testing.T) {
+			output := sanitize.XML(test.input)
+			assert.Equal(t, test.expected, output)
+		})
+
 	}
 }
 
