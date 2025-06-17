@@ -258,9 +258,29 @@ func ExampleCustom_numeric() {
 
 // TestCustomCompiled verifies CustomCompiled using a precompiled regex
 func TestCustomCompiled_Basic(t *testing.T) {
-	re := regexp.MustCompile(`[^a-zA-Z0-9]`)
-	output := sanitize.CustomCompiled("Works 123!", re)
-	assert.Equal(t, "Works123", output)
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+		re       *regexp.Regexp
+	}{
+		{"alpha numeric", "Works 123!", "Works123", regexp.MustCompile(`[^a-zA-Z0-9]`)},
+		{"decimal", "ThisWorks1.23!", "1.23", regexp.MustCompile(`[^0-9.-]`)},
+		{"numbers and letters", "ThisWorks1.23!", "ThisWorks123", regexp.MustCompile(`[^0-9a-zA-Z]`)},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			output := sanitize.CustomCompiled(tt.input, tt.re)
+			assert.Equal(t, tt.expected, output)
+		})
+	}
+}
+
+func TestCustomCompiled_NilRegex(t *testing.T) {
+	require.Panics(t, func() {
+		sanitize.CustomCompiled("panic", nil)
+	})
 }
 
 // BenchmarkCustomCompiled benchmarks the CustomCompiled method
