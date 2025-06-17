@@ -31,14 +31,12 @@ import (
 
 // Set all the regular expressions
 var (
-	bitcoinCashAddrRegExp = regexp.MustCompile(`[^ac-hj-np-zAC-HJ-NP-Z02-9]`)                                              // Bitcoin `cashaddr` address accepted characters
-	bitcoinRegExp         = regexp.MustCompile(`[^a-km-zA-HJ-NP-Z1-9]`)                                                    // Bitcoin address accepted characters
-	domainRegExp          = regexp.MustCompile(`[^a-zA-Z0-9-.]`)                                                           // Domain accepted characters
-	emailRegExp           = regexp.MustCompile(`[^a-zA-Z0-9-_.@+]`)                                                        // Email address characters
-	htmlRegExp            = regexp.MustCompile(`(?i)<[^>]*>`)                                                              // HTML/XML tags or any alligator open/close tags
-	ipAddressRegExp       = regexp.MustCompile(`[^a-zA-Z0-9:.]`)                                                           // IPV4 and IPV6 characters only
-	scriptRegExp          = regexp.MustCompile(`(?i)<(script|iframe|embed|object)[^>]*>.*</(script|iframe|embed|object)>`) // Scripts and embeds
-	wwwRegExp             = regexp.MustCompile(`(?i)www.`)                                                                 // For removing www
+	domainRegExp     = regexp.MustCompile(`[^a-zA-Z0-9-.]`)                                                           // Domain accepted characters
+	emailRegExp      = regexp.MustCompile(`[^a-zA-Z0-9-_.@+]`)                                                        // Email address characters
+	htmlRegExp       = regexp.MustCompile(`(?i)<[^>]*>`)                                                              // HTML/XML tags or any alligator open/close tags
+	ipAddressRegExp  = regexp.MustCompile(`[^a-zA-Z0-9:.]`)                                                           // IPV4 and IPV6 characters only
+	scriptRegExp     = regexp.MustCompile(`(?i)<(script|iframe|embed|object)[^>]*>.*</(script|iframe|embed|object)>`) // Scripts and embeds
+	wwwRegExp        = regexp.MustCompile(`(?i)www.`)                                                                 // For removing www
 )
 
 // emptySpace is an empty space for replacing
@@ -123,7 +121,19 @@ func AlphaNumeric(original string, spaces bool) string {
 //
 // See more usage examples in the `sanitize_test.go` file.
 func BitcoinAddress(original string) string {
-	return string(bitcoinRegExp.ReplaceAll([]byte(original), emptySpace))
+	var b strings.Builder
+	b.Grow(len(original))
+	for _, r := range original {
+		if (r >= 'a' && r <= 'k') ||
+			(r >= 'm' && r <= 'z') ||
+			(r >= 'A' && r <= 'H') ||
+			(r >= 'J' && r <= 'N') ||
+			(r >= 'P' && r <= 'Z') ||
+			(r >= '1' && r <= '9') {
+			b.WriteRune(r)
+		}
+	}
+	return b.String()
 }
 
 // BitcoinCashAddress returns a sanitized string containing only valid characters for a Bitcoin Cash address (cashaddr format).
@@ -143,7 +153,23 @@ func BitcoinAddress(original string) string {
 //
 // See more usage examples in the `sanitize_test.go` file.
 func BitcoinCashAddress(original string) string {
-	return string(bitcoinCashAddrRegExp.ReplaceAll([]byte(original), emptySpace))
+	var b strings.Builder
+	b.Grow(len(original))
+	for _, r := range original {
+		if r == '0' ||
+			(r >= '2' && r <= '9') ||
+			r == 'a' ||
+			(r >= 'c' && r <= 'h') ||
+			(r >= 'j' && r <= 'n') ||
+			(r >= 'p' && r <= 'z') ||
+			r == 'A' ||
+			(r >= 'C' && r <= 'H') ||
+			(r >= 'J' && r <= 'N') ||
+			(r >= 'P' && r <= 'Z') {
+			b.WriteRune(r)
+		}
+	}
+	return b.String()
 }
 
 // Custom uses a custom regex string and returns the sanitized result.
