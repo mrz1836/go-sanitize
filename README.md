@@ -142,8 +142,8 @@ View the generated [documentation](https://pkg.go.dev/github.com/mrz1836/go-sani
 - [`AlphaNumeric`](sanitize.go): Remove non-alphanumeric characters, optionally keep spaces
 - [`BitcoinAddress`](sanitize.go): Filter input to valid Bitcoin address characters
 - [`BitcoinCashAddress`](sanitize.go): Filter input to valid Bitcoin Cash address characters
-- [`Custom`](sanitize.go): Use a custom regex to filter input
-- [`CustomCompiled`](sanitize.go): Use a precompiled regex to filter input
+- [`Custom`](sanitize.go): Use a custom regex to filter input _(legacy)_
+- [`CustomCompiled`](sanitize.go): Use a precompiled regex to filter input **(suggested)**
 - [`Decimal`](sanitize.go): Keep only decimal or float characters
 - [`Domain`](sanitize.go): Sanitize domain, optionally preserving case and removing www
 - [`Email`](sanitize.go): Normalize an email address
@@ -338,7 +338,7 @@ Performance benchmarks for the core functions in this library, executed on an Ap
 | [Scripts](sanitize_test.go)                 | 2,025,324  |   594.6 |   64 |         2 |
 | [SingleLine](sanitize_test.go)              | 555,826    | 2,141.0 |   96 |         4 |
 | [Time](sanitize_test.go)                    | 24,114,907 |   48.93 |   16 |         1 |
-| [URI](sanitize_test.go)                     | 2,319,432  |   516.5 |   80 |         3 |
+| [URI](sanitize_test.go)                     | 11,414,026 |   104.7 |   32 |         1 |
 | [URL](sanitize_test.go)                     | 2,322,772  |   515.5 |   80 |         3 |
 | [XML](sanitize_test.go)                     | 4,179,268  |   288.5 |   56 |         3 |
 | [XSS](sanitize_test.go)                     | 3,499,938  |   345.1 |   40 |         2 |
