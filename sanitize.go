@@ -710,6 +710,17 @@ func XML(original string) string {
 // This function sanitizes the input string by removing common XSS attack vectors,
 // such as script tags, eval functions, and JavaScript protocol handlers.
 //
+// NOTE: this is NOT a comprehensive XSS prevention solution.
+//
+// For a more improved approach, use a library like `github.com/microcosm-cc/bluemonday`
+//
+// import "github.com/microcosm-cc/bluemonday"
+//
+//	func SafeHTML(unsafe string) string {
+//		p := bluemonday.UGCPolicy() // or build your own allow-list
+//		return p.Sanitize(unsafe)
+//	}
+//
 // Parameters:
 // - original: The input string to be sanitized.
 //
