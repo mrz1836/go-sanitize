@@ -34,8 +34,8 @@ func FuzzAlphaNumeric(f *testing.F) {
 	})
 }
 
-// FuzzAlpha validates that Alpha only returns letters and optional spaces.
-func FuzzAlpha(f *testing.F) {
+// FuzzAlpha_Basic validates that Alpha only returns letters and optional spaces.
+func FuzzAlpha_Basic(f *testing.F) {
 	seed := []struct {
 		input  string
 		spaces bool
