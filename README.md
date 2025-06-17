@@ -142,8 +142,8 @@ View the generated [documentation](https://pkg.go.dev/github.com/mrz1836/go-sani
 - [`AlphaNumeric`](sanitize.go): Remove non-alphanumeric characters, optionally keep spaces
 - [`BitcoinAddress`](sanitize.go): Filter input to valid Bitcoin address characters
 - [`BitcoinCashAddress`](sanitize.go): Filter input to valid Bitcoin Cash address characters
-- [`Custom`](sanitize.go): Use a custom regex to filter input
-- [`CustomCompiled`](sanitize.go): Use a precompiled regex to filter input
+- [`Custom`](sanitize.go): Use a custom regex to filter input _(legacy)_
+- [`CustomCompiled`](sanitize.go): Use a precompiled regex to filter input **(suggested)**
 - [`Decimal`](sanitize.go): Keep only decimal or float characters
 - [`Domain`](sanitize.go): Sanitize domain, optionally preserving case and removing www
 - [`Email`](sanitize.go): Normalize an email address
