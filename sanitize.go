@@ -31,20 +31,19 @@ import (
 
 // Set all the regular expressions
 var (
-	bitcoinCashAddrRegExp    = regexp.MustCompile(`[^ac-hj-np-zAC-HJ-NP-Z02-9]`)                                              // Bitcoin `cashaddr` address accepted characters
-	bitcoinRegExp            = regexp.MustCompile(`[^a-km-zA-HJ-NP-Z1-9]`)                                                    // Bitcoin address accepted characters
-	domainRegExp             = regexp.MustCompile(`[^a-zA-Z0-9-.]`)                                                           // Domain accepted characters
-	emailRegExp              = regexp.MustCompile(`[^a-zA-Z0-9-_.@+]`)                                                        // Email address characters
-	htmlRegExp               = regexp.MustCompile(`(?i)<[^>]*>`)                                                              // HTML/XML tags or any alligator open/close tags
-	ipAddressRegExp          = regexp.MustCompile(`[^a-zA-Z0-9:.]`)                                                           // IPV4 and IPV6 characters only
-	punctuationRegExp        = regexp.MustCompile(`[^a-zA-Z0-9-'"#&!?,.\s]+`)                                                 // Standard accepted punctuation characters
-	scientificNotationRegExp = regexp.MustCompile(`[^0-9.eE+-]`)                                                              // Scientific Notation (float) (positive and negative)
-	scriptRegExp             = regexp.MustCompile(`(?i)<(script|iframe|embed|object)[^>]*>.*</(script|iframe|embed|object)>`) // Scripts and embeds
-	singleLineRegExp         = regexp.MustCompile(`(\r)|(\n)|(\t)|(\v)|(\f)`)                                                 // Carriage returns, line feeds, tabs, for single line transition
-	timeRegExp               = regexp.MustCompile(`[^0-9:]`)                                                                  // Time allowed characters
-	uriRegExp                = regexp.MustCompile(`[^a-zA-Z0-9-_/?&=#%]`)                                                     // URI allowed characters
-	urlRegExp                = regexp.MustCompile(`[^a-zA-Z0-9-_/:.,?&@=#%]`)                                                 // URL allowed characters
-	wwwRegExp                = regexp.MustCompile(`(?i)www.`)                                                                 // For removing www
+	bitcoinCashAddrRegExp = regexp.MustCompile(`[^ac-hj-np-zAC-HJ-NP-Z02-9]`)                                              // Bitcoin `cashaddr` address accepted characters
+	bitcoinRegExp         = regexp.MustCompile(`[^a-km-zA-HJ-NP-Z1-9]`)                                                    // Bitcoin address accepted characters
+	domainRegExp          = regexp.MustCompile(`[^a-zA-Z0-9-.]`)                                                           // Domain accepted characters
+	emailRegExp           = regexp.MustCompile(`[^a-zA-Z0-9-_.@+]`)                                                        // Email address characters
+	htmlRegExp            = regexp.MustCompile(`(?i)<[^>]*>`)                                                              // HTML/XML tags or any alligator open/close tags
+	ipAddressRegExp       = regexp.MustCompile(`[^a-zA-Z0-9:.]`)                                                           // IPV4 and IPV6 characters only
+	punctuationRegExp     = regexp.MustCompile(`[^a-zA-Z0-9-'"#&!?,.\s]+`)                                                 // Standard accepted punctuation characters
+	scriptRegExp          = regexp.MustCompile(`(?i)<(script|iframe|embed|object)[^>]*>.*</(script|iframe|embed|object)>`) // Scripts and embeds
+	singleLineRegExp      = regexp.MustCompile(`(\r)|(\n)|(\t)|(\v)|(\f)`)                                                 // Carriage returns, line feeds, tabs, for single line transition
+	timeRegExp            = regexp.MustCompile(`[^0-9:]`)                                                                  // Time allowed characters
+	uriRegExp             = regexp.MustCompile(`[^a-zA-Z0-9-_/?&=#%]`)                                                     // URI allowed characters
+	urlRegExp             = regexp.MustCompile(`[^a-zA-Z0-9-_/:.,?&@=#%]`)                                                 // URL allowed characters
+	wwwRegExp             = regexp.MustCompile(`(?i)www.`)                                                                 // For removing www
 )
 
 // emptySpace is an empty space for replacing
@@ -540,7 +539,14 @@ func Punctuation(original string) string {
 //
 // See more usage examples in the `sanitize_test.go` file.
 func ScientificNotation(original string) string {
-	return string(scientificNotationRegExp.ReplaceAll([]byte(original), emptySpace))
+	var b strings.Builder
+	b.Grow(len(original))
+	for _, r := range original {
+		if unicode.IsDigit(r) || r == '.' || r == 'e' || r == 'E' || r == '+' || r == '-' {
+			b.WriteRune(r)
+		}
+	}
+	return b.String()
 }
 
 // Scripts removes all script, iframe, embed, and object tags from the input string.
