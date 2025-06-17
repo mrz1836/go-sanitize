@@ -333,7 +333,7 @@ Performance benchmarks for the core functions in this library, executed on an Ap
 | [IPAddress_IPV6](sanitize_test.go)          | 1,000,000  | 1,066.0 |  225 |         6 |
 | [Numeric](sanitize_test.go)                 | 27,050,888 |    44.0 |   16 |         1 |
 | [PathName](sanitize_test.go)                | 15,465,885 |   78.74 |   24 |         1 |
-| [Punctuation](sanitize_test.go)             | 1,895,738  |   621.8 |  160 |         4 |
+| [Punctuation](sanitize_test.go)             | 9,166,885  |   130.7 |   48 |         1 |
 | [ScientificNotation](sanitize_test.go)      | 19,580,979 |   61.32 |   24 |         1 |
 | [Scripts](sanitize_test.go)                 | 2,025,324  |   594.6 |   64 |         2 |
 | [SingleLine](sanitize_test.go)              | 555,826    | 2,141.0 |   96 |         4 |
