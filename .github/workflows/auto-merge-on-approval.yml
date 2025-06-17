@@ -12,10 +12,9 @@
 #    • No requested reviewers remaining
 #    • No "Changes Requested" reviews
 #    • All required status checks pass:
-#        - test (1.18.x, ubuntu-latest)
-#        - test (1.19.x, ubuntu-latest)
-#        - test (1.23.x, ubuntu-latest)
-#        - test (1.24.x, ubuntu-latest)
+#        - test (1.18.x, ubuntu-latest) (min version)
+#        - test (1.23.x, ubuntu-latest) (-1 version)
+#        - test (1.24.x, ubuntu-latest) (latest version)
 #        - Analyze (go)
 #    • Title must not contain "WIP"
 #    • PR must not have the "work-in-progress" label
@@ -116,7 +115,6 @@ jobs:
                       // Required checks
                       const requiredChecks = [
                         'test (1.18.x, ubuntu-latest)',
-                        'test (1.19.x, ubuntu-latest)',
                         'test (1.23.x, ubuntu-latest)',
                         'test (1.24.x, ubuntu-latest)',
                         'Analyze (go)',
