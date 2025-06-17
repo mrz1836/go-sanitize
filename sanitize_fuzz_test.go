@@ -10,8 +10,8 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// FuzzAlphaNumeric_General validates that AlphaNumeric only returns letters, digits, and optional spaces.
-func FuzzAlphaNumeric_General(f *testing.F) {
+// FuzzAlphaNumeric validates that AlphaNumeric only returns letters, digits, and optional spaces.
+func FuzzAlphaNumeric(f *testing.F) {
 	seed := []struct {
 		input  string
 		spaces bool
@@ -34,8 +34,8 @@ func FuzzAlphaNumeric_General(f *testing.F) {
 	})
 }
 
-// FuzzAlpha_General validates that Alpha only returns letters and optional spaces.
-func FuzzAlpha_General(f *testing.F) {
+// FuzzAlpha validates that Alpha only returns letters and optional spaces.
+func FuzzAlpha(f *testing.F) {
 	seed := []struct {
 		input  string
 		spaces bool
@@ -58,8 +58,8 @@ func FuzzAlpha_General(f *testing.F) {
 	})
 }
 
-// FuzzBitcoinAddress_General validates that BitcoinAddress only returns valid Bitcoin address characters.
-func FuzzBitcoinAddress_General(f *testing.F) {
+// FuzzBitcoinAddress validates that BitcoinAddress only returns valid Bitcoin address characters.
+func FuzzBitcoinAddress(f *testing.F) {
 	seed := []string{
 		":1K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs!",
 		"OIl01K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs!",
@@ -82,8 +82,8 @@ func FuzzBitcoinAddress_General(f *testing.F) {
 	})
 }
 
-// FuzzBitcoinCashAddress_General validates that BitcoinCashAddress only returns valid Bitcoin Cash address characters.
-func FuzzBitcoinCashAddress_General(f *testing.F) {
+// FuzzBitcoinCashAddress validates that BitcoinCashAddress only returns valid Bitcoin Cash address characters.
+func FuzzBitcoinCashAddress(f *testing.F) {
 	seed := []string{
 		"$#:qze7yy2au5vuznvn8lzj5y0j5t066vhs75e3m0eptz!",
 		"pqbq3728yw0y47sOqn6l2na30mcw6zm78idzq5ucqzc371",
@@ -110,8 +110,8 @@ func FuzzBitcoinCashAddress_General(f *testing.F) {
 	})
 }
 
-// FuzzDecimal_General validates that Decimal only returns digits, hyphens, and dots.
-func FuzzDecimal_General(f *testing.F) {
+// FuzzDecimal validates that Decimal only returns digits, hyphens, and dots.
+func FuzzDecimal(f *testing.F) {
 	seed := []string{
 		"The price is -123.45 USD",
 		"Balance: 0.001234",
@@ -129,8 +129,8 @@ func FuzzDecimal_General(f *testing.F) {
 	})
 }
 
-// FuzzDomain_General validates that Domain only returns valid domain characters when no error.
-func FuzzDomain_General(f *testing.F) {
+// FuzzDomain validates that Domain only returns valid domain characters when no error.
+func FuzzDomain(f *testing.F) {
 	seed := []struct {
 		input        string
 		preserveCase bool
@@ -155,8 +155,8 @@ func FuzzDomain_General(f *testing.F) {
 	})
 }
 
-// FuzzEmail_General validates that Email only returns valid email characters.
-func FuzzEmail_General(f *testing.F) {
+// FuzzEmail validates that Email only returns valid email characters.
+func FuzzEmail(f *testing.F) {
 	seed := []struct {
 		input        string
 		preserveCase bool
@@ -178,9 +178,9 @@ func FuzzEmail_General(f *testing.F) {
 	})
 }
 
-// FuzzFirstToUpper_General validates that FirstToUpper capitalizes the first
+// FuzzFirstToUpper validates that FirstToUpper capitalizes the first
 // character while leaving the rest untouched.
-func FuzzFirstToUpper_General(f *testing.F) {
+func FuzzFirstToUpper(f *testing.F) {
 	seed := []string{"example", "Already Upper", ""}
 	for _, tc := range seed {
 		f.Add(tc)
@@ -199,9 +199,9 @@ func FuzzFirstToUpper_General(f *testing.F) {
 	})
 }
 
-// FuzzFormalName_General validates that FormalName only returns characters
+// FuzzFormalName validates that FormalName only returns characters
 // typically allowed in proper names.
-func FuzzFormalName_General(f *testing.F) {
+func FuzzFormalName(f *testing.F) {
 	seed := []string{
 		"Mark Mc'Cuban-Host",
 		"Does #Not Work!",
@@ -226,9 +226,9 @@ func FuzzFormalName_General(f *testing.F) {
 	})
 }
 
-// FuzzIPAddress_General validates that IPAddress returns a canonical IP string
+// FuzzIPAddress validates that IPAddress returns a canonical IP string
 // when input contains a valid address.
-func FuzzIPAddress_General(f *testing.F) {
+func FuzzIPAddress(f *testing.F) {
 	seed := []string{"192.168.0.1", "2602:305:bceb:1bd0:44ef:fedb:4f8f:da4f", "bad"}
 	for _, tc := range seed {
 		f.Add(tc)
@@ -244,8 +244,8 @@ func FuzzIPAddress_General(f *testing.F) {
 	})
 }
 
-// FuzzNumeric_General validates that Numeric only returns digits.
-func FuzzNumeric_General(f *testing.F) {
+// FuzzNumeric validates that Numeric only returns digits.
+func FuzzNumeric(f *testing.F) {
 	seed := []string{
 		"Phone: 123-456-7890",
 		"Order #987654321",
@@ -262,8 +262,8 @@ func FuzzNumeric_General(f *testing.F) {
 	})
 }
 
-// FuzzPathName_General validates that PathName only returns valid pathname characters.
-func FuzzPathName_General(f *testing.F) {
+// FuzzPathName validates that PathName only returns valid pathname characters.
+func FuzzPathName(f *testing.F) {
 	seed := []string{
 		"file:name/with*invalid|chars",
 		"another path\\with spaces.txt",
@@ -281,8 +281,8 @@ func FuzzPathName_General(f *testing.F) {
 	})
 }
 
-// FuzzPunctuation_General validates that Punctuation only returns letters, digits, spaces, and standard punctuation.
-func FuzzPunctuation_General(f *testing.F) {
+// FuzzPunctuation validates that Punctuation only returns letters, digits, spaces, and standard punctuation.
+func FuzzPunctuation(f *testing.F) {
 	seed := []string{
 		"Hello, World! How's it going? (Good, I hope.)",
 		"Testing #1 & #2: \"quotes\" and punctuation!",
@@ -302,8 +302,8 @@ func FuzzPunctuation_General(f *testing.F) {
 	})
 }
 
-// FuzzScientificNotation_General validates that ScientificNotation only returns digits, dots, and exponent characters.
-func FuzzScientificNotation_General(f *testing.F) {
+// FuzzScientificNotation validates that ScientificNotation only returns digits, dots, and exponent characters.
+func FuzzScientificNotation(f *testing.F) {
 	seed := []string{
 		" String: 1.23e-3 ",
 		"$1.0E+10",
@@ -321,8 +321,8 @@ func FuzzScientificNotation_General(f *testing.F) {
 	})
 }
 
-// FuzzSingleLine_General validates that SingleLine removes all newline characters.
-func FuzzSingleLine_General(f *testing.F) {
+// FuzzSingleLine validates that SingleLine removes all newline characters.
+func FuzzSingleLine(f *testing.F) {
 	seed := []string{
 		"First\nSecond",
 		"Tab\tSeparated",
@@ -340,8 +340,8 @@ func FuzzSingleLine_General(f *testing.F) {
 	})
 }
 
-// FuzzTime_General validates that Time only returns digits and colons.
-func FuzzTime_General(f *testing.F) {
+// FuzzTime validates that Time only returns digits and colons.
+func FuzzTime(f *testing.F) {
 	seed := []string{
 		"t00:00d -EST",
 		"Time 12:34:56!",
@@ -359,8 +359,8 @@ func FuzzTime_General(f *testing.F) {
 	})
 }
 
-// FuzzURI_General validates that URI only returns valid URI characters.
-func FuzzURI_General(f *testing.F) {
+// FuzzURI validates that URI only returns valid URI characters.
+func FuzzURI(f *testing.F) {
 	seed := []string{
 		"/This/Works/?that=123&this#page10%",
 		"Test?=what! &this=that",
@@ -379,8 +379,8 @@ func FuzzURI_General(f *testing.F) {
 	})
 }
 
-// FuzzURL_General validates that URL only returns valid URL characters.
-func FuzzURL_General(f *testing.F) {
+// FuzzURL validates that URL only returns valid URL characters.
+func FuzzURL(f *testing.F) {
 	seed := []string{
 		"https://domain.com/this/test?this=value&another=123%#page",
 		"https://Example.com/This/Works?^No&this",
@@ -400,8 +400,8 @@ func FuzzURL_General(f *testing.F) {
 	})
 }
 
-// FuzzHTML_General validates that HTML removes all HTML tags.
-func FuzzHTML_General(f *testing.F) {
+// FuzzHTML validates that HTML removes all HTML tags.
+func FuzzHTML(f *testing.F) {
 	seed := []string{
 		"<div>Hello <b>World</b></div>",
 		"Plain <b>text</b>",
@@ -416,8 +416,8 @@ func FuzzHTML_General(f *testing.F) {
 	})
 }
 
-// FuzzScripts_General validates that Scripts removes script and embed tags.
-func FuzzScripts_General(f *testing.F) {
+// FuzzScripts validates that Scripts removes script and embed tags.
+func FuzzScripts(f *testing.F) {
 	seed := []string{
 		"<script>alert('x')</script>",
 		"<iframe src='t'></iframe>",
