@@ -1,6 +1,7 @@
 package sanitize_test
 
 import (
+	"net"
 	"testing"
 	"unicode"
 
@@ -145,5 +146,62 @@ func FuzzEmail_General(f *testing.F) {
 			require.Truef(t, valid,
 				"invalid rune %q in %q (input: %q)", r, out, input)
 		}
+	})
+}
+
+// FuzzFirstToUpper_General validates that FirstToUpper capitalizes the first
+// character while leaving the rest untouched.
+func FuzzFirstToUpper_General(f *testing.F) {
+	seed := []string{"example", "Already Upper", ""}
+	for _, tc := range seed {
+		f.Add(tc)
+	}
+	f.Fuzz(func(t *testing.T, input string) {
+		out := sanitize.FirstToUpper(input)
+		inRunes := []rune(input)
+		outRunes := []rune(out)
+		if len(inRunes) == 0 {
+			require.Empty(t, outRunes)
+			return
+		}
+		require.Len(t, outRunes, len(inRunes))
+		require.Equal(t, unicode.ToUpper(inRunes[0]), outRunes[0])
+		require.Equal(t, inRunes[1:], outRunes[1:])
+	})
+}
+
+// FuzzFormalName_General validates that FormalName only returns characters
+// typically allowed in proper names.
+func FuzzFormalName_General(f *testing.F) {
+	seed := []string{"Mark Mc'Cuban-Host", "Does #Not Work!"}
+	for _, tc := range seed {
+		f.Add(tc)
+	}
+	f.Fuzz(func(t *testing.T, input string) {
+		out := sanitize.FormalName(input)
+		for _, r := range out {
+			valid := unicode.IsLetter(r) || unicode.IsDigit(r) ||
+				r == '-' || r == '\'' || r == ',' || r == '.' || unicode.IsSpace(r)
+			require.Truef(t, valid,
+				"invalid rune %q in %q (input: %q)", r, out, input)
+		}
+	})
+}
+
+// FuzzIPAddress_General validates that IPAddress returns a canonical IP string
+// when input contains a valid address.
+func FuzzIPAddress_General(f *testing.F) {
+	seed := []string{"192.168.0.1", "2602:305:bceb:1bd0:44ef:fedb:4f8f:da4f", "bad"}
+	for _, tc := range seed {
+		f.Add(tc)
+	}
+	f.Fuzz(func(t *testing.T, input string) {
+		out := sanitize.IPAddress(input)
+		if out == "" {
+			return
+		}
+		ip := net.ParseIP(out)
+		require.NotNilf(t, ip, "output %q is not a valid IP", out)
+		require.Equal(t, ip.String(), out)
 	})
 }
