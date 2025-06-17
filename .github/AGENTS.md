@@ -365,14 +365,14 @@ Clear history ⇒ easy maintenance. Follow these rules for every commit and bran
 ```
 
 * **`<type>`** — `feat`, `fix`, `docs`, `test`, `refactor`, `chore`, `build`, `ci`
-* **`<scope>`** — Affected subsystem or package (e.g., `api`, `countries`, `deps`). Omit if global.
+* **`<scope>`** — Affected subsystem or package (e.g., `api`, `sanitize`, `deps`). Omit if global.
 * **Short description** — ≤ 50 chars, imperative mood ("add pagination", "fix panic")
 * **Body** (optional) — What & why, links to issues (`Closes #123`), and breaking‑change note (`BREAKING CHANGE:`)
 
 **Examples**
 
 ```
-feat(countries): add Alpha-3 lookup by numeric code
+feat(sanitizer): add new sanitization method Thing()
 fix(generator): handle malformed JSON input gracefully
 docs(README): improve installation instructions
 ```
@@ -383,14 +383,14 @@ docs(README): improve installation instructions
 
 | Purpose            | Prefix      | Example                            |
 |--------------------|-------------|------------------------------------|
-| Feature            | `feat/`     | `feat/pagination-api`              |
-| Bug Fix            | `fix/`      | `fix/country-code-off-by-one`      |
-| Documentation      | `docs/`     | `docs/agents-commenting-standards` |
-| Refactor / Cleanup | `refactor/` | `refactor/remove-dead-code`        |
-| Tests              | `test/`     | `test/generator-edge-cases`        |
+| Bug Fix            | `fix/`      | `fix/code-off-by-one`              |
 | Chore / Meta       | `chore/`    | `chore/upgrade-go-1.23`            |
+| Documentation      | `docs/`     | `docs/agents-commenting-standards` |
+| Feature            | `feat/`     | `feat/pagination-api`              |
 | Hotfix (prod)      | `hotfix/`   | `hotfix/rollback-broken-deploy`    |
 | Prototype / Spike  | `proto/`    | `proto/iso3166-expansion`          |
+| Refactor / Cleanup | `refactor/` | `refactor/remove-dead-code`        |
+| Tests              | `test/`     | `test/generator-edge-cases`        |
 
 * Use **kebab‑case** after the prefix.
 * Keep branch names concise yet descriptive.
@@ -617,13 +617,13 @@ Security is a first-class requirement. If you discover a vulnerability—no matt
 This section tracks notable updates to `AGENTS.md`, including the date, author, and purpose of each revision. 
 All contributors are expected to append entries here when making meaningful changes to agent behavior, conventions, or policies.
 
-| Date       | Author   | Summary of Changes |
-|------------|----------|--------------------|
-| 2025-06-17 | @mrz1836 | Documented Go Fuzz test guidance |
-| 2025-06-16 | @mrz1836 | Adapted to fix this project go-sanitize |
-| 2025-06-04 | @mrz1836 | Documented citation and configuration files for contributors |
-| 2025-06-03 | @mrz1836 | Major rewrite: clarified commenting standards and merged scope/purpose |
+| Date       | Author   | Summary of Changes                                                             |
+|------------|----------|--------------------------------------------------------------------------------|
+| 2025-06-17 | @mrz1836 | Documented Go Fuzz test guidance                                               |
+| 2025-06-16 | @mrz1836 | Adapted to fix this project go-sanitize                                        |
+| 2025-06-04 | @mrz1836 | Documented citation and configuration files for contributors                   |
+| 2025-06-03 | @mrz1836 | Major rewrite: clarified commenting standards and merged scope/purpose         |
 | 2025-06-03 | @mrz1836 | Combined testing and development sections; improved formatting & test guidance |
-| 2025-06-03 | @mrz1836 | Enhanced dependency management practices and security scanning advice |
+| 2025-06-03 | @mrz1836 | Enhanced dependency management practices and security scanning advice          |
 
 > For minor edits (typos, formatting), this log update is optional. For all behavioral or structural changes, log entries are **required**.
