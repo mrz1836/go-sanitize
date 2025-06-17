@@ -688,6 +688,12 @@ func TestFormalName_EdgeCases(t *testing.T) {
 		{"digits", "John Doe 3rd", "John Doe 3rd"},
 		{"newline", "John\nDoe", "John\nDoe"},
 		{"leading spaces", "  John", "  John"},
+		{"apostrophe and hyphen", "O'Leary-Brown", "O'Leary-Brown"},
+		{"prefix d'", "d'Artagnan", "d'Artagnan"},
+		{"curly apostrophe", "D’Angelo", "DAngelo"},
+		{"multiple spaces", "Van  der  Meer", "Van  der  Meer"},
+		{"accented surname", "Émilie du Châtelet", "milie du Chtelet"},
+		{"foreign letters", "Björk Guðmundsdóttir", "Bjrk Gumundsdttir"},
 	}
 
 	for _, test := range tests {

@@ -201,7 +201,16 @@ func FuzzFirstToUpper_General(f *testing.F) {
 // FuzzFormalName_General validates that FormalName only returns characters
 // typically allowed in proper names.
 func FuzzFormalName_General(f *testing.F) {
-	seed := []string{"Mark Mc'Cuban-Host", "Does #Not Work!"}
+	seed := []string{
+		"Mark Mc'Cuban-Host",
+		"Does #Not Work!",
+		"O'Leary-Brown",
+		"d'Artagnan",
+		"D’Angelo",
+		"Van  der  Meer",
+		"Émilie du Châtelet",
+		"Björk Guðmundsdóttir",
+	}
 	for _, tc := range seed {
 		f.Add(tc)
 	}
