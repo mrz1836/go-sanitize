@@ -314,7 +314,7 @@ func Domain(original string, preserveCase bool, removeWww bool) (string, error) 
 		host = host[4:]
 	}
 
-	// Convert to lowercase if not preserving case
+	// Convert to lowercase if not preserving our case
 	if !preserveCase {
 		host = strings.ToLower(host)
 	}
