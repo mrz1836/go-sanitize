@@ -1,22 +1,22 @@
 ## Default to the repo name if empty
 ifndef BINARY_NAME
-	override BINARY_NAME=app
+	override BINARY_NAME := app
 endif
 
 ## Define the binary name
 ifdef CUSTOM_BINARY_NAME
-	override BINARY_NAME=$(CUSTOM_BINARY_NAME)
+	override BINARY_NAME := $(CUSTOM_BINARY_NAME)
 endif
 
 ## Set the binary release names
-DARWIN=$(BINARY_NAME)-darwin
-LINUX=$(BINARY_NAME)-linux
-WINDOWS=$(BINARY_NAME)-windows.exe
+DARWIN := $(BINARY_NAME)-darwin
+LINUX := $(BINARY_NAME)-linux
+WINDOWS := $(BINARY_NAME)-windows.exe
 
 ## Define the binary name
-TAGS=
+TAGS :=
 ifdef GO_BUILD_TAGS
-	override TAGS=-tags $(GO_BUILD_TAGS)
+	override TAGS := -tags $(GO_BUILD_TAGS)
 endif
 
 .PHONY: bench
@@ -47,10 +47,9 @@ generate: ## Runs the go generate command in the base of the repo
 .PHONY: godocs
 godocs: ## Sync the latest tag with GoDocs
 	@echo "syndicating to GoDocs..."
-	@test $(GIT_DOMAIN)
-	@test $(REPO_OWNER)
-	@test $(REPO_NAME)
-	@test $(VERSION_SHORT)
+	@if [ -z "$(GIT_DOMAIN)" ] || [ -z "$(REPO_OWNER)" ] || [ -z "$(REPO_NAME)" ] || [ -z "$(VERSION_SHORT)" ]; then \
+	        echo "Missing variables for GoDocs push" && exit 1; \
+	fi
 	@curl https://proxy.golang.org/$(GIT_DOMAIN)/$(REPO_OWNER)/$(REPO_NAME)/@v/$(VERSION_SHORT).info
 
 .PHONY: install
@@ -61,7 +60,7 @@ install: ## Install the application
 .PHONY: install-go
 install-go: ## Install the application (Using Native Go)
 	@echo "installing package..."
-	@go install $(GIT_DOMAIN)/$(REPO_OWNER)/$(REPO_NAME) $(TAGS)
+	@go install $(TAGS) $(GIT_DOMAIN)/$(REPO_OWNER)/$(REPO_NAME)@$(VERSION_SHORT)
 
 .PHONY: lint
 lint: ## Run the golangci-lint application (install if not found)
@@ -151,7 +150,6 @@ uninstall: ## Uninstall the application (and remove files)
 	@test $(REPO_OWNER)
 	@test $(REPO_NAME)
 	@go clean -i $(GIT_DOMAIN)/$(REPO_OWNER)/$(REPO_NAME)
-	@rm -rf $$GOPATH/src/$(GIT_DOMAIN)/$(REPO_OWNER)/$(REPO_NAME)
 	@rm -rf $$GOPATH/bin/$(BINARY_NAME)
 
 .PHONY: update
