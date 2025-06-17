@@ -587,6 +587,39 @@ func ExampleFirstToUpper() {
 	// Output: This works
 }
 
+// TestFirstToUpperBuilder tests the FirstToUpperBuilder method
+func TestFirstToUpperBuilder_Basic(t *testing.T) {
+
+	var tests = []struct {
+		input    string
+		expected string
+	}{
+		{"thisworks", "Thisworks"},
+		{"Thisworks", "Thisworks"},
+		{"this", "This"},
+		{"t", "T"},
+		{"tt", "Tt"},
+	}
+
+	for _, test := range tests {
+		output := sanitize.FirstToUpperBuilder(test.input)
+		assert.Equal(t, test.expected, output)
+	}
+}
+
+// BenchmarkFirstToUpperBuilder benchmarks the FirstToUpperBuilder method
+func BenchmarkFirstToUpperBuilder(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_ = sanitize.FirstToUpperBuilder("make this upper")
+	}
+}
+
+// ExampleFirstToUpperBuilder example using FirstToUpperBuilder()
+func ExampleFirstToUpperBuilder() {
+	fmt.Println(sanitize.FirstToUpperBuilder("this works"))
+	// Output: This works
+}
+
 // TestFormalName tests the formal name method
 func TestFormalName_Basic(t *testing.T) {
 

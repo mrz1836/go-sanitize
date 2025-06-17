@@ -326,7 +326,8 @@ Performance benchmarks for the core functions in this library, executed on an Ap
 | [BenchmarkDomain\_RemoveWww](sanitize_test.go)        | 1,673,802  |   719.2 |  274 |         9 |
 | [BenchmarkEmail](sanitize_test.go)                    | 2,140,860  |   560.2 |  136 |         6 |
 | [BenchmarkEmail\_PreserveCase](sanitize_test.go)      | 2,634,862  |   458.5 |  112 |         5 |
-| [BenchmarkFirstToUpper](sanitize_test.go)             | 13,146,956 |    90.7 |   24 |         1 |
+| [BenchmarkFirstToUpper](sanitize_test.go)             | 6,658,629 |   223.0 |   24 |         1 |
+| [BenchmarkFirstToUpperBuilder](sanitize_test.go)      | 23,158,608 |    51.5 |   16 |         1 |
 | [BenchmarkFormalName](sanitize_test.go)               | 3,300,636  |   360.5 |   64 |         3 |
 | [BenchmarkHTML](sanitize_test.go)                     | 2,541,874  |   473.1 |   64 |         3 |
 | [BenchmarkIPAddress](sanitize_test.go)                | 2,895,540  |   408.4 |   80 |         5 |
