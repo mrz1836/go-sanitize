@@ -349,6 +349,31 @@ func TestDecimal_Basic(t *testing.T) {
 	}
 }
 
+// TestDecimal_EdgeCases tests Decimal with additional edge cases
+func TestDecimal_EdgeCases(t *testing.T) {
+
+	var tests = []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{"empty string", "", ""},
+		{"letters only", "abc", ""},
+		{"plus sign", "+100.50", "100.50"},
+		{"multiple decimals", "1.2.3", "1.2.3"},
+		{"embedded minus", "1-2-3", "1-2-3"},
+		{"scientific notation", "1e-3", "1-3"},
+		{"comma separated", "1,234.56", "1234.56"},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			output := sanitize.Decimal(test.input)
+			assert.Equal(t, test.expected, output)
+		})
+	}
+}
+
 // BenchmarkDecimal benchmarks the Decimal method
 func BenchmarkDecimal(b *testing.B) {
 	for i := 0; i < b.N; i++ {
@@ -649,6 +674,30 @@ func TestFormalName_Basic(t *testing.T) {
 	}
 }
 
+// TestFormalName_EdgeCases tests FormalName with additional edge cases
+func TestFormalName_EdgeCases(t *testing.T) {
+
+	var tests = []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{"empty string", "", ""},
+		{"accented characters", "José María", "Jos Mara"},
+		{"underscores", "Name_With_Underscore", "NameWithUnderscore"},
+		{"digits", "John Doe 3rd", "John Doe 3rd"},
+		{"newline", "John\nDoe", "John\nDoe"},
+		{"leading spaces", "  John", "  John"},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			output := sanitize.FormalName(test.input)
+			assert.Equal(t, test.expected, output)
+		})
+	}
+}
+
 // BenchmarkFormalName benchmarks the FormalName method
 func BenchmarkFormalName(b *testing.B) {
 	for i := 0; i < b.N; i++ {
@@ -823,6 +872,30 @@ func TestPathName_Basic(t *testing.T) {
 	for _, test := range tests {
 		output := sanitize.PathName(test.input)
 		assert.Equal(t, test.expected, output)
+	}
+}
+
+// TestPathName_EdgeCases tests PathName with additional edge cases
+func TestPathName_EdgeCases(t *testing.T) {
+
+	var tests = []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{"empty string", "", ""},
+		{"file extension", "myfile.txt", "myfiletxt"},
+		{"windows path", "C:\\temp\\file.txt", "Ctempfiletxt"},
+		{"unicode chars", "naïve.txt", "navetxt"},
+		{"spaces", "dir name/file", "dirnamefile"},
+		{"valid symbols", "filename-123_ABC", "filename-123_ABC"},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			output := sanitize.PathName(test.input)
+			assert.Equal(t, test.expected, output)
+		})
 	}
 }
 
