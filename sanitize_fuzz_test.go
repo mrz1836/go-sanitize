@@ -205,3 +205,61 @@ func FuzzIPAddress_General(f *testing.F) {
 		require.Equal(t, ip.String(), out)
 	})
 }
+
+// FuzzNumeric_General validates that Numeric only returns digits.
+func FuzzNumeric_General(f *testing.F) {
+	seed := []string{
+		"Phone: 123-456-7890",
+		"Order #987654321",
+	}
+	for _, tc := range seed {
+		f.Add(tc)
+	}
+	f.Fuzz(func(t *testing.T, input string) {
+		out := sanitize.Numeric(input)
+		for _, r := range out {
+			require.Truef(t, unicode.IsDigit(r),
+				"invalid rune %q in %q (input: %q)", r, out, input)
+		}
+	})
+}
+
+// FuzzPathName_General validates that PathName only returns valid pathname characters.
+func FuzzPathName_General(f *testing.F) {
+	seed := []string{
+		"file:name/with*invalid|chars",
+		"another path\\with spaces.txt",
+	}
+	for _, tc := range seed {
+		f.Add(tc)
+	}
+	f.Fuzz(func(t *testing.T, input string) {
+		out := sanitize.PathName(input)
+		for _, r := range out {
+			valid := unicode.IsLetter(r) || unicode.IsDigit(r) || r == '-' || r == '_'
+			require.Truef(t, valid,
+				"invalid rune %q in %q (input: %q)", r, out, input)
+		}
+	})
+}
+
+// FuzzPunctuation_General validates that Punctuation only returns letters, digits, spaces, and standard punctuation.
+func FuzzPunctuation_General(f *testing.F) {
+	seed := []string{
+		"Hello, World! How's it going? (Good, I hope.)",
+		"Testing #1 & #2: \"quotes\" and punctuation!",
+	}
+	for _, tc := range seed {
+		f.Add(tc)
+	}
+	f.Fuzz(func(t *testing.T, input string) {
+		out := sanitize.Punctuation(input)
+		for _, r := range out {
+			valid := unicode.IsLetter(r) || unicode.IsDigit(r) || r == '-' || r == '\'' ||
+				r == '"' || r == '#' || r == '&' || r == '!' || r == '?' || r == ',' ||
+				r == '.' || unicode.IsSpace(r)
+			require.Truef(t, valid,
+				"invalid rune %q in %q (input: %q)", r, out, input)
+		}
+	})
+}
