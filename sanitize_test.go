@@ -140,7 +140,7 @@ func ExampleAlphaNumeric_withSpaces() {
 }
 
 // TestBitcoinAddress will test all permutations
-func TestBitcoinAddress_Basic(t *testing.T) {
+func TestBitcoinAddress(t *testing.T) {
 
 	var tests = []struct {
 		name     string
@@ -185,7 +185,7 @@ func ExampleBitcoinAddress() {
 }
 
 // TestBitcoinCashAddress will test all permutations of using BitcoinCashAddress()
-func TestBitcoinCashAddress_Basic(t *testing.T) {
+func TestBitcoinCashAddress(t *testing.T) {
 
 	var tests = []struct {
 		name     string
