@@ -38,7 +38,6 @@ var (
 	formalNameRegExp         = regexp.MustCompile(`[^a-zA-Z0-9-',.\s]`)                                                       // Characters recognized in surnames and proper names
 	htmlRegExp               = regexp.MustCompile(`(?i)<[^>]*>`)                                                              // HTML/XML tags or any alligator open/close tags
 	ipAddressRegExp          = regexp.MustCompile(`[^a-zA-Z0-9:.]`)                                                           // IPV4 and IPV6 characters only
-	pathNameRegExp           = regexp.MustCompile(`[^a-zA-Z0-9-_]`)                                                           // Path name (file name, seo)
 	punctuationRegExp        = regexp.MustCompile(`[^a-zA-Z0-9-'"#&!?,.\s]+`)                                                 // Standard accepted punctuation characters
 	scientificNotationRegExp = regexp.MustCompile(`[^0-9.eE+-]`)                                                              // Scientific Notation (float) (positive and negative)
 	scriptRegExp             = regexp.MustCompile(`(?i)<(script|iframe|embed|object)[^>]*>.*</(script|iframe|embed|object)>`) // Scripts and embeds
@@ -475,7 +474,21 @@ func Numeric(original string) string {
 //
 // See more usage examples in the `sanitize_test.go` file.
 func PathName(original string) string {
-	return string(pathNameRegExp.ReplaceAll([]byte(original), emptySpace))
+	var b strings.Builder
+	b.Grow(len(original))
+	for _, r := range original {
+		switch {
+		case '0' <= r && r <= '9':
+			b.WriteRune(r)
+		case 'a' <= r && r <= 'z':
+			b.WriteRune(r)
+		case 'A' <= r && r <= 'Z':
+			b.WriteRune(r)
+		case r == '-' || r == '_':
+			b.WriteRune(r)
+		}
+	}
+	return b.String()
 }
 
 // Punctuation returns a string with basic punctuation preserved.
