@@ -496,6 +496,11 @@ func TestHTML(t *testing.T) {
 		{"test_1", "<b>This works?</b>", "This works?"},
 		{"test_2", "<html><b>This works?</b><i></i></br></html>", "This works?"},
 		{"test_3", "<html><b class='test'>This works?</b><i></i></br></html>", "This works?"},
+		{"nested tags", "Hello <div>world <span>!</span></div>", "Hello world !"},
+		{"unclosed tag", "<div>test", "test"},
+		{"partial closing", "<div>test</div", "test</div"},
+		{"html comments", "<!-- comment -->text", "text"},
+		{"script tag remains", "<script>alert('x')</script>", "alert('x')"},
 	}
 
 	for _, test := range tests {
@@ -717,6 +722,11 @@ func TestScripts(t *testing.T) {
 		{"test_4", `this <iframe width="50" class="something"></iframe>`, "this "},
 		{"test_5", `this <embed width="50" class="something"></embed>`, "this "},
 		{"test_6", `this <object width="50" class="something"></object>`, "this "},
+		{"multiple scripts", "pre<script>1</script>mid<script>2</script>post", "prepost"},
+		{"mismatched tags", "<script>one</iframe>two</script>", ""},
+		{"uppercase script", "this <SCRIPT>evil()</SCRIPT> works", "this  works"},
+		{"unclosed script", "<script>oops", "<script>oops"},
+		{"closing only", "oops</script>", "oops</script>"},
 	}
 
 	for _, test := range tests {
@@ -773,6 +783,10 @@ func TestTime(t *testing.T) {
 		{"negative time prefix", "-10:20", "10:20"},
 		{"subsecond time", "12:34:56.789", "12:34:56789"},
 		{"whitespace in time", "10\n:20\t:30", "10:20:30"},
+		{"hyphen separated", "12-34-56", "123456"},
+		{"only colons", "::", "::"},
+		{"trailing colon", "12:34:", "12:34:"},
+		{"unicode digits", "１２：３４", "１２３４"},
 	}
 
 	for _, test := range tests {
@@ -854,6 +868,11 @@ func TestXML(t *testing.T) {
 	}{
 		{"test_1", `<?xml version="1.0" encoding="UTF-8"?><note>Something</note>`, "Something"},
 		{"test_2", `<body>This works?</body><title>Something</title>`, "This works?Something"},
+		{"nested tags", `<root><child>data</child><child2/></root>`, "data"},
+		{"attributes", `text <tag attr='1'>value</tag> more`, "text value more"},
+		{"unclosed tag", `<tag>unclosed`, "unclosed"},
+		{"xml header and comment", `<?xml version='1.0'?><!--comment--><a>1</a>`, "1"},
+		{"cdata removed", `<a><![CDATA[test]]></a>`, ""},
 	}
 
 	for _, test := range tests {
