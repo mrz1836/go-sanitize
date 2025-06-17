@@ -91,11 +91,19 @@ lint: ## Run the golangci-lint application (install if not found)
 	echo "Running golangci-lint..."; \
 	golangci-lint run --verbose
 
+.PHONY: run-fuzz-tests
+run-fuzz-tests:
+	@for pkg in $(shell go list ./...); do \
+		go test -fuzz=Fuzz -fuzztime=5s $$pkg || exit 1; \
+	done
+
 .PHONY: test
 test: ## Runs lint and ALL tests
 	@$(MAKE) lint
 	@echo "running tests..."
 	@go test ./... -v $(TAGS)
+	@echo "running fuzz tests..."
+	@$(MAKE) run-fuzz-tests
 
 .PHONY: test-unit
 test-unit: ## Runs tests and outputs coverage
@@ -113,12 +121,16 @@ test-ci: ## Runs all tests via CI (exports coverage)
 	@$(MAKE) lint
 	@echo "running tests (CI)..."
 	@go test ./... -race -coverprofile=coverage.txt -covermode=atomic $(TAGS)
+	@echo "running fuzz tests (CI)..."
+	@$(MAKE) run-fuzz-tests
 
 .PHONY: test-ci-no-race
 test-ci-no-race: ## Runs all tests via CI (no race) (exports coverage)
 	@$(MAKE) lint
 	@echo "running tests (CI - no race)..."
 	@go test ./... -coverprofile=coverage.txt -covermode=atomic $(TAGS)
+	@echo "running fuzz tests (CI)..."
+	@$(MAKE) run-fuzz-tests
 
 .PHONY: test-ci-short
 test-ci-short: ## Runs unit tests via CI (exports coverage)
