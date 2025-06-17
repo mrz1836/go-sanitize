@@ -2,6 +2,7 @@ package sanitize_test
 
 import (
 	"net"
+	"regexp"
 	"testing"
 	"unicode"
 
@@ -396,5 +397,37 @@ func FuzzURL_General(f *testing.F) {
 			require.Truef(t, valid,
 				"invalid rune %q in %q (input: %q)", r, out, input)
 		}
+	})
+}
+
+// FuzzHTML_General validates that HTML removes all HTML tags.
+func FuzzHTML_General(f *testing.F) {
+	seed := []string{
+		"<div>Hello <b>World</b></div>",
+		"Plain <b>text</b>",
+	}
+	for _, tc := range seed {
+		f.Add(tc)
+	}
+	htmlPattern := regexp.MustCompile(`(?i)<[^>]*>`)
+	f.Fuzz(func(t *testing.T, input string) {
+		out := sanitize.HTML(input)
+		require.False(t, htmlPattern.MatchString(out), "output %q still contains HTML tags", out)
+	})
+}
+
+// FuzzScripts_General validates that Scripts removes script and embed tags.
+func FuzzScripts_General(f *testing.F) {
+	seed := []string{
+		"<script>alert('x')</script>",
+		"<iframe src='t'></iframe>",
+	}
+	for _, tc := range seed {
+		f.Add(tc)
+	}
+	scriptPattern := regexp.MustCompile(`(?i)<(script|iframe|embed|object)[^>]*>.*</(script|iframe|embed|object)>`)
+	f.Fuzz(func(t *testing.T, input string) {
+		out := sanitize.Scripts(input)
+		require.False(t, scriptPattern.MatchString(out), "output %q still contains script tags", out)
 	})
 }
