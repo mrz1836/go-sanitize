@@ -155,6 +155,12 @@ func TestBitcoinAddress_Basic(t *testing.T) {
 
 		// No uppercase letter O, uppercase letter I, lowercase letter l, and the number 0
 		{"uppercase letters", "OIl01K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs!", "1K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs"},
+
+		// Additional edge cases with normal, vanity, and rare addresses
+		{"vanity address", "1CounterpartyXXXXXXXXXXXXXXXUWLpVr", "1CounterpartyXXXXXXXXXXXXXXXUWLpVr"},
+		{"burn address", "1111111111111111111114oLvT2", "1111111111111111111114oLvT2"},
+		{"remove punctuation", "1BoatSLRHtKNngkdXEeobR76b53LETtpyT!!", "1BoatSLRHtKNngkdXEeobR76b53LETtpyT"},
+		{"remove spaces around", " 17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ ", "17SkEw2md5avVNyYgj6RiXuQKNwkXaxFyQ"},
 	}
 
 	for _, test := range tests {
@@ -191,6 +197,11 @@ func TestBitcoinCashAddress_Basic(t *testing.T) {
 
 		// No letters o, b, i, or number 1
 		{"remove ignored characters", "pqbq3728yw0y47sOqn6l2na30mcw6zm78idzq5ucqzc371", "pqq3728yw0y47sqn6l2na30mcw6zm78dzq5ucqzc37"},
+
+		// Additional edge cases with normal, vanity, and rare addresses
+		{"basic cashaddr", "qpm2qsznhks23z7629mms6s4cwef74vcwvy22gdx6a", "qpm2qsznhks23z7629mms6s4cwef74vcwvy22gdx6a"},
+		{"remove punctuation", "bitcoincash:qqq3728yw0y47sqn6l2na30mcw6zm78dzq5ucqzc37!!", "tcncashqqq3728yw0y47sqn6l2na30mcw6zm78dzq5ucqzc37"},
+		{"remove spaces", " qr95tpm9f6qt8azfzd73ydyccdefhkcdv3ldk00ht0 ", "qr95tpm9f6qt8azfzd73ydyccdefhkcdv3ldk00ht0"},
 	}
 
 	for _, test := range tests {
