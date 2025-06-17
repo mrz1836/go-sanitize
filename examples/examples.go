@@ -3,6 +3,7 @@ package main
 
 import (
 	"log"
+	"regexp"
 
 	"github.com/mrz1836/go-sanitize"
 )
@@ -27,6 +28,10 @@ func main() {
 	// Custom allows any regular expression for sanitization.
 	customIn := "Sample #1 String"
 	log.Printf("Custom(%q, `[^a-zA-Z]`) => %q\n", customIn, sanitize.Custom(customIn, `[^a-zA-Z]`))
+
+	// CustomCompiled uses a precompiled regular expression for speed.
+	re := regexp.MustCompile(`[^a-zA-Z]`)
+	log.Printf("CustomCompiled(%q) => %q\n", customIn, sanitize.CustomCompiled(customIn, re))
 
 	// Decimal keeps digits and decimal separators.
 	decIn := "$ -99.99!"

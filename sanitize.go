@@ -177,6 +177,29 @@ func Custom(original string, regExp string) string {
 	return string(regexp.MustCompile(regExp).ReplaceAll([]byte(original), emptySpace))
 }
 
+// CustomCompiled returns a sanitized string using a pre-compiled regular
+// expression. This function provides better performance when the same pattern is
+// reused across multiple calls.
+//
+// Parameters:
+// - original: The input string to be sanitized.
+// - re: A compiled regular expression used for sanitization.
+//
+// Returns:
+// - A sanitized string based on the provided regular expression.
+//
+// Example:
+//
+//	input := "Hello, World! 123"
+//	customRegExp := regexp.MustCompile(`[^a-zA-Z\s]`)
+//	result := sanitize.CustomCompiled(input, customRegExp)
+//	fmt.Println(result) // Output: "Hello World"
+//
+// View more examples in the `sanitize_test.go` file.
+func CustomCompiled(original string, re *regexp.Regexp) string {
+	return re.ReplaceAllString(original, "")
+}
+
 // Decimal returns a sanitized string containing only decimal/float values, including positive and negative numbers.
 // This function removes any characters that are not part of the accepted decimal format.
 //

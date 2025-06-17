@@ -2,6 +2,7 @@ package sanitize_test
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 	"testing"
 
@@ -253,6 +254,28 @@ func ExampleCustom() {
 func ExampleCustom_numeric() {
 	fmt.Println(sanitize.Custom("Example String 2!", `[^0-9]`))
 	// Output: 2
+}
+
+// TestCustomCompiled verifies CustomCompiled using a precompiled regex
+func TestCustomCompiled_Basic(t *testing.T) {
+	re := regexp.MustCompile(`[^a-zA-Z0-9]`)
+	output := sanitize.CustomCompiled("Works 123!", re)
+	assert.Equal(t, "Works123", output)
+}
+
+// BenchmarkCustomCompiled benchmarks the CustomCompiled method
+func BenchmarkCustomCompiled(b *testing.B) {
+	re := regexp.MustCompile(`[^a-zA-Z0-9]`)
+	for i := 0; i < b.N; i++ {
+		_ = sanitize.CustomCompiled("This is the test string 12345.", re)
+	}
+}
+
+// ExampleCustomCompiled example using CustomCompiled with an alpha regex
+func ExampleCustomCompiled() {
+	re := regexp.MustCompile(`[^a-zA-Z]`)
+	fmt.Println(sanitize.CustomCompiled("Example String 2!", re))
+	// Output: ExampleString
 }
 
 // TestDecimal tests the decimal sanitize method

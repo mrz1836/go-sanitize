@@ -132,6 +132,7 @@ View the generated [documentation](https://pkg.go.dev/github.com/mrz1836/go-sani
 - Alpha and alphanumeric sanitization with optional spaces
 - Bitcoin and Bitcoin Cash address sanitizers
 - Custom regular expression helper for arbitrary patterns
+- Precompiled regex sanitizer for repeated patterns
 - Decimal, domain, email and IP address normalization
 - HTML and XML stripping with script removal
 - URI, URL and XSS sanitization
@@ -142,6 +143,7 @@ View the generated [documentation](https://pkg.go.dev/github.com/mrz1836/go-sani
 - [`BitcoinAddress`](sanitize.go): Filter input to valid Bitcoin address characters
 - [`BitcoinCashAddress`](sanitize.go): Filter input to valid Bitcoin Cash address characters
 - [`Custom`](sanitize.go): Use a custom regex to filter input
+- [`CustomCompiled`](sanitize.go): Use a precompiled regex to filter input
 - [`Decimal`](sanitize.go): Keep only decimal or float characters
 - [`Domain`](sanitize.go): Sanitize domain, optionally preserving case and removing www
 - [`Email`](sanitize.go): Normalize an email address
@@ -316,6 +318,7 @@ Performance benchmarks for the core functions in this library, executed on an Ap
 | [BenchmarkBitcoinAddress](sanitize_test.go)           | 2,156,088  |   555.2 |  160 |         4 |
 | [BenchmarkBitcoinCashAddress](sanitize_test.go)       | 1,619,050  |   744.5 |  160 |         4 |
 | [BenchmarkCustom](sanitize_test.go)                   | 879,280    | 1,279.0 |  943 |        17 |
+| [BenchmarkCustomCompiled](sanitize_test.go)           | 795,579    | 1,476.0 |   96 |         5 |
 | [BenchmarkDecimal](sanitize_test.go)                  | 2,035,514  |   595.4 |   56 |         3 |
 | [BenchmarkDomain](sanitize_test.go)                   | 2,493,144  |   473.0 |  225 |         6 |
 | [BenchmarkDomain\_PreserveCase](sanitize_test.go)     | 2,879,966  |   420.9 |  209 |         5 |
