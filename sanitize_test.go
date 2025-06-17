@@ -1193,6 +1193,30 @@ func TestURI_Basic(t *testing.T) {
 	}
 }
 
+// TestURI_EdgeCases tests the URI sanitize method with various edge cases
+func TestURI_EdgeCases(t *testing.T) {
+
+	var tests = []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{"encoded spaces", "path%20with%20space", "path%20with%20space"},
+		{"remove colon", "path:to/resource", "pathto/resource"},
+		{"unicode characters", "/世界/привет", "//"}, //nolint:gosmopolitan // validating removal of non-Latin runes
+		{"plus sign in query", "/query?name=foo+bar", "/query?name=foobar"},
+		{"mixed invalid characters", "/path/../to/;evil?x=1^&y=2", "/path//to/evil?x=1&y=2"},
+		{"trim spaces", "  /something ", "/something"},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			output := sanitize.URI(test.input)
+			assert.Equal(t, test.expected, output)
+		})
+	}
+}
+
 // BenchmarkURI benchmarks the URI method
 func BenchmarkURI(b *testing.B) {
 	for i := 0; i < b.N; i++ {
@@ -1220,6 +1244,31 @@ func TestURL_Basic(t *testing.T) {
 		{"removing symbols", "https://domain.com/this/test?param$!@()[]{}'<>", "https://domain.com/this/test?param@"},
 		{"params and anchors", "https://domain.com/this/test?this=value&another=123%#page", "https://domain.com/this/test?this=value&another=123%#page"},
 		{"allow commas", "https://domain.com/this/test,this,value", "https://domain.com/this/test,this,value"},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			output := sanitize.URL(test.input)
+			assert.Equal(t, test.expected, output)
+		})
+	}
+}
+
+// TestURL_EdgeCases tests the URL sanitize method with various edge cases
+func TestURL_EdgeCases(t *testing.T) {
+
+	var tests = []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{"with port", "https://example.com:8080/path", "https://example.com:8080/path"},
+		{"ipv6 address", "https://[2001:db8::1]/path", "https://2001:db8::1/path"},
+		{"plus sign in query", "https://example.com?q=foo+bar", "https://example.com?q=foobar"},
+		{"trim spaces", " https://example.com/test ", "https://example.com/test"},
+		{"file url path", "file:///C:/Program Files/Test", "file:///C:/ProgramFiles/Test"},
+		{"with user info", "https://user:pass@example.com/", "https://user:pass@example.com/"},
+		{"fragment invalid characters", "https://example.com/path#frag!", "https://example.com/path#frag"},
 	}
 
 	for _, test := range tests {
