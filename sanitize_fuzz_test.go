@@ -242,7 +242,7 @@ func FuzzHTML(f *testing.F) {
 
 // when input contains a valid address.
 func FuzzIPAddress(f *testing.F) {
-	seed := []string{"192.168.0.1", "2602:305:bceb:1bd0:44ef:fedb:4f8f:da4f", "bad"}
+	seed := []string{"192.168.0.1", "2602:305:bceb:1bd0:44ef:fedb:4f8f:da4f", "::ffff:192.0.2.128", "bad"}
 	for _, tc := range seed {
 		f.Add(tc)
 	}
