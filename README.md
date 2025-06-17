@@ -339,7 +339,7 @@ Performance benchmarks for the core functions in this library, executed on an Ap
 | [SingleLine](sanitize_test.go)              | 555,826    | 2,141.0 |   96 |         4 |
 | [Time](sanitize_test.go)                    | 24,114,907 |   48.93 |   16 |         1 |
 | [URI](sanitize_test.go)                     | 11,414,026 |   104.7 |   32 |         1 |
-| [URL](sanitize_test.go)                     | 2,322,772  |   515.5 |   80 |         3 |
+| [URL](sanitize_test.go)                     | 11,462,407 |   105.1 |   32 |         1 |
 | [XML](sanitize_test.go)                     | 4,179,268  |   288.5 |   56 |         3 |
 | [XSS](sanitize_test.go)                     | 3,499,938  |   345.1 |   40 |         2 |
 

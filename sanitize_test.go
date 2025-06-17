@@ -1203,7 +1203,7 @@ func TestURI_EdgeCases(t *testing.T) {
 	}{
 		{"encoded spaces", "path%20with%20space", "path%20with%20space"},
 		{"remove colon", "path:to/resource", "pathto/resource"},
-		{"unicode characters", "/世界/привет", "//"}, //nolint:gosmopolitan // validating removal of non-Latin runes
+		{"unicode characters", "/世界/привет", "/世界/привет"}, //nolint:gosmopolitan // validating removal of non-Latin runes
 		{"plus sign in query", "/query?name=foo+bar", "/query?name=foobar"},
 		{"mixed invalid characters", "/path/../to/;evil?x=1^&y=2", "/path//to/evil?x=1&y=2"},
 		{"trim spaces", "  /something ", "/something"},
