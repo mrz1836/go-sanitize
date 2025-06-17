@@ -53,6 +53,11 @@ func TestAlpha_EdgeCases(t *testing.T) {
 		{"tabs", "\tThis1\tThat2", `ThisThat`, true},
 		{"carriage returns with n", "\nThis1\nThat2", `ThisThat`, true},
 		{"carriage returns with r", "\rThis1\rThat2", `ThisThat`, true},
+		{"accented characters", "éclair", "clair", false},
+		{"greek characters", "Σigma", "igma", false},
+		{"sharp s", "ßeta", "eta", false},
+		{"numbers only", "123456", "", false},
+		{"spaces only", "   ", "   ", true},
 	}
 
 	for _, test := range tests {
@@ -108,6 +113,30 @@ func TestAlphaNumeric_Basic(t *testing.T) {
 		{"carriage returns with n", "\nThis1\nThat2", `This1That2`, true},
 		{"carriage returns with r", "\rThis1\rThat2", `This1That2`, true},
 		{"tabs", "\tThis1\tThat2", `This1That2`, true},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			output := sanitize.AlphaNumeric(test.input, test.typeCase)
+			assert.Equal(t, test.expected, output)
+		})
+	}
+}
+
+// TestAlphaNumeric_EdgeCases tests AlphaNumeric with additional edge cases
+func TestAlphaNumeric_EdgeCases(t *testing.T) {
+
+	var tests = []struct {
+		name     string
+		input    string
+		expected string
+		typeCase bool
+	}{
+		{"empty string", "", "", false},
+		{"spaces only", "   ", "   ", true},
+		{"accents and numbers", "éclair123", "clair123", false},
+		{"mixed unicode", "ßeta Σigma 456", "eta igma 456", true},
+		{"numbers only", "987654", "987654", false},
 	}
 
 	for _, test := range tests {
@@ -739,6 +768,30 @@ func TestNumeric_Basic(t *testing.T) {
 	for _, test := range tests {
 		output := sanitize.Numeric(test.input)
 		assert.Equal(t, test.expected, output)
+	}
+}
+
+// TestNumeric_EdgeCases tests Numeric with additional edge cases
+func TestNumeric_EdgeCases(t *testing.T) {
+
+	var tests = []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{"empty string", "", ""},
+		{"letters only", "abcd", ""},
+		{"negative decimal", "-123.45", "12345"},
+		{"phone format", "(123) 456-7890", "1234567890"},
+		{"hex prefix", "0xFF 55", "055"},
+		{"spaces only", "   ", ""},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			output := sanitize.Numeric(test.input)
+			assert.Equal(t, test.expected, output)
+		})
 	}
 }
 
