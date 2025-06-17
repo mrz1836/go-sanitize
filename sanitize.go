@@ -38,7 +38,6 @@ var (
 	htmlRegExp            = regexp.MustCompile(`(?i)<[^>]*>`)                                                              // HTML/XML tags or any alligator open/close tags
 	ipAddressRegExp       = regexp.MustCompile(`[^a-zA-Z0-9:.]`)                                                           // IPV4 and IPV6 characters only
 	scriptRegExp          = regexp.MustCompile(`(?i)<(script|iframe|embed|object)[^>]*>.*</(script|iframe|embed|object)>`) // Scripts and embeds
-	singleLineRegExp      = regexp.MustCompile(`(\r)|(\n)|(\t)|(\v)|(\f)`)                                                 // Carriage returns, line feeds, tabs, for single line transition
 	wwwRegExp             = regexp.MustCompile(`(?i)www.`)                                                                 // For removing www
 )
 
@@ -593,7 +592,17 @@ func Scripts(original string) string {
 //
 // See more usage examples in the `sanitize_test.go` file.
 func SingleLine(original string) string {
-	return singleLineRegExp.ReplaceAllString(original, " ")
+	var b strings.Builder
+	b.Grow(len(original))
+	for _, r := range original {
+		switch r {
+		case '\r', '\n', '\t', '\v', '\f':
+			b.WriteRune(' ')
+		default:
+			b.WriteRune(r)
+		}
+	}
+	return b.String()
 }
 
 // Time returns just the time part of the string.
