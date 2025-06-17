@@ -81,6 +81,34 @@ func FuzzBitcoinAddress_General(f *testing.F) {
 	})
 }
 
+// FuzzBitcoinCashAddress_General validates that BitcoinCashAddress only returns valid Bitcoin Cash address characters.
+func FuzzBitcoinCashAddress_General(f *testing.F) {
+	seed := []string{
+		"$#:qze7yy2au5vuznvn8lzj5y0j5t066vhs75e3m0eptz!",
+		"pqbq3728yw0y47sOqn6l2na30mcw6zm78idzq5ucqzc371",
+	}
+	for _, tc := range seed {
+		f.Add(tc)
+	}
+	f.Fuzz(func(t *testing.T, input string) {
+		out := sanitize.BitcoinCashAddress(input)
+		for _, r := range out {
+			valid := r == '0' ||
+				(r >= '2' && r <= '9') ||
+				r == 'a' ||
+				(r >= 'c' && r <= 'h') ||
+				(r >= 'j' && r <= 'n') ||
+				(r >= 'p' && r <= 'z') ||
+				r == 'A' ||
+				(r >= 'C' && r <= 'H') ||
+				(r >= 'J' && r <= 'N') ||
+				(r >= 'P' && r <= 'Z')
+			require.Truef(t, valid,
+				"invalid rune %q in %q (input: %q)", r, out, input)
+		}
+	})
+}
+
 // FuzzDecimal_General validates that Decimal only returns digits, hyphens, and dots.
 func FuzzDecimal_General(f *testing.F) {
 	seed := []string{
