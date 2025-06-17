@@ -37,7 +37,6 @@ var (
 	emailRegExp           = regexp.MustCompile(`[^a-zA-Z0-9-_.@+]`)                                                        // Email address characters
 	htmlRegExp            = regexp.MustCompile(`(?i)<[^>]*>`)                                                              // HTML/XML tags or any alligator open/close tags
 	ipAddressRegExp       = regexp.MustCompile(`[^a-zA-Z0-9:.]`)                                                           // IPV4 and IPV6 characters only
-	punctuationRegExp     = regexp.MustCompile(`[^a-zA-Z0-9-'"#&!?,.\s]+`)                                                 // Standard accepted punctuation characters
 	scriptRegExp          = regexp.MustCompile(`(?i)<(script|iframe|embed|object)[^>]*>.*</(script|iframe|embed|object)>`) // Scripts and embeds
 	singleLineRegExp      = regexp.MustCompile(`(\r)|(\n)|(\t)|(\v)|(\f)`)                                                 // Carriage returns, line feeds, tabs, for single line transition
 	uriRegExp             = regexp.MustCompile(`[^a-zA-Z0-9-_/?&=#%]`)                                                     // URI allowed characters
@@ -517,7 +516,16 @@ func PathName(original string) string {
 //
 // See more usage examples in the `sanitize_test.go` file.
 func Punctuation(original string) string {
-	return string(punctuationRegExp.ReplaceAll([]byte(original), emptySpace))
+	var b strings.Builder
+	b.Grow(len(original))
+	for _, r := range original {
+		if unicode.IsLetter(r) || unicode.IsDigit(r) ||
+			r == '-' || r == '\'' || r == '"' || r == '#' || r == '&' ||
+			r == '!' || r == '?' || r == ',' || r == '.' || unicode.IsSpace(r) {
+			b.WriteRune(r)
+		}
+	}
+	return b.String()
 }
 
 // ScientificNotation returns a sanitized string containing only valid characters for scientific notation.
