@@ -180,7 +180,7 @@ func FuzzEmail(f *testing.F) {
 	})
 }
 
-// character while leaving the rest untouched.
+// FuzzFirstToUpper validates that FirstToUpper capitalizes the first letter of the input string.
 func FuzzFirstToUpper(f *testing.F) {
 	seed := []string{"example", "Already Upper", ""}
 	for _, tc := range seed {
@@ -200,7 +200,7 @@ func FuzzFirstToUpper(f *testing.F) {
 	})
 }
 
-// typically allowed in proper names.
+// FuzzFormalName validates that FormalName only returns valid characters for names.
 func FuzzFormalName(f *testing.F) {
 	seed := []string{
 		"Mark Mc'Cuban-Host",
@@ -242,7 +242,7 @@ func FuzzHTML(f *testing.F) {
 	})
 }
 
-// when input contains a valid address.
+// FuzzIPAddress validates that IPAddress only returns valid IP addresses.
 func FuzzIPAddress(f *testing.F) {
 	seed := []string{"192.168.0.1", "2602:305:bceb:1bd0:44ef:fedb:4f8f:da4f", "::ffff:192.0.2.128", "bad"}
 	for _, tc := range seed {
