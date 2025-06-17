@@ -31,87 +31,89 @@ import (
 
 // Set all the regular expressions
 var (
-	alphaNumericRegExp           = regexp.MustCompile(`[^a-zA-Z0-9]`)                                                             // Alpha numeric
-	alphaNumericWithSpacesRegExp = regexp.MustCompile(`[^a-zA-Z0-9 ]`)                                                            // Alphanumeric (with "ONLY" spaces)
-	alphaRegExp                  = regexp.MustCompile(`[^a-zA-Z]`)                                                                // Alpha characters
-	alphaWithSpacesRegExp        = regexp.MustCompile(`[^a-zA-Z ]`)                                                               // Alpha characters (with spaces)
-	bitcoinCashAddrRegExp        = regexp.MustCompile(`[^ac-hj-np-zAC-HJ-NP-Z02-9]`)                                              // Bitcoin `cashaddr` address accepted characters
-	bitcoinRegExp                = regexp.MustCompile(`[^a-km-zA-HJ-NP-Z1-9]`)                                                    // Bitcoin address accepted characters
-	decimalRegExp                = regexp.MustCompile(`[^0-9.-]`)                                                                 // Decimals (positive and negative)
-	domainRegExp                 = regexp.MustCompile(`[^a-zA-Z0-9-.]`)                                                           // Domain accepted characters
-	emailRegExp                  = regexp.MustCompile(`[^a-zA-Z0-9-_.@+]`)                                                        // Email address characters
-	formalNameRegExp             = regexp.MustCompile(`[^a-zA-Z0-9-',.\s]`)                                                       // Characters recognized in surnames and proper names
-	htmlRegExp                   = regexp.MustCompile(`(?i)<[^>]*>`)                                                              // HTML/XML tags or any alligator open/close tags
-	ipAddressRegExp              = regexp.MustCompile(`[^a-zA-Z0-9:.]`)                                                           // IPV4 and IPV6 characters only
-	numericRegExp                = regexp.MustCompile(`[^0-9]`)                                                                   // Numbers only
-	pathNameRegExp               = regexp.MustCompile(`[^a-zA-Z0-9-_]`)                                                           // Path name (file name, seo)
-	punctuationRegExp            = regexp.MustCompile(`[^a-zA-Z0-9-'"#&!?,.\s]+`)                                                 // Standard accepted punctuation characters
-	scientificNotationRegExp     = regexp.MustCompile(`[^0-9.eE+-]`)                                                              // Scientific Notation (float) (positive and negative)
-	scriptRegExp                 = regexp.MustCompile(`(?i)<(script|iframe|embed|object)[^>]*>.*</(script|iframe|embed|object)>`) // Scripts and embeds
-	singleLineRegExp             = regexp.MustCompile(`(\r)|(\n)|(\t)|(\v)|(\f)`)                                                 // Carriage returns, line feeds, tabs, for single line transition
-	timeRegExp                   = regexp.MustCompile(`[^0-9:]`)                                                                  // Time allowed characters
-	uriRegExp                    = regexp.MustCompile(`[^a-zA-Z0-9-_/?&=#%]`)                                                     // URI allowed characters
-	urlRegExp                    = regexp.MustCompile(`[^a-zA-Z0-9-_/:.,?&@=#%]`)                                                 // URL allowed characters
-	wwwRegExp                    = regexp.MustCompile(`(?i)www.`)                                                                 // For removing www
+	bitcoinCashAddrRegExp    = regexp.MustCompile(`[^ac-hj-np-zAC-HJ-NP-Z02-9]`)                                              // Bitcoin `cashaddr` address accepted characters
+	bitcoinRegExp            = regexp.MustCompile(`[^a-km-zA-HJ-NP-Z1-9]`)                                                    // Bitcoin address accepted characters
+	decimalRegExp            = regexp.MustCompile(`[^0-9.-]`)                                                                 // Decimals (positive and negative)
+	domainRegExp             = regexp.MustCompile(`[^a-zA-Z0-9-.]`)                                                           // Domain accepted characters
+	emailRegExp              = regexp.MustCompile(`[^a-zA-Z0-9-_.@+]`)                                                        // Email address characters
+	formalNameRegExp         = regexp.MustCompile(`[^a-zA-Z0-9-',.\s]`)                                                       // Characters recognized in surnames and proper names
+	htmlRegExp               = regexp.MustCompile(`(?i)<[^>]*>`)                                                              // HTML/XML tags or any alligator open/close tags
+	ipAddressRegExp          = regexp.MustCompile(`[^a-zA-Z0-9:.]`)                                                           // IPV4 and IPV6 characters only
+	numericRegExp            = regexp.MustCompile(`[^0-9]`)                                                                   // Numbers only
+	pathNameRegExp           = regexp.MustCompile(`[^a-zA-Z0-9-_]`)                                                           // Path name (file name, seo)
+	punctuationRegExp        = regexp.MustCompile(`[^a-zA-Z0-9-'"#&!?,.\s]+`)                                                 // Standard accepted punctuation characters
+	scientificNotationRegExp = regexp.MustCompile(`[^0-9.eE+-]`)                                                              // Scientific Notation (float) (positive and negative)
+	scriptRegExp             = regexp.MustCompile(`(?i)<(script|iframe|embed|object)[^>]*>.*</(script|iframe|embed|object)>`) // Scripts and embeds
+	singleLineRegExp         = regexp.MustCompile(`(\r)|(\n)|(\t)|(\v)|(\f)`)                                                 // Carriage returns, line feeds, tabs, for single line transition
+	timeRegExp               = regexp.MustCompile(`[^0-9:]`)                                                                  // Time allowed characters
+	uriRegExp                = regexp.MustCompile(`[^a-zA-Z0-9-_/?&=#%]`)                                                     // URI allowed characters
+	urlRegExp                = regexp.MustCompile(`[^a-zA-Z0-9-_/:.,?&@=#%]`)                                                 // URL allowed characters
+	wwwRegExp                = regexp.MustCompile(`(?i)www.`)                                                                 // For removing www
 )
 
 // emptySpace is an empty space for replacing
 var emptySpace = []byte("")
 
-// Alpha returns a string containing only alphabetic characters (a-z, A-Z).
-// If the `spaces` parameter is set to true, spaces will be preserved in the output.
+// Alpha returns a string containing only alphabetic characters (a-z, A-Z) from the input.
+// Optionally, it preserves spaces if the `spaces` parameter is set to true.
+// All non-alphabetic characters (and spaces, if not preserved) are removed.
+// This function supports Unicode letters (IsLetter) and is useful for sanitizing names or text fields
+// where only letters (and optional spaces) are allowed.
 //
 // Parameters:
-// - original: The input string to be sanitized.
-// - spaces: A boolean flag indicating whether spaces should be preserved.
+//   - original: The input string to be sanitized.
+//   - spaces: If true, spaces are preserved in the output; otherwise, they are removed.
 //
 // Returns:
-// - A sanitized string containing only alphabetic characters and, optionally, spaces.
+//   - A sanitized string containing only alphabetic characters and, optionally, spaces.
 //
 // Example:
 //
-//	input := "Hello, World! 123"
+//	input := "Hello, 世界! 123"
 //	result := sanitize.Alpha(input, true)
-//	fmt.Println(result) // Output: "Hello World"
+//	fmt.Println(result) // Output: "Hello 世界"
 //
-// View more examples in the `sanitize_test.go` file.
+// See more usage examples in the `sanitize_test.go` file.
 func Alpha(original string, spaces bool) string {
-
-	// Leave only white spaces if enabled
-	if spaces {
-		return string(alphaWithSpacesRegExp.ReplaceAll([]byte(original), emptySpace))
+	var b strings.Builder
+	b.Grow(len(original))
+	for _, r := range original {
+		if unicode.IsLetter(r) || (spaces && r == ' ') {
+			b.WriteRune(r)
+		}
 	}
-
-	// No spaces
-	return string(alphaRegExp.ReplaceAll([]byte(original), emptySpace))
+	return b.String()
 }
 
-// AlphaNumeric returns a string containing only alphanumeric characters (a-z, A-Z, 0-9).
-// If the `spaces` parameter is set to true, spaces will be preserved in the output.
+// AlphaNumeric returns a string containing only alphanumeric characters (a-z, A-Z, 0-9) from the input.
+// Optionally, it preserves spaces if the `spaces` parameter is set to true.
+// All non-alphanumeric characters (and spaces, if not preserved) are removed.
+// This function supports Unicode letters and digits, making it suitable for sanitizing user input,
+// filenames, or any text where only letters, numbers, and optional spaces are allowed.
 //
 // Parameters:
-// - original: The input string to be sanitized.
-// - spaces: A boolean flag indicating whether spaces should be preserved.
+//   - original: The input string to be sanitized.
+//   - spaces: If true, spaces are preserved in the output; otherwise, they are removed.
 //
 // Returns:
-// - A sanitized string containing only alphanumeric characters and, optionally, spaces.
+//   - A sanitized string containing only alphanumeric characters and, optionally, spaces.
 //
 // Example:
 //
-//	input := "Hello, World! 123"
+//	input := "Hello, 世界! 123"
 //	result := sanitize.AlphaNumeric(input, true)
-//	fmt.Println(result) // Output: "Hello World 123"
+//	fmt.Println(result) // Output: "Hello 世界 123"
 //
-// View more examples in the `sanitize_test.go` file.
+// See more usage examples in the `sanitize_test.go` file.
 func AlphaNumeric(original string, spaces bool) string {
-
-	// Leave white spaces?
-	if spaces {
-		return string(alphaNumericWithSpacesRegExp.ReplaceAll([]byte(original), emptySpace))
+	var b strings.Builder
+	b.Grow(len(original))
+	for _, r := range original {
+		if unicode.IsLetter(r) || unicode.IsDigit(r) || (spaces && r == ' ') {
+			b.WriteRune(r)
+		}
 	}
-
-	// No spaces
-	return string(alphaNumericRegExp.ReplaceAll([]byte(original), emptySpace))
+	return b.String()
 }
 
 // BitcoinAddress returns a sanitized string containing only valid characters for a Bitcoin address.

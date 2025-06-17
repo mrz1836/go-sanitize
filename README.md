@@ -312,10 +312,10 @@ Performance benchmarks for the core functions in this library, executed on an Ap
 
 | Benchmark                                   | Iterations |   ns/op | B/op | allocs/op |
 |---------------------------------------------|------------|--------:|-----:|----------:|
-| [Alpha](sanitize_test.go)                   | 1,876,178  |   630.1 |  120 |         6 |
-| [Alpha_WithSpaces](sanitize_test.go)        | 2,686,694  |   447.4 |   88 |         4 |
-| [AlphaNumeric](sanitize_test.go)            | 1,598,070  |   759.4 |  128 |         6 |
-| [AlphaNumeric_WithSpaces](sanitize_test.go) | 1,963,266  |   621.1 |  112 |         4 |
+| [Alpha](sanitize_test.go)                   | 15,108,703 |    78.7 |   24 |         1 |
+| [Alpha_WithSpaces](sanitize_test.go)        | 13,972,903 |    83.2 |   24 |         1 |
+| [AlphaNumeric](sanitize_test.go)            | 10,619,542 |    112. |   32 |         1 |
+| [AlphaNumeric_WithSpaces](sanitize_test.go) | 10,005,721 |   118.9 |   32 |         1 |
 | [BitcoinAddress](sanitize_test.go)          | 2,151,312  |   552.5 |  161 |         4 |
 | [BitcoinCashAddress](sanitize_test.go)      | 1,615,339  |   738.0 |  160 |         4 |
 | [Custom](sanitize_test.go)                  | 920,336    | 1,277.0 |  944 |        17 |

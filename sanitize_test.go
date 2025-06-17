@@ -53,9 +53,9 @@ func TestAlpha_EdgeCases(t *testing.T) {
 		{"tabs", "\tThis1\tThat2", `ThisThat`, true},
 		{"carriage returns with n", "\nThis1\nThat2", `ThisThat`, true},
 		{"carriage returns with r", "\rThis1\rThat2", `ThisThat`, true},
-		{"accented characters", "éclair", "clair", false},
-		{"greek characters", "Σigma", "igma", false},
-		{"sharp s", "ßeta", "eta", false},
+		{"accented characters", "éclair", "éclair", false},
+		{"greek characters", "Σigma", "Σigma", false},
+		{"sharp s", "ßeta", "ßeta", false},
 		{"numbers only", "123456", "", false},
 		{"spaces only", "   ", "   ", true},
 	}
@@ -134,8 +134,8 @@ func TestAlphaNumeric_EdgeCases(t *testing.T) {
 	}{
 		{"empty string", "", "", false},
 		{"spaces only", "   ", "   ", true},
-		{"accents and numbers", "éclair123", "clair123", false},
-		{"mixed unicode", "ßeta Σigma 456", "eta igma 456", true},
+		{"accents and numbers", "éclair123", "éclair123", false},
+		{"mixed unicode", "ßeta Σigma 456", "ßeta Σigma 456", true},
 		{"numbers only", "987654", "987654", false},
 	}
 
