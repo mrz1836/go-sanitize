@@ -310,39 +310,39 @@ Performance benchmarks for the core functions in this library, executed on an Ap
 
 ### Benchmark Results
 
-| Benchmark                                             | Iterations |   ns/op | B/op | allocs/op |
-|-------------------------------------------------------|------------|--------:|-----:|----------:|
-| [BenchmarkAlpha](sanitize_test.go)                    | 1,879,712  |   635.2 |  120 |         6 |
-| [BenchmarkAlpha\_WithSpaces](sanitize_test.go)        | 2,388,141  |   502.9 |   88 |         4 |
-| [BenchmarkAlphaNumeric](sanitize_test.go)             | 1,587,366  |   757.7 |  128 |         6 |
-| [BenchmarkAlphaNumeric\_WithSpaces](sanitize_test.go) | 1,911,022  |   634.4 |  112 |         4 |
-| [BenchmarkBitcoinAddress](sanitize_test.go)           | 2,156,088  |   555.2 |  160 |         4 |
-| [BenchmarkBitcoinCashAddress](sanitize_test.go)       | 1,619,050  |   744.5 |  160 |         4 |
-| [BenchmarkCustom](sanitize_test.go)                   | 879,280    | 1,279.0 |  943 |        17 |
-| [BenchmarkCustomCompiled](sanitize_test.go)           | 795,579    | 1,476.0 |   96 |         5 |
-| [BenchmarkDecimal](sanitize_test.go)                  | 2,035,514  |   595.4 |   56 |         3 |
-| [BenchmarkDomain](sanitize_test.go)                   | 2,493,144  |   473.0 |  225 |         6 |
-| [BenchmarkDomain\_PreserveCase](sanitize_test.go)     | 2,879,966  |   420.9 |  209 |         5 |
-| [BenchmarkDomain\_RemoveWww](sanitize_test.go)        | 1,673,802  |   719.2 |  274 |         9 |
-| [BenchmarkEmail](sanitize_test.go)                    | 2,140,860  |   560.2 |  136 |         6 |
-| [BenchmarkEmail\_PreserveCase](sanitize_test.go)      | 2,634,862  |   458.5 |  112 |         5 |
-| [BenchmarkFirstToUpper](sanitize_test.go)             | 6,658,629 |   223.0 |   24 |         1 |
-| [BenchmarkFirstToUpperBuilder](sanitize_test.go)      | 23,158,608 |    51.5 |   16 |         1 |
-| [BenchmarkFormalName](sanitize_test.go)               | 3,300,636  |   360.5 |   64 |         3 |
-| [BenchmarkHTML](sanitize_test.go)                     | 2,541,874  |   473.1 |   64 |         3 |
-| [BenchmarkIPAddress](sanitize_test.go)                | 2,895,540  |   408.4 |   80 |         5 |
-| [BenchmarkIPAddress\_IPV6](sanitize_test.go)          | 1,000,000  | 1,074.0 |  225 |         6 |
-| [BenchmarkNumeric](sanitize_test.go)                  | 2,908,365  |   414.4 |   40 |         3 |
-| [BenchmarkPathName](sanitize_test.go)                 | 2,348,728  |   510.1 |   64 |         3 |
-| [BenchmarkPunctuation](sanitize_test.go)              | 1,929,290  |   624.6 |  160 |         4 |
-| [BenchmarkScientificNotation](sanitize_test.go)       | 1,955,768  |   614.5 |   56 |         3 |
-| [BenchmarkScripts](sanitize_test.go)                  | 2,020,128  |   598.1 |   64 |         2 |
-| [BenchmarkSingleLine](sanitize_test.go)               | 536,860    | 2,146.0 |   96 |         4 |
-| [BenchmarkTime](sanitize_test.go)                     | 2,159,088  |   556.3 |   40 |         3 |
-| [BenchmarkURI](sanitize_test.go)                      | 2,309,937  |   518.2 |   80 |         3 |
-| [BenchmarkURL](sanitize_test.go)                      | 2,329,815  |   514.4 |   80 |         3 |
-| [BenchmarkXML](sanitize_test.go)                      | 4,123,827  |   290.3 |   56 |         3 |
-| [BenchmarkXSS](sanitize_test.go)                      | 3,485,330  |   344.7 |   40 |         2 |
+| Benchmark                                   | Iterations |   ns/op | B/op | allocs/op |
+|---------------------------------------------|------------|--------:|-----:|----------:|
+| [Alpha](sanitize_test.go)                   | 1,876,178  |   630.1 |  120 |         6 |
+| [Alpha_WithSpaces](sanitize_test.go)        | 2,686,694  |   447.4 |   88 |         4 |
+| [AlphaNumeric](sanitize_test.go)            | 1,598,070  |   759.4 |  128 |         6 |
+| [AlphaNumeric_WithSpaces](sanitize_test.go) | 1,963,266  |   621.1 |  112 |         4 |
+| [BitcoinAddress](sanitize_test.go)          | 2,151,312  |   552.5 |  161 |         4 |
+| [BitcoinCashAddress](sanitize_test.go)      | 1,615,339  |   738.0 |  160 |         4 |
+| [Custom](sanitize_test.go)                  | 920,336    | 1,277.0 |  944 |        17 |
+| [CustomCompiled](sanitize_test.go)          | 1,638,974  |   730.6 |   96 |         5 |
+| [Decimal](sanitize_test.go)                 | 2,046,079  |   591.1 |   56 |         3 |
+| [Domain](sanitize_test.go)                  | 2,537,883  |   470.8 |  226 |         6 |
+| [Domain_PreserveCase](sanitize_test.go)     | 2,880,139  |   420.0 |  209 |         5 |
+| [Domain_RemoveWww](sanitize_test.go)        | 1,671,598  |   718.3 |  274 |         9 |
+| [Email](sanitize_test.go)                   | 2,159,338  |   555.8 |  137 |         6 |
+| [Email_PreserveCase](sanitize_test.go)      | 2,641,934  |   453.1 |  112 |         5 |
+| [FirstToUpper](sanitize_test.go)            | 13,212,590 |    90.3 |   24 |         1 |
+| [FirstToUpperBuilder](sanitize_test.go)     | 65,667,067 |    18.1 |   16 |         1 |
+| [FormalName](sanitize_test.go)              | 3,332,299  |   361.7 |   64 |         3 |
+| [HTML](sanitize_test.go)                    | 2,557,639  |   469.4 |   64 |         3 |
+| [IPAddress](sanitize_test.go)               | 2,936,395  |   407.8 |   80 |         5 |
+| [IPAddress_IPV6](sanitize_test.go)          | 1,000,000  | 1,066.0 |  225 |         6 |
+| [Numeric](sanitize_test.go)                 | 2,952,349  |   410.1 |   40 |         3 |
+| [PathName](sanitize_test.go)                | 2,336,929  |   510.0 |   64 |         3 |
+| [Punctuation](sanitize_test.go)             | 1,895,738  |   621.8 |  160 |         4 |
+| [ScientificNotation](sanitize_test.go)      | 1,956,897  |   612.8 |   56 |         3 |
+| [Scripts](sanitize_test.go)                 | 2,025,324  |   594.6 |   64 |         2 |
+| [SingleLine](sanitize_test.go)              | 555,826    | 2,141.0 |   96 |         4 |
+| [Time](sanitize_test.go)                    | 2,183,936  |   549.7 |   40 |         3 |
+| [URI](sanitize_test.go)                     | 2,319,432  |   516.5 |   80 |         3 |
+| [URL](sanitize_test.go)                     | 2,322,772  |   515.5 |   80 |         3 |
+| [XML](sanitize_test.go)                     | 4,179,268  |   288.5 |   56 |         3 |
+| [XSS](sanitize_test.go)                     | 3,499,938  |   345.1 |   40 |         2 |
 
 > These benchmarks reflect fast, allocation-free lookups for most retrieval functions, ensuring optimal performance in production environments.
 
