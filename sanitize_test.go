@@ -103,9 +103,9 @@ func TestAlphaNumeric_Basic(t *testing.T) {
 		{"string with spaces", "Test This String-! 123", "Test This String 123", true},
 		{"symbols and spaces", `~!@#$%^&*()-_Symbols 123=+[{]};:'"<>,./?`, "Symbols 123", true},
 		{"ticks and spaces", "“This is a quote with tick`s…”☺ 123", "This is a quote with ticks 123", true},
-		{"carriage return and spaces", "\nThis1\nThat2", `
-This1
-That2`, true},
+		{"carriage returns with n", "\nThis1\nThat2", `This1That2`, true},
+		{"carriage returns with r", "\rThis1\rThat2", `This1That2`, true},
+		{"tabs", "\tThis1\tThat2", `This1That2`, true},
 	}
 
 	for _, test := range tests {

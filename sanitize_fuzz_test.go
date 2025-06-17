@@ -5,9 +5,10 @@ import (
 	"unicode"
 
 	"github.com/mrz1836/go-sanitize"
+	"github.com/stretchr/testify/require"
 )
 
-// FuzzAlphaNumeric validates that AlphaNumeric only returns letters, digits and optional spaces.
+// FuzzAlphaNumeric_General validates that AlphaNumeric only returns letters, digits, and optional spaces.
 func FuzzAlphaNumeric_General(f *testing.F) {
 	seed := []struct {
 		input  string
@@ -25,9 +26,8 @@ func FuzzAlphaNumeric_General(f *testing.F) {
 			if spaces && r == ' ' {
 				continue
 			}
-			if !unicode.IsLetter(r) && !unicode.IsDigit(r) {
-				t.Fatalf("invalid rune %q in %q", r, out)
-			}
+			require.Truef(t, unicode.IsLetter(r) || unicode.IsDigit(r),
+				"invalid rune %q in %q (input: %q, spaces: %v)", r, out, input, spaces)
 		}
 	})
 }

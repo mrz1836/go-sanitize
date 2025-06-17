@@ -16,21 +16,6 @@ Features:
 Usage:
 To use this package, import it and call the desired sanitization function with the input data. Each function is documented with examples in the `sanitize_test.go` file.
 
-Example:
-
-	package main
-
-	import (
-	    "fmt"
-	    "github.com/mrz1836/go-sanitize"
-	)
-
-	func main() {
-	    input := "<script>alert('test');</script>"
-	    sanitized := sanitize.XSS(input)
-	    fmt.Println(sanitized) // Output: >alert('test');</
-	}
-
 If you have any suggestions or comments, please feel free to open an issue on this project's GitHub page.
 */
 package sanitize
@@ -46,7 +31,7 @@ import (
 // Set all the regular expressions
 var (
 	alphaNumericRegExp           = regexp.MustCompile(`[^a-zA-Z0-9]`)                                                             // Alpha numeric
-	alphaNumericWithSpacesRegExp = regexp.MustCompile(`[^a-zA-Z0-9\s]`)                                                           // Alphanumeric (with spaces)
+	alphaNumericWithSpacesRegExp = regexp.MustCompile(`[^a-zA-Z0-9 ]`)                                                            // Alphanumeric (with "ONLY" spaces)
 	alphaRegExp                  = regexp.MustCompile(`[^a-zA-Z]`)                                                                // Alpha characters
 	alphaWithSpacesRegExp        = regexp.MustCompile(`[^a-zA-Z\s]`)                                                              // Alpha characters (with spaces)
 	bitcoinCashAddrRegExp        = regexp.MustCompile(`[^ac-hj-np-zAC-HJ-NP-Z02-9]`)                                              // Bitcoin `cashaddr` address accepted characters
@@ -91,7 +76,7 @@ var emptySpace = []byte("")
 // View more examples in the `sanitize_test.go` file.
 func Alpha(original string, spaces bool) string {
 
-	// Leave white spaces?
+	// Leave only white spaces if enabled
 	if spaces {
 		return string(alphaWithSpacesRegExp.ReplaceAll([]byte(original), emptySpace))
 	}
