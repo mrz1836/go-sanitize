@@ -315,16 +315,16 @@ Performance benchmarks for the core functions in this library, executed on an Ap
 |-------------------------------------------------------|------------|--------:|-----:|----------:|
 | [Alpha](sanitize_benchmark_test.go)                   | 15,108,703 |    78.7 |   24 |         1 |
 | [Alpha_WithSpaces](sanitize_benchmark_test.go)        | 13,972,903 |    83.2 |   24 |         1 |
-| [AlphaNumeric](sanitize_benchmark_test.go)            | 10,619,542 |    112. |   32 |         1 |
+| [AlphaNumeric](sanitize_benchmark_test.go)            | 10,619,542 |   112.0 |   32 |         1 |
 | [AlphaNumeric_WithSpaces](sanitize_benchmark_test.go) | 10,005,721 |   118.9 |   32 |         1 |
-| [BitcoinAddress](sanitize_benchmark_test.go)          | 10,766,221 |  112..0 |   48 |         1 |
+| [BitcoinAddress](sanitize_benchmark_test.go)          | 10,766,221 |   112.0 |   48 |         1 |
 | [BitcoinCashAddress](sanitize_benchmark_test.go)      | 7,910,431  |   151.6 |   48 |         1 |
 | [Custom](sanitize_benchmark_test.go) _(Legacy)_       | 920,336    | 1,277.0 |  944 |        17 |
 | [CustomCompiled](sanitize_benchmark_test.go)          | 1,638,974  |   730.6 |   96 |         5 |
 | [Decimal](sanitize_benchmark_test.go)                 | 18,779,281 |   62.74 |   24 |         1 |
-| [Domain](sanitize_benchmark_test.go)                  | 2,537,883  |   470.8 |  226 |         6 |
-| [Domain_PreserveCase](sanitize_benchmark_test.go)     | 2,880,139  |   420.0 |  209 |         5 |
-| [Domain_RemoveWww](sanitize_benchmark_test.go)        | 1,671,598  |   718.3 |  274 |         9 |
+| [Domain](sanitize_benchmark_test.go)                  | 4,988,238  |   243.2 |  176 |         3 |
+| [Domain_PreserveCase](sanitize_benchmark_test.go)     | 5,707,197  |   210.4 |  160 |         2 |
+| [Domain_RemoveWww](sanitize_benchmark_test.go)        | 4,991,971  |   240.4 |  176 |         3 |
 | [Email](sanitize_benchmark_test.go)                   | 2,159,338  |   555.8 |  137 |         6 |
 | [Email_PreserveCase](sanitize_benchmark_test.go)      | 2,641,934  |   453.1 |  112 |         5 |
 | [FirstToUpper](sanitize_benchmark_test.go)            | 65,587,063 |   17.93 |   16 |         1 |
