@@ -609,7 +609,14 @@ func SingleLine(original string) string {
 //
 // See more usage examples in the `sanitize_test.go` file.
 func Time(original string) string {
-	return string(timeRegExp.ReplaceAll([]byte(original), emptySpace))
+	var b strings.Builder
+	b.Grow(len(original))
+	for _, r := range original {
+		if unicode.IsDigit(r) || r == ':' {
+			b.WriteRune(r)
+		}
+	}
+	return b.String()
 }
 
 // URI returns a sanitized string containing only valid URI characters.
