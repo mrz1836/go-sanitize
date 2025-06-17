@@ -947,6 +947,37 @@ func ExamplePunctuation() {
 	// Output: "Does" 'this' work? this too
 }
 
+// TestPunctuation_EdgeCases tests Punctuation with various edge cases
+func TestPunctuation_EdgeCases(t *testing.T) {
+
+	var tests = []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{"empty string", "", ""},
+		{"spaces only", "   ", "   "},
+		{"tabs and newlines", "line1\nline2\tend", "line1\nline2\tend"},
+		{"disallowed punctuation", "Hello; world: [test] {case}", "Hello world test case"},
+		{"unicode punctuation", "¡Hola señor!", "Hola señor!"},
+		{"accents kept", "Café & crème brûlée?", "Café & crème brûlée?"},
+		{"underscore and plus", "foo_bar+baz", "foobarbaz"},
+		{"parentheses", "Need (something); else: yes?", "Need something else yes?"},
+		{"smart quotes", "She said “Hello”", "She said Hello"},
+		{"dash variants", "This—is—dash", "Thisisdash"},
+		{"numbers with punctuation", "Version 2.0.1, (build #1234)", "Version 2.0.1, build #1234"},
+		{"emoji", "Smile 😊, please!", "Smile , please!"},
+		{"mixed allowed", `He said: "Go!"`, `He said "Go!"`},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			output := sanitize.Punctuation(test.input)
+			assert.Equal(t, test.expected, output)
+		})
+	}
+}
+
 // TestScientificNotation tests the scientific notation sanitize method
 func TestScientificNotation_Basic(t *testing.T) {
 
