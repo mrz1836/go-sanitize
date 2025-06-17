@@ -305,7 +305,7 @@ func Domain(original string, preserveCase bool, removeWww bool) (string, error) 
 		return original, err
 	}
 
-	host := u.Host
+	host := u.Hostname()
 
 	// Remove leading www.
 	if removeWww && len(host) >= 4 && strings.EqualFold(host[:4], "www.") {
