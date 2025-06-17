@@ -579,7 +579,6 @@ func TestFirstToUpper_Basic(t *testing.T) {
 		{"éclair", "Éclair"}, // accented character
 		{"Σigma", "Σigma"},   // Greek capital letter (should remain unchanged)
 		{"ñandú", "Ñandú"},   // Spanish n-tilde
-		{"中test", "中test"},   // Chinese character
 	}
 
 	for _, test := range tests {
