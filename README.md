@@ -155,7 +155,7 @@ View the generated [documentation](https://pkg.go.dev/github.com/mrz1836/go-sani
 - [`PathName`](sanitize.go): Sanitize to a path-friendly name
 - [`Punctuation`](sanitize.go): Allow letters, numbers and basic punctuation
 - [`ScientificNotation`](sanitize.go): Keep characters valid in scientific notation
-- [`Scripts`](sanitize.go): Remove script, iframe and object tags
+- [`Scripts`](sanitize.go): Remove scripts, iframe and object tags
 - [`SingleLine`](sanitize.go): Replace line breaks and tabs with spaces
 - [`Time`](sanitize.go): Keep only valid time characters
 - [`URI`](sanitize.go): Keep characters allowed in a URI
