@@ -13,16 +13,23 @@ authors:
     given-names: "Mr"
     name: "mrz1836"
 keywords:
-  - golang
-  - sanitize
-  - input-validation
-  - security
-  - xss
-  - html-sanitization
-  - url-validation
   - data-cleaning
+  - data-sanitization
+  - data-validation
   - go
+  - go-module
+  - go-package
+  - golang
   - golang-library
+  - html-sanitization
+  - input-sanitization
+  - input-validation
+  - normalization
   - safe-input
+  - sanitize
+  - string-normalization
   - string-sanitization
-abstract: "A Go package for sanitizing strings, HTML, and URLs. It provides functions to clean and validate input data, ensuring it is safe for use in applications. The package includes features for removing unwanted characters, encoding HTML entities, and validating URLs."
+  - url-validation
+  - user-input
+  - xss
+abstract: "A lightweight Go library for sanitizing and normalizing strings, HTML, and URLs. It offers robust utilities for input validation, data cleaning, and safe string handling in Go applications."
