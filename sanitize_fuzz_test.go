@@ -31,3 +31,27 @@ func FuzzAlphaNumeric_General(f *testing.F) {
 		}
 	})
 }
+
+// FuzzAlpha_General validates that Alpha only returns letters and optional spaces.
+func FuzzAlpha_General(f *testing.F) {
+	seed := []struct {
+		input  string
+		spaces bool
+	}{
+		{"Example 123!", false},
+		{"Another Example 456?", true},
+	}
+	for _, tc := range seed {
+		f.Add(tc.input, tc.spaces)
+	}
+	f.Fuzz(func(t *testing.T, input string, spaces bool) {
+		out := sanitize.Alpha(input, spaces)
+		for _, r := range out {
+			if spaces && r == ' ' {
+				continue
+			}
+			require.Truef(t, unicode.IsLetter(r),
+				"invalid rune %q in %q (input: %q, spaces: %v)", r, out, input, spaces)
+		}
+	})
+}
