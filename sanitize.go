@@ -31,12 +31,12 @@ import (
 
 // Set all the regular expressions
 var (
-	domainRegExp     = regexp.MustCompile(`[^a-zA-Z0-9-.]`)                                                           // Domain accepted characters
-	emailRegExp      = regexp.MustCompile(`[^a-zA-Z0-9-_.@+]`)                                                        // Email address characters
-	htmlRegExp       = regexp.MustCompile(`(?i)<[^>]*>`)                                                              // HTML/XML tags or any alligator open/close tags
-	ipAddressRegExp  = regexp.MustCompile(`[^a-zA-Z0-9:.]`)                                                           // IPV4 and IPV6 characters only
-	scriptRegExp     = regexp.MustCompile(`(?i)<(script|iframe|embed|object)[^>]*>.*</(script|iframe|embed|object)>`) // Scripts and embeds
-	wwwRegExp        = regexp.MustCompile(`(?i)www.`)                                                                 // For removing www
+	domainRegExp    = regexp.MustCompile(`[^a-zA-Z0-9-.]`)                                                           // Domain accepted characters
+	emailRegExp     = regexp.MustCompile(`[^a-zA-Z0-9-_.@+]`)                                                        // Email address characters
+	htmlRegExp      = regexp.MustCompile(`(?i)<[^>]*>`)                                                              // HTML/XML tags or any alligator open/close tags
+	ipAddressRegExp = regexp.MustCompile(`[^a-zA-Z0-9:.]`)                                                           // IPV4 and IPV6 characters only
+	scriptRegExp    = regexp.MustCompile(`(?i)<(script|iframe|embed|object)[^>]*>.*</(script|iframe|embed|object)>`) // Scripts and embeds
+	wwwRegExp       = regexp.MustCompile(`(?i)www.`)                                                                 // For removing www
 )
 
 // emptySpace is an empty space for replacing
@@ -756,7 +756,7 @@ func XML(original string) string {
 // This function sanitizes the input string by removing common XSS attack vectors,
 // such as script tags, eval functions, and JavaScript protocol handlers.
 //
-// NOTE: this is NOT a comprehensive XSS prevention solution.
+// WARNING: this is NOT a comprehensive XSS prevention solution.
 //
 // For a more improved approach, use a library like `github.com/microcosm-cc/bluemonday`
 //
