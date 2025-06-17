@@ -276,14 +276,14 @@ func TestDomain(t *testing.T) {
 			},
 			{
 				"full url with params, remove www",
-				"http://www.IAmaDomain.com/?this=that#plusThis",
+				"https://www.IAmaDomain.com/?this=that#plusThis",
 				"iamadomain.com",
 				false,
 				true,
 			},
 			{
 				"full url with params, leave www",
-				"http://www.IAmaDomain.com/?this=that#plusThis",
+				"https://www.IAmaDomain.com/?this=that#plusThis",
 				"www.iamadomain.com",
 				false,
 				false,
@@ -315,6 +315,13 @@ func TestDomain(t *testing.T) {
 				"domain.com",
 				false,
 				true,
+			},
+			{
+				"invalid unicode in host",
+				"https://examplé.com",
+				"exampl.com",
+				false,
+				false,
 			},
 		}
 		for _, test := range tests {

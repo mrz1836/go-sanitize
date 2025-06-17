@@ -288,44 +288,48 @@ func Decimal(original string) string {
 // See the benchmarks in the `sanitize_benchmark_test.go` file.
 // See the fuzz tests in the `sanitize_fuzz_test.go` file.
 func Domain(original string, preserveCase bool, removeWww bool) (string, error) {
-
-	// Try to see if we have a host
-	if len(original) == 0 {
+	if original == "" {
 		return original, nil
 	}
 
-	// Missing http?
-	if !strings.Contains(original, "http") {
-		original = "http://" + strings.TrimSpace(original)
+	// Ensure URL has a scheme for parsing
+	original = strings.TrimSpace(original)
+	if !strings.HasPrefix(original, "http://") && !strings.HasPrefix(original, "https://") {
+		original = "http://" + original
 	}
 
-	// Try to parse the url
+	// Parse the URL to extract the hostname
 	u, err := url.Parse(original)
 	if err != nil {
 		return original, err
 	}
 
+	// Extract the hostname from the URL
 	host := u.Hostname()
 
 	// Remove leading www.
-	if removeWww && len(host) >= len("www.") && strings.EqualFold(host[:len("www.")], "www.") {
-		host = host[len("www."):]
+	if removeWww && len(host) >= 4 &&
+		(host[0] == 'w' || host[0] == 'W') &&
+		strings.EqualFold(host[:4], "www.") {
+		host = host[4:]
 	}
 
+	// Convert to lowercase if not preserving case
+	if !preserveCase {
+		host = strings.ToLower(host)
+	}
+
+	// Filter to valid domain characters: a-z, A-Z, 0-9, hyphen, dot
 	var b strings.Builder
 	b.Grow(len(host))
 	for _, r := range host {
-		valid := r == '-' || r == '.' || (r >= '0' && r <= '9') ||
-			(r >= 'a' && r <= 'z') || (r >= 'A' && r <= 'Z')
-		if !valid {
-			continue
+		if r == '-' || r == '.' || (r >= '0' && r <= '9') ||
+			(r >= 'a' && r <= 'z') || (r >= 'A' && r <= 'Z') {
+			b.WriteRune(r)
 		}
-		if !preserveCase && r >= 'A' && r <= 'Z' {
-			r += 'a' - 'A'
-		}
-		b.WriteRune(r)
 	}
 
+	// Return the sanitized domain name
 	return b.String(), nil
 }
 
