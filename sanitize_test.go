@@ -969,6 +969,35 @@ func TestScientificNotation_Basic(t *testing.T) {
 	}
 }
 
+// TestScientificNotation_EdgeCases tests ScientificNotation with various edge cases
+func TestScientificNotation_EdgeCases(t *testing.T) {
+
+	var tests = []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{"empty string", "", ""},
+		{"letters only", "abcde", "e"},
+		{"uppercase exponent", "1.2E+3", "1.2E+3"},
+		{"trailing plus", "1.0e+3+", "1.0e+3+"},
+		{"multiple exponents", "1e2e3", "1e2e3"},
+		{"comma separated", "1,234.56e7", "1234.56e7"},
+		{"embedded minus", "1-2.3e4", "1-2.3e4"},
+		{"arabic digits", "١٢٣.٤٥e٦", "١٢٣.٤٥e٦"},
+		{"whitespace and newline", "1.2e3\n4.5e6", "1.2e34.5e6"},
+		{"multiple decimals", "1.2.3e4", "1.2.3e4"},
+		{"signs only", "+-", "+-"},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			output := sanitize.ScientificNotation(test.input)
+			assert.Equal(t, test.expected, output)
+		})
+	}
+}
+
 // BenchmarkDecimal benchmarks the ScientificNotation method
 func BenchmarkScientificNotation(b *testing.B) {
 	for i := 0; i < b.N; i++ {
