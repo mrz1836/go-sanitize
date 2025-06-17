@@ -205,3 +205,101 @@ func FuzzIPAddress_General(f *testing.F) {
 		require.Equal(t, ip.String(), out)
 	})
 }
+
+// FuzzScientificNotation_General validates that ScientificNotation only returns digits, dots, signs, and scientific notation characters.
+func FuzzScientificNotation_General(f *testing.F) {
+	seed := []string{
+		" String: 1.23e-3 ",
+		" Value: -4.56E+7 ",
+	}
+	for _, tc := range seed {
+		f.Add(tc)
+	}
+	f.Fuzz(func(t *testing.T, input string) {
+		out := sanitize.ScientificNotation(input)
+		for _, r := range out {
+			valid := unicode.IsDigit(r) || r == '.' || r == 'e' || r == 'E' || r == '+' || r == '-'
+			require.Truef(t, valid,
+				"invalid rune %q in %q (input: %q)", r, out, input)
+		}
+	})
+}
+
+// FuzzSingleLine_General validates that SingleLine removes all line breaks and control characters.
+func FuzzSingleLine_General(f *testing.F) {
+	seed := []string{
+		"First\nSecond",
+		"Line1\r\nLine2\tDone",
+	}
+	for _, tc := range seed {
+		f.Add(tc)
+	}
+	f.Fuzz(func(t *testing.T, input string) {
+		out := sanitize.SingleLine(input)
+		for _, r := range out {
+			require.NotContainsf(t, "\r\n\t\v\f", string(r), "invalid rune %q in %q (input: %q)", r, out, input)
+		}
+	})
+}
+
+// FuzzTime_General validates that Time only returns digits and colons.
+func FuzzTime_General(f *testing.F) {
+	seed := []string{
+		"t00:00d -EST",
+		"Time 01:02:03",
+	}
+	for _, tc := range seed {
+		f.Add(tc)
+	}
+	f.Fuzz(func(t *testing.T, input string) {
+		out := sanitize.Time(input)
+		for _, r := range out {
+			valid := unicode.IsDigit(r) || r == ':'
+			require.Truef(t, valid,
+				"invalid rune %q in %q (input: %q)", r, out, input)
+		}
+	})
+}
+
+// FuzzURI_General validates that URI only returns valid URI characters.
+func FuzzURI_General(f *testing.F) {
+	seed := []string{
+		"Test?=what! &this=that",
+		"Test?=what! &this=/that/!()*^",
+		"/This/Works/?that=123&this#page10%",
+	}
+	for _, tc := range seed {
+		f.Add(tc)
+	}
+	f.Fuzz(func(t *testing.T, input string) {
+		out := sanitize.URI(input)
+		for _, r := range out {
+			valid := unicode.IsLetter(r) || unicode.IsDigit(r) ||
+				r == '-' || r == '_' || r == '/' || r == '?' || r == '&' || r == '=' || r == '#' || r == '%'
+			require.Truef(t, valid,
+				"invalid rune %q in %q (input: %q)", r, out, input)
+		}
+	})
+}
+
+// FuzzURL_General validates that URL only returns valid URL characters.
+func FuzzURL_General(f *testing.F) {
+	seed := []string{
+		"https://domain.com/this/test?this=value&another=123%#page",
+		"Test?=what! &this=that#works",
+		"/this/test?param$",
+	}
+	for _, tc := range seed {
+		f.Add(tc)
+	}
+	f.Fuzz(func(t *testing.T, input string) {
+		out := sanitize.URL(input)
+		for _, r := range out {
+			valid := unicode.IsLetter(r) || unicode.IsDigit(r) ||
+				r == '-' || r == '_' || r == '/' || r == ':' || r == '.' || r == ',' ||
+				r == '?' || r == '&' || r == '@' || r == '=' || r == '#' || r == '%'
+			require.Truef(t, valid,
+				"invalid rune %q in %q (input: %q)", r, out, input)
+		}
+	})
+}
