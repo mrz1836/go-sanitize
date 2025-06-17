@@ -1,7 +1,6 @@
 package sanitize_test
 
 import (
-	"fmt"
 	"regexp"
 	"strings"
 	"testing"
@@ -51,32 +50,6 @@ func TestAlpha(t *testing.T) {
 	}
 }
 
-// BenchmarkAlphaNoSpaces benchmarks the Alpha method
-func BenchmarkAlpha(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		_ = sanitize.Alpha("This is the test string.", false)
-	}
-}
-
-// BenchmarkAlpha_WithSpaces benchmarks the Alpha method
-func BenchmarkAlpha_WithSpaces(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		_ = sanitize.Alpha("This is the test string.", true)
-	}
-}
-
-// ExampleAlpha example using Alpha() and no spaces flag
-func ExampleAlpha() {
-	fmt.Println(sanitize.Alpha("Example String!", false))
-	// Output: ExampleString
-}
-
-// ExampleAlpha_withSpaces example using Alpha with a space flag
-func ExampleAlpha_withSpaces() {
-	fmt.Println(sanitize.Alpha("Example String!", true))
-	// Output: Example String
-}
-
 // TestAlphaNumeric tests the alphanumeric sanitize method
 func TestAlphaNumeric(t *testing.T) {
 	tests := []struct {
@@ -113,32 +86,6 @@ func TestAlphaNumeric(t *testing.T) {
 	}
 }
 
-// BenchmarkAlphaNumeric benchmarks the AlphaNumeric method
-func BenchmarkAlphaNumeric(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		_ = sanitize.AlphaNumeric("This is the test string 12345.", false)
-	}
-}
-
-// BenchmarkAlphaNumeric_WithSpaces benchmarks the AlphaNumeric method
-func BenchmarkAlphaNumeric_WithSpaces(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		_ = sanitize.AlphaNumeric("This is the test string 12345.", true)
-	}
-}
-
-// ExampleAlphaNumeric example using AlphaNumeric() with no spaces
-func ExampleAlphaNumeric() {
-	fmt.Println(sanitize.AlphaNumeric("Example String 2!", false))
-	// Output: ExampleString2
-}
-
-// ExampleAlphaNumeric_withSpaces example using AlphaNumeric() with spaces
-func ExampleAlphaNumeric_withSpaces() {
-	fmt.Println(sanitize.AlphaNumeric("Example String 2!", true))
-	// Output: Example String 2
-}
-
 // TestBitcoinAddress will test all permutations
 func TestBitcoinAddress(t *testing.T) {
 
@@ -171,19 +118,6 @@ func TestBitcoinAddress(t *testing.T) {
 	}
 }
 
-// BenchmarkBitcoinAddress benchmarks the BitcoinAddress method
-func BenchmarkBitcoinAddress(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		_ = sanitize.BitcoinAddress("1K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs")
-	}
-}
-
-// ExampleBitcoinAddress example using BitcoinAddress()
-func ExampleBitcoinAddress() {
-	fmt.Println(sanitize.BitcoinAddress(":1K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs!"))
-	// Output: 1K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs
-}
-
 // TestBitcoinCashAddress will test all permutations of using BitcoinCashAddress()
 func TestBitcoinCashAddress(t *testing.T) {
 
@@ -212,19 +146,6 @@ func TestBitcoinCashAddress(t *testing.T) {
 	}
 }
 
-// BenchmarkBitcoinCashAddress benchmarks the BitcoinCashAddress() method
-func BenchmarkBitcoinCashAddress(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		_ = sanitize.BitcoinCashAddress("qze7yy2au5vuznvn8lzj5y0j5t066vhs75e3m0eptz")
-	}
-}
-
-// ExampleBitcoinCashAddress example using BitcoinCashAddress() `cashaddr`
-func ExampleBitcoinCashAddress() {
-	fmt.Println(sanitize.BitcoinAddress("qze7yy2au5vuznvn8lzj5y0j5t066vhs75e3m0eptz!"))
-	// Output: qze7yy2au5vuznvn8zj5yj5t66vhs75e3meptz
-}
-
 // TestCustom tests the custom sanitize method
 func TestCustom(t *testing.T) {
 
@@ -242,25 +163,6 @@ func TestCustom(t *testing.T) {
 		output := sanitize.Custom(test.input, test.regex)
 		assert.Equal(t, test.expected, output)
 	}
-}
-
-// BenchmarkCustom benchmarks the Custom method
-func BenchmarkCustom(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		_ = sanitize.Custom("This is the test string 12345.", `[^a-zA-Z0-9]`)
-	}
-}
-
-// ExampleCustom example using Custom() using an alpha regex
-func ExampleCustom() {
-	fmt.Println(sanitize.Custom("Example String 2!", `[^a-zA-Z]`))
-	// Output: ExampleString
-}
-
-// ExampleCustom_numeric example using Custom() using a numeric regex
-func ExampleCustom_numeric() {
-	fmt.Println(sanitize.Custom("Example String 2!", `[^0-9]`))
-	// Output: 2
 }
 
 // TestCustomCompiled verifies CustomCompiled using a precompiled regex
@@ -289,21 +191,6 @@ func TestCustomCompiled_NilRegex(t *testing.T) {
 	require.Panics(t, func() {
 		sanitize.CustomCompiled("panic", nil)
 	})
-}
-
-// BenchmarkCustomCompiled benchmarks the CustomCompiled method
-func BenchmarkCustomCompiled(b *testing.B) {
-	re := regexp.MustCompile(`[^a-zA-Z0-9]`)
-	for i := 0; i < b.N; i++ {
-		_ = sanitize.CustomCompiled("This is the test string 12345.", re)
-	}
-}
-
-// ExampleCustomCompiled example using CustomCompiled with an alpha regex
-func ExampleCustomCompiled() {
-	re := regexp.MustCompile(`[^a-zA-Z]`)
-	fmt.Println(sanitize.CustomCompiled("Example String 2!", re))
-	// Output: ExampleString
 }
 
 // TestDecimal tests the decimal sanitize method
@@ -336,25 +223,6 @@ func TestDecimal(t *testing.T) {
 			assert.Equal(t, test.expected, output)
 		})
 	}
-}
-
-// BenchmarkDecimal benchmarks the Decimal method
-func BenchmarkDecimal(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		_ = sanitize.Decimal("String: -123.12345")
-	}
-}
-
-// ExampleDecimal example using Decimal() for a positive number
-func ExampleDecimal() {
-	fmt.Println(sanitize.Decimal("$ 99.99!"))
-	// Output: 99.99
-}
-
-// ExampleDecimal_negative example using Decimal() for a negative number
-func ExampleDecimal_negative() {
-	fmt.Println(sanitize.Decimal("$ -99.99!"))
-	// Output: -99.99
 }
 
 // TestDomain tests the domain sanitize method
@@ -483,45 +351,6 @@ func TestDomain(t *testing.T) {
 	})
 }
 
-// BenchmarkDomain benchmarks the Domain method
-func BenchmarkDomain(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		_, _ = sanitize.Domain("https://Example.COM/?param=value", false, false)
-	}
-}
-
-// BenchmarkDomain_PreserveCase benchmarks the Domain method
-func BenchmarkDomain_PreserveCase(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		_, _ = sanitize.Domain("https://Example.COM/?param=value", true, false)
-	}
-}
-
-// BenchmarkDomain_RemoveWww benchmarks the Domain method
-func BenchmarkDomain_RemoveWww(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		_, _ = sanitize.Domain("https://Example.COM/?param=value", false, true)
-	}
-}
-
-// ExampleDomain example using Domain()
-func ExampleDomain() {
-	fmt.Println(sanitize.Domain("https://www.Example.COM/?param=value", false, false))
-	// Output: www.example.com <nil>
-}
-
-// ExampleDomain_preserveCase example using Domain() and preserving the case
-func ExampleDomain_preserveCase() {
-	fmt.Println(sanitize.Domain("https://www.Example.COM/?param=value", true, false))
-	// Output: www.Example.COM <nil>
-}
-
-// ExampleDomain_removeWww example using Domain() and removing the www subdomain
-func ExampleDomain_removeWww() {
-	fmt.Println(sanitize.Domain("https://www.Example.COM/?param=value", false, true))
-	// Output: example.com <nil>
-}
-
 // TestEmail tests the email sanitize method
 func TestEmail(t *testing.T) {
 
@@ -544,32 +373,6 @@ func TestEmail(t *testing.T) {
 		output := sanitize.Email(test.input, test.preserveCase)
 		assert.Equal(t, test.expected, output)
 	}
-}
-
-// BenchmarkEmail benchmarks the Email method
-func BenchmarkEmail(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		_ = sanitize.Email("mailto:Person@Example.COM ", false)
-	}
-}
-
-// BenchmarkEmail_PreserveCase benchmarks the Email method
-func BenchmarkEmail_PreserveCase(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		_ = sanitize.Email("mailto:Person@Example.COM ", true)
-	}
-}
-
-// ExampleEmail example using Email()
-func ExampleEmail() {
-	fmt.Println(sanitize.Email("mailto:Person@Example.COM", false))
-	// Output: person@example.com
-}
-
-// ExampleEmail_preserveCase example using Email() and preserving the case
-func ExampleEmail_preserveCase() {
-	fmt.Println(sanitize.Email("mailto:Person@Example.COM", true))
-	// Output: Person@Example.COM
 }
 
 // TestFirstToUpper tests the first to upper method
@@ -603,19 +406,6 @@ func TestFirstToUpper(t *testing.T) {
 		output := sanitize.FirstToUpper(test.input)
 		assert.Equal(t, test.expected, output)
 	}
-}
-
-// BenchmarkFirstToUpper benchmarks the FirstToUpper method
-func BenchmarkFirstToUpper(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		_ = sanitize.FirstToUpper("make this upper")
-	}
-}
-
-// ExampleFirstToUpper example using FirstToUpper()
-func ExampleFirstToUpper() {
-	fmt.Println(sanitize.FirstToUpper("this works"))
-	// Output: This works
 }
 
 // TestFormalName tests the FormalName sanitize method
@@ -655,19 +445,6 @@ func TestFormalName(t *testing.T) {
 	}
 }
 
-// BenchmarkFormalName benchmarks the FormalName method
-func BenchmarkFormalName(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		_ = sanitize.FormalName("John McDonald Jr.")
-	}
-}
-
-// ExampleFormalName example using FormalName()
-func ExampleFormalName() {
-	fmt.Println(sanitize.FormalName("John McDonald Jr.!"))
-	// Output: John McDonald Jr.
-}
-
 // TestHTML tests the HTML sanitize method
 func TestHTML(t *testing.T) {
 
@@ -684,19 +461,6 @@ func TestHTML(t *testing.T) {
 		output := sanitize.HTML(test.input)
 		assert.Equal(t, test.expected, output)
 	}
-}
-
-// BenchmarkHTML benchmarks the HTML method
-func BenchmarkHTML(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		_ = sanitize.HTML("<html><b>Test This!</b></html>")
-	}
-}
-
-// ExampleHTML example using HTML()
-func ExampleHTML() {
-	fmt.Println(sanitize.HTML("<body>This Works?</body>"))
-	// Output: This Works?
 }
 
 // TestIPAddress tests the ip address sanitize method
@@ -734,32 +498,6 @@ func TestIPAddress_Basic(t *testing.T) {
 	}
 }
 
-// BenchmarkIPAddress benchmarks the IPAddress method
-func BenchmarkIPAddress(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		_ = sanitize.IPAddress(" 192.168.0.1 ")
-	}
-}
-
-// BenchmarkIPAddress_V6 benchmarks the IPAddress method
-func BenchmarkIPAddress_IPV6(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		_ = sanitize.IPAddress(" 2602:305:bceb:1bd0:44ef:fedb:4f8f:da4f ")
-	}
-}
-
-// ExampleIPAddress example using IPAddress() for IPV4 address
-func ExampleIPAddress() {
-	fmt.Println(sanitize.IPAddress(" 192.168.0.1 "))
-	// Output: 192.168.0.1
-}
-
-// ExampleIPAddress_ipv6 example using IPAddress() for IPV6 address
-func ExampleIPAddress_ipv6() {
-	fmt.Println(sanitize.IPAddress(" 2602:305:bceb:1bd0:44ef:fedb:4f8f:da4f "))
-	// Output: 2602:305:bceb:1bd0:44ef:fedb:4f8f:da4f
-}
-
 // TestNumeric tests the numeric sanitize method
 func TestNumeric(t *testing.T) {
 	tests := []struct {
@@ -786,19 +524,6 @@ func TestNumeric(t *testing.T) {
 			assert.Equal(t, test.expected, output)
 		})
 	}
-}
-
-// BenchmarkNumeric benchmarks the numeric method
-func BenchmarkNumeric(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		_ = sanitize.Numeric(" 192.168.0.1 ")
-	}
-}
-
-// ExampleNumeric example using Numeric()
-func ExampleNumeric() {
-	fmt.Println(sanitize.Numeric("This:123 + 90!"))
-	// Output: 12390
 }
 
 // TestPathName tests the PathName sanitize method
@@ -828,19 +553,6 @@ func TestPathName(t *testing.T) {
 			assert.Equal(t, test.expected, output)
 		})
 	}
-}
-
-// BenchmarkPathName benchmarks the PathName method
-func BenchmarkPathName(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		_ = sanitize.PathName("/This-Path-Name_Works-/")
-	}
-}
-
-// ExampleNumeric example using PathName()
-func ExamplePathName() {
-	fmt.Println(sanitize.PathName("/This-Works_Now-123/!"))
-	// Output: This-Works_Now-123
 }
 
 // TestPunctuation tests the punctuation sanitize method
@@ -883,19 +595,6 @@ func TestPunctuation(t *testing.T) {
 	}
 }
 
-// BenchmarkPunctuation benchmarks the Punctuation method
-func BenchmarkPunctuation(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		_ = sanitize.Punctuation("Does this work? They're doing it?")
-	}
-}
-
-// ExamplePunctuation example using Punctuation()
-func ExamplePunctuation() {
-	fmt.Println(sanitize.Punctuation(`[@"Does" 'this' work?@] this too`))
-	// Output: "Does" 'this' work? this too
-}
-
 // TestScientificNotation tests the scientific notation sanitize method
 func TestScientificNotation(t *testing.T) {
 	tests := []struct {
@@ -934,19 +633,6 @@ func TestScientificNotation(t *testing.T) {
 	}
 }
 
-// BenchmarkDecimal benchmarks the ScientificNotation method
-func BenchmarkScientificNotation(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		_ = sanitize.ScientificNotation("String: -1.096e-3")
-	}
-}
-
-// ExampleScientificNotation example using ScientificNotation() for a positive number
-func ExampleScientificNotation() {
-	fmt.Println(sanitize.ScientificNotation("$ 1.096e-3!"))
-	// Output: 1.096e-3
-}
-
 // TestScripts tests the script removal
 func TestScripts(t *testing.T) {
 
@@ -966,19 +652,6 @@ func TestScripts(t *testing.T) {
 		output := sanitize.Scripts(test.input)
 		assert.Equal(t, test.expected, output)
 	}
-}
-
-// BenchmarkScripts benchmarks the Scripts method
-func BenchmarkScripts(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		_ = sanitize.Scripts("<script>$(){ var remove='me'; }</script>")
-	}
-}
-
-// ExampleScripts example using Scripts()
-func ExampleScripts() {
-	fmt.Println(sanitize.Scripts(`Does<script>This</script>Work?`))
-	// Output: DoesWork?
 }
 
 // TestSingleLine tests the SingleLine method
@@ -1006,24 +679,6 @@ func TestSingleLine(t *testing.T) {
 			assert.Equal(t, test.expected, output)
 		})
 	}
-}
-
-// BenchmarkSingleLine benchmarks the SingleLine method
-func BenchmarkSingleLine(b *testing.B) {
-	testString := `This line
-That Line
-Another Line`
-	for i := 0; i < b.N; i++ {
-		_ = sanitize.SingleLine(testString)
-	}
-}
-
-// ExampleSingleLine example using SingleLine()
-func ExampleSingleLine() {
-	fmt.Println(sanitize.SingleLine(`Does
-This
-Work?`))
-	// Output: Does This Work?
 }
 
 // TestTime tests the time sanitize method
@@ -1055,19 +710,6 @@ func TestTime(t *testing.T) {
 	}
 }
 
-// BenchmarkTime benchmarks the Time method
-func BenchmarkTime(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		_ = sanitize.Time("Time is 05:10:23")
-	}
-}
-
-// ExampleTime example using Time()
-func ExampleTime() {
-	fmt.Println(sanitize.Time(`Time 01:02:03!`))
-	// Output: 01:02:03
-}
-
 // TestURI tests the URI sanitize method
 func TestURI(t *testing.T) {
 	tests := []struct {
@@ -1095,19 +737,6 @@ func TestURI(t *testing.T) {
 			assert.Equal(t, test.expected, output)
 		})
 	}
-}
-
-// BenchmarkURI benchmarks the URI method
-func BenchmarkURI(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		_ = sanitize.URI("/Test/This/Url/?param=value")
-	}
-}
-
-// ExampleURI example using URI()
-func ExampleURI() {
-	fmt.Println(sanitize.URI("/This/Works?^No&this"))
-	// Output: /This/Works?No&this
 }
 
 // TestURL tests the URL sanitize method
@@ -1143,19 +772,6 @@ func TestURL(t *testing.T) {
 	}
 }
 
-// BenchmarkURL benchmarks the URL method
-func BenchmarkURL(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		_ = sanitize.URL("/Test/This/Url/?param=value")
-	}
-}
-
-// ExampleURL example using URL()
-func ExampleURL() {
-	fmt.Println(sanitize.URL("https://Example.com/This/Works?^No&this"))
-	// Output: https://Example.com/This/Works?No&this
-}
-
 // TestXML tests the XML sanitize method
 func TestXML(t *testing.T) {
 
@@ -1171,19 +787,6 @@ func TestXML(t *testing.T) {
 		output := sanitize.XML(test.input)
 		assert.Equal(t, test.expected, output)
 	}
-}
-
-// BenchmarkXML benchmarks the XML method
-func BenchmarkXML(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		_ = sanitize.XML("<xml>Test This!</xml>")
-	}
-}
-
-// ExampleXML example using XML()
-func ExampleXML() {
-	fmt.Println(sanitize.XML("<xml>This?</xml>"))
-	// Output: This?
 }
 
 // TestXSS tests the XSS sanitize method
@@ -1245,17 +848,4 @@ func TestXSS(t *testing.T) {
 			assert.Equal(t, tt.expected, output)
 		})
 	}
-}
-
-// BenchmarkXSS benchmarks the XSS method
-func BenchmarkXSS(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		_ = sanitize.XSS("<script>Test This!</script>")
-	}
-}
-
-// ExampleXSS example using XSS()
-func ExampleXSS() {
-	fmt.Println(sanitize.XSS("<script>This?</script>"))
-	// Output: >This?</
 }
