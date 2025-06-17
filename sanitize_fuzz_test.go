@@ -63,6 +63,7 @@ func FuzzBitcoinAddress(f *testing.F) {
 	seed := []string{
 		":1K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs!",
 		"OIl01K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs!",
+		"1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
 	}
 	for _, tc := range seed {
 		f.Add(tc)
@@ -87,6 +88,7 @@ func FuzzBitcoinCashAddress(f *testing.F) {
 	seed := []string{
 		"$#:qze7yy2au5vuznvn8lzj5y0j5t066vhs75e3m0eptz!",
 		"pqbq3728yw0y47sOqn6l2na30mcw6zm78idzq5ucqzc371",
+		"1PUwPCNqKiC6La8wtbJEAhnBvtc8gdw19h",
 	}
 	for _, tc := range seed {
 		f.Add(tc)
@@ -280,7 +282,7 @@ func FuzzNumeric(f *testing.F) {
 // FuzzPathName validates that PathName only returns valid pathname characters.
 func FuzzPathName(f *testing.F) {
 	seed := []string{
-		"file:name/with*invalid|chars",
+		"file:name/with*invalid|chars_week",
 		"another path\\with spaces.txt",
 	}
 	for _, tc := range seed {
@@ -299,7 +301,7 @@ func FuzzPathName(f *testing.F) {
 // FuzzPunctuation validates that Punctuation only returns letters, digits, spaces, and standard punctuation.
 func FuzzPunctuation(f *testing.F) {
 	seed := []string{
-		"Hello, World! How's it going? (Good, I hope.)",
+		"Hello, World! How's it going? (Good, I hope.) ``[]{}",
 		"Testing #1 & #2: \"quotes\" and punctuation!",
 	}
 	for _, tc := range seed {
