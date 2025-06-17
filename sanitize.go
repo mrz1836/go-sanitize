@@ -31,11 +31,9 @@ import (
 
 // Set all the regular expressions
 var (
-	domainRegExp = regexp.MustCompile(`[^a-zA-Z0-9-.]`)                                                           // Domain accepted characters
 	emailRegExp  = regexp.MustCompile(`[^a-zA-Z0-9-_.@+]`)                                                        // Email address characters
 	htmlRegExp   = regexp.MustCompile(`(?i)<[^>]*>`)                                                              // HTML/XML tags or any alligator open/close tags
 	scriptRegExp = regexp.MustCompile(`(?i)<(script|iframe|embed|object)[^>]*>.*</(script|iframe|embed|object)>`) // Scripts and embeds
-	wwwRegExp    = regexp.MustCompile(`(?i)www.`)                                                                 // For removing www
 )
 
 // emptySpace is an empty space for replacing
@@ -307,18 +305,28 @@ func Domain(original string, preserveCase bool, removeWww bool) (string, error) 
 		return original, err
 	}
 
+	host := u.Hostname()
+
 	// Remove leading www.
-	if removeWww {
-		u.Host = wwwRegExp.ReplaceAllString(u.Host, "")
+	if removeWww && len(host) >= len("www.") && strings.EqualFold(host[:len("www.")], "www.") {
+		host = host[len("www."):]
 	}
 
-	// Keeps the exact case of the original input string
-	if preserveCase {
-		return string(domainRegExp.ReplaceAll([]byte(u.Host), emptySpace)), nil
+	var b strings.Builder
+	b.Grow(len(host))
+	for _, r := range host {
+		valid := r == '-' || r == '.' || (r >= '0' && r <= '9') ||
+			(r >= 'a' && r <= 'z') || (r >= 'A' && r <= 'Z')
+		if !valid {
+			continue
+		}
+		if !preserveCase && r >= 'A' && r <= 'Z' {
+			r += 'a' - 'A'
+		}
+		b.WriteRune(r)
 	}
 
-	// Generally, all domains should be uniform and lowercase
-	return string(domainRegExp.ReplaceAll([]byte(strings.ToLower(u.Host)), emptySpace)), nil
+	return b.String(), nil
 }
 
 // Email returns a sanitized email address string. Email addresses are forced
