@@ -33,7 +33,7 @@ var (
 	alphaNumericRegExp           = regexp.MustCompile(`[^a-zA-Z0-9]`)                                                             // Alpha numeric
 	alphaNumericWithSpacesRegExp = regexp.MustCompile(`[^a-zA-Z0-9 ]`)                                                            // Alphanumeric (with "ONLY" spaces)
 	alphaRegExp                  = regexp.MustCompile(`[^a-zA-Z]`)                                                                // Alpha characters
-	alphaWithSpacesRegExp        = regexp.MustCompile(`[^a-zA-Z\s]`)                                                              // Alpha characters (with spaces)
+	alphaWithSpacesRegExp        = regexp.MustCompile(`[^a-zA-Z ]`)                                                               // Alpha characters (with spaces)
 	bitcoinCashAddrRegExp        = regexp.MustCompile(`[^ac-hj-np-zAC-HJ-NP-Z02-9]`)                                              // Bitcoin `cashaddr` address accepted characters
 	bitcoinRegExp                = regexp.MustCompile(`[^a-km-zA-HJ-NP-Z1-9]`)                                                    // Bitcoin address accepted characters
 	decimalRegExp                = regexp.MustCompile(`[^0-9.-]`)                                                                 // Decimals (positive and negative)

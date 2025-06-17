@@ -27,9 +27,7 @@ func TestAlpha_Basic(t *testing.T) {
 		{"spaces", "Test This String-!123", "Test This String", true},
 		{"symbols and spaces", `~!@#$%^&*()-_Symbols=+[{]};:'"<>,./?`, "Symbols", true},
 		{"quotes and spaces", "“This is a quote with tick`s … ” ☺ ", "This is a quote with ticks    ", true},
-		{"carriage returns", "\nThis\nThat", `
-This
-That`, true},
+		{"carriage returns", "\nThis\nThat", `ThisThat`, true},
 	}
 
 	for _, test := range tests {
@@ -52,6 +50,9 @@ func TestAlpha_EdgeCases(t *testing.T) {
 		{"empty string", "", "", false},
 		{"only special characters", "!@#$%^&*()", "", false},
 		{"very long string", strings.Repeat("a", 1000), strings.Repeat("a", 1000), false},
+		{"tabs", "\tThis1\tThat2", `ThisThat`, true},
+		{"carriage returns with n", "\nThis1\nThat2", `ThisThat`, true},
+		{"carriage returns with r", "\rThis1\rThat2", `ThisThat`, true},
 	}
 
 	for _, test := range tests {
