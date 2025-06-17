@@ -1,5 +1,5 @@
 # go-sanitize
-> Simple library of sanitation methods for data sanitation and reduction
+> Lightweight Go library providing robust string sanitization and normalization utilities
 
 <table>
   <thead>
