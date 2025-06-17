@@ -31,7 +31,6 @@ import (
 
 // Set all the regular expressions
 var (
-	emailRegExp  = regexp.MustCompile(`[^a-zA-Z0-9-_.@+]`)                                                        // Email address characters
 	htmlRegExp   = regexp.MustCompile(`(?i)<[^>]*>`)                                                              // HTML/XML tags or any alligator open/close tags
 	scriptRegExp = regexp.MustCompile(`(?i)<(script|iframe|embed|object)[^>]*>.*</(script|iframe|embed|object)>`) // Scripts and embeds
 )
@@ -334,7 +333,7 @@ func Domain(original string, preserveCase bool, removeWww bool) (string, error) 
 }
 
 // Email returns a sanitized email address string. Email addresses are forced
-// to lowercase and remove any mail-to prefixes.
+// to lowercase by default and remove any MailTo prefixes (case-insensitive).
 //
 // Parameters:
 // - original: The input string to be sanitized.
@@ -354,17 +353,37 @@ func Domain(original string, preserveCase bool, removeWww bool) (string, error) 
 // See the fuzz tests in the `sanitize_fuzz_test.go` file.
 func Email(original string, preserveCase bool) string {
 
-	// Leave the email address in its original case
-	if preserveCase {
-		return string(emailRegExp.ReplaceAll(
-			[]byte(strings.ReplaceAll(original, "mailto:", "")), emptySpace),
-		)
+	// Skip all work for empty string
+	if original == "" {
+		return original
 	}
 
-	// Standard is forced to lowercase
-	return string(emailRegExp.ReplaceAll(
-		[]byte(strings.ToLower(strings.ReplaceAll(original, "mailto:", ""))), emptySpace),
-	)
+	// Trim surrounding white space
+	original = strings.TrimSpace(original)
+
+	// Remove a leading "mailto:" prefix in any case
+	if len(original) >= 7 && strings.EqualFold(original[:7], "mailto:") {
+		original = original[7:]
+	}
+
+	// Standard output is lowercase
+	if !preserveCase {
+		original = strings.ToLower(original)
+	}
+
+	// Filter to valid email characters
+	var b strings.Builder
+	b.Grow(len(original))
+	for _, r := range original {
+		valid := r == '@' || r == '.' || r == '_' || r == '-' || r == '+' ||
+			(r >= '0' && r <= '9') ||
+			(r >= 'a' && r <= 'z') || (r >= 'A' && r <= 'Z')
+		if valid {
+			b.WriteRune(r)
+		}
+	}
+
+	return b.String()
 }
 
 // FirstToUpper returns a copy of the input string with the first Unicode letter
