@@ -151,7 +151,7 @@ View the generated [documentation](https://pkg.go.dev/github.com/mrz1836/go-sani
 - [`FirstToUpper`](sanitize.go): Capitalize the first letter of a string
 - [`FormalName`](sanitize.go): Keep only formal name characters
 - [`HTML`](sanitize.go): Strip HTML tags
-- [`IPAddress`](sanitize.go): Return sanitized IPv4 or IPv6 address
+- [`IPAddress`](sanitize.go): Return sanitized and valid IPv4 or IPv6 address
 - [`Numeric`](sanitize.go): Remove all but numeric digits
 - [`PathName`](sanitize.go): Sanitize to a path-friendly name
 - [`Punctuation`](sanitize.go): Allow letters, numbers and basic punctuation

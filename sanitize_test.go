@@ -128,14 +128,23 @@ func TestBitcoinCashAddress(t *testing.T) {
 	}{
 		{"remove symbols", "$#:qze7yy2au5vuznvn8lzj5y0j5t066vhs75e3m0eptz!", "qze7yy2au5vuznvn8lzj5y0j5t066vhs75e3m0eptz"},
 		{"remove spaces", " $#:qze7yy2 au5vuznvn8lzj5y0j5t066 vhs75e3m0eptz! ", "qze7yy2au5vuznvn8lzj5y0j5t066vhs75e3m0eptz"},
-
-		// No letters o, b, i, or number 1
 		{"remove ignored characters", "pqbq3728yw0y47sOqn6l2na30mcw6zm78idzq5ucqzc371", "pqq3728yw0y47sqn6l2na30mcw6zm78dzq5ucqzc37"},
-
-		// Additional edge cases with normal, vanity, and rare addresses
 		{"basic cashaddr", "qpm2qsznhks23z7629mms6s4cwef74vcwvy22gdx6a", "qpm2qsznhks23z7629mms6s4cwef74vcwvy22gdx6a"},
 		{"remove punctuation", "bitcoincash:qqq3728yw0y47sqn6l2na30mcw6zm78dzq5ucqzc37!!", "tcncashqqq3728yw0y47sqn6l2na30mcw6zm78dzq5ucqzc37"},
 		{"remove spaces", " qr95tpm9f6qt8azfzd73ydyccdefhkcdv3ldk00ht0 ", "qr95tpm9f6qt8azfzd73ydyccdefhkcdv3ldk00ht0"},
+
+		// Additional test cases
+		{"empty string", "", ""},
+		{"only symbols", "!@#$%^&*()", ""},
+		{"mixed case address", "QPM2QSZNHKS23Z7629MMS6S4CWEF74VCWVY22GDX6A", "QPM2QSZNHKS23Z7629MMS6S4CWEF74VCWVY22GDX6A"},
+		{"address with newlines", "\nqpm2qsznhks23z7629mms6s4cwef74vcwvy22gdx6a\n", "qpm2qsznhks23z7629mms6s4cwef74vcwvy22gdx6a"},
+		{"address with tabs", "\tqpm2qsznhks23z7629mms6s4cwef74vcwvy22gdx6a\t", "qpm2qsznhks23z7629mms6s4cwef74vcwvy22gdx6a"},
+		{"address with unicode", "qpm2qsznhks23z7629mms6s4cwef74vcwvy22gdx6a世界", "qpm2qsznhks23z7629mms6s4cwef74vcwvy22gdx6a"}, //nolint:gosmopolitan // Unicode characters are not valid in Bitcoin Cash addresses
+		{"address with dashes", "qpm2qszn-hks23z7629mms6s4cwef74vcwvy22gdx6a", "qpm2qsznhks23z7629mms6s4cwef74vcwvy22gdx6a"},
+		{"address with numbers only", "1234567890", "234567890"},
+		{"address with prefix and suffix", "!!qpm2qsznhks23z7629mms6s4cwef74vcwvy22gdx6a!!", "qpm2qsznhks23z7629mms6s4cwef74vcwvy22gdx6a"},
+		{"address with internal spaces", "qpm2qszn hks23z7629mms6s4cwef74vcwvy22gdx6a", "qpm2qsznhks23z7629mms6s4cwef74vcwvy22gdx6a"},
+		{"address with mixed valid and invalid", "qpm2qszn!@#hks23z76*29mms6s4cwef74vcwvy22gdx6a", "qpm2qsznhks23z7629mms6s4cwef74vcwvy22gdx6a"},
 	}
 
 	for _, test := range tests {
@@ -355,23 +364,48 @@ func TestDomain(t *testing.T) {
 func TestEmail(t *testing.T) {
 
 	var tests = []struct {
+		name         string
 		input        string
 		expected     string
 		preserveCase bool
 	}{
-		{"mailto:testME@GmAil.com", "testme@gmail.com", false},
-		{"test_ME@GmAil.com", "test_me@gmail.com", false},
-		{"test-ME@GmAil.com", "test-me@gmail.com", false},
-		{"test.ME@GmAil.com", "test.me@gmail.com", false},
-		{" test_ME @GmAil.com ", "test_me@gmail.com", false},
-		{" <<test_ME @GmAil.com!>> ", "test_me@gmail.com", false},
-		{" test_ME+2@GmAil.com ", "test_me+2@gmail.com", false},
-		{" test_ME+2@GmAil.com ", "test_ME+2@GmAil.com", true},
+		{"basic_1", "mailto:testME@GmAil.com", "testme@gmail.com", false},
+		{"basic_2", "test_ME@GmAil.com", "test_me@gmail.com", false},
+		{"basic_3", "test-ME@GmAil.com", "test-me@gmail.com", false},
+		{"basic_4", "test.ME@GmAil.com", "test.me@gmail.com", false},
+		{"basic_5", " test_ME @GmAil.com ", "test_me@gmail.com", false},
+		{"basic_6", " <<test_ME @GmAil.com!>> ", "test_me@gmail.com", false},
+		{"basic_7", " test_ME+2@GmAil.com ", "test_me+2@gmail.com", false},
+		{"basic_8", " test_ME+2@GmAil.com ", "test_ME+2@GmAil.com", true},
+
+		// Additional edge cases
+		{"empty string", "", "", false},
+		{"spaces only", "   ", "", false},
+		{"symbols only", "!@#$%^&*()", "@", false},
+		{"invalid email format", "not-an-email", "not-an-email", false},
+		{"multiple @ symbols", "test@@example.com", "test@@example.com", false},
+		{"unicode in local part", "tést@exámple.com", "tst@exmple.com", false},
+		{"unicode in domain", "test@exámple.com", "test@exmple.com", false},
+		{"email with subdomain", "user@mail.example.com", "user@mail.example.com", false},
+		{"email with numbers", "user123@123mail.com", "user123@123mail.com", false},
+		{"email with dash and underscore", "user-name_test@domain-name.com", "user-name_test@domain-name.com", false},
+		{"email with plus and dot", "user.name+tag@domain.com", "user.name+tag@domain.com", false},
+		{"email with leading/trailing spaces", "  user@domain.com  ", "user@domain.com", false},
+		{"email with mixed case and preserve", "Test@Domain.COM", "Test@Domain.COM", true},
+		{"email with mixed case and no preserve", "Test@Domain.COM", "test@domain.com", false},
+		{"email with mailto and preserve", "MailTo:Test@Domain.COM", "MailToTest@Domain.COM", true},
+		{"email with special chars in local", "user!#$%&'*+/=?^_`{|}~@domain.com", "user+_@domain.com", false},
+		{"email with special chars in domain", "user@do!main.com", "user@domain.com", false},
+		{"email with multiple dots", "user..name@domain.com", "user..name@domain.com", false},
+		{"email with tab and newline", "user@domain.com\t\n", "user@domain.com", false},
 	}
 
 	for _, test := range tests {
-		output := sanitize.Email(test.input, test.preserveCase)
-		assert.Equal(t, test.expected, output)
+		t.Run(test.name, func(t *testing.T) {
+			output := sanitize.Email(test.input, test.preserveCase)
+			assert.Equal(t, test.expected, output)
+		})
+
 	}
 }
 
@@ -464,7 +498,7 @@ func TestHTML(t *testing.T) {
 }
 
 // TestIPAddress tests the ip address sanitize method
-func TestIPAddress_Basic(t *testing.T) {
+func TestIPAddress(t *testing.T) {
 
 	var tests = []struct {
 		input    string
