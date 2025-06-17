@@ -93,7 +93,10 @@ lint: ## Run the golangci-lint application (install if not found)
 .PHONY: run-fuzz-tests
 run-fuzz-tests: ## Runs fuzz tests for all packages
 	@for pkg in $(shell go list ./...); do \
-		go test -fuzz=Fuzz -fuzztime=5s $$pkg || exit 1; \
+		for fuzz in $$(go test -list ^Fuzz -run=^$${pkg} | grep ^Fuzz); do \
+			echo "Running fuzz test $$fuzz in $$pkg"; \
+			go test -fuzz=$$fuzz -fuzztime=5s $$pkg || exit 1; \
+		done \
 	done
 
 .PHONY: test
