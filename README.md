@@ -334,7 +334,7 @@ Performance benchmarks for the core functions in this library, executed on an Ap
 | [Numeric](sanitize_test.go)                 | 27,050,888 |    44.0 |   16 |         1 |
 | [PathName](sanitize_test.go)                | 15,465,885 |   78.74 |   24 |         1 |
 | [Punctuation](sanitize_test.go)             | 1,895,738  |   621.8 |  160 |         4 |
-| [ScientificNotation](sanitize_test.go)      | 1,956,897  |   612.8 |   56 |         3 |
+| [ScientificNotation](sanitize_test.go)      | 19,580,979 |   61.32 |   24 |         1 |
 | [Scripts](sanitize_test.go)                 | 2,025,324  |   594.6 |   64 |         2 |
 | [SingleLine](sanitize_test.go)              | 555,826    | 2,141.0 |   96 |         4 |
 | [Time](sanitize_test.go)                    | 24,114,907 |   48.93 |   16 |         1 |
