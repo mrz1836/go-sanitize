@@ -1088,6 +1088,27 @@ func ExampleTime() {
 	// Output: 01:02:03
 }
 
+// TestTime_EdgeCases tests additional edge cases for the Time sanitize method
+func TestTime_EdgeCases(t *testing.T) {
+
+	var tests = []struct {
+		input    string
+		expected string
+	}{
+		{"", ""},
+		{"abc", ""},
+		{"10:20PM", "10:20"},
+		{"-10:20", "10:20"},
+		{"12:34:56.789", "12:34:56789"},
+		{"10\n:20\t:30", "10:20:30"},
+	}
+
+	for _, test := range tests {
+		output := sanitize.Time(test.input)
+		assert.Equal(t, test.expected, output)
+	}
+}
+
 // TestURI tests the URI sanitize method
 func TestURI_Basic(t *testing.T) {
 
