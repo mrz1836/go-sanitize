@@ -279,6 +279,25 @@ func FuzzNumeric(f *testing.F) {
 	})
 }
 
+// FuzzPhoneNumber validates that PhoneNumber only returns digits and plus signs.
+func FuzzPhoneNumber(f *testing.F) {
+	seed := []string{
+		"+1 (234) 567-8900",
+		"(555)555-5555 ext.123",
+	}
+	for _, tc := range seed {
+		f.Add(tc)
+	}
+	f.Fuzz(func(t *testing.T, input string) {
+		out := sanitize.PhoneNumber(input)
+		for _, r := range out {
+			valid := unicode.IsDigit(r) || r == '+'
+			require.Truef(t, valid,
+				"invalid rune %q in %q (input: %q)", r, out, input)
+		}
+	})
+}
+
 // FuzzPathName validates that PathName only returns valid pathname characters.
 func FuzzPathName(f *testing.F) {
 	seed := []string{

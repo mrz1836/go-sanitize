@@ -553,6 +553,39 @@ func Numeric(original string) string {
 	return b.String()
 }
 
+// PhoneNumber returns a sanitized string containing only numeric digits and the
+// plus sign (+).
+//
+// This function is useful for normalizing phone numbers by stripping away
+// characters like spaces, dashes, parentheses, and extensions while preserving
+// any leading international prefix.
+//
+// Parameters:
+//   - original: The input string representing a phone number to be sanitized.
+//
+// Returns:
+//   - A sanitized phone number consisting solely of digits and plus signs.
+//
+// Example:
+//
+//	input := "+1 (234) 567-8900"
+//	result := sanitize.PhoneNumber(input)
+//	fmt.Println(result) // Output: "+12345678900"
+//
+// See more usage examples in the `sanitize_example_test.go` file.
+// See the benchmarks in the `sanitize_benchmark_test.go` file.
+// See the fuzz tests in the `sanitize_fuzz_test.go` file.
+func PhoneNumber(original string) string {
+	var b strings.Builder
+	b.Grow(len(original))
+	for _, r := range original {
+		if unicode.IsDigit(r) || r == '+' {
+			b.WriteRune(r)
+		}
+	}
+	return b.String()
+}
+
 // PathName returns a sanitized string suitable for use as a file or directory name.
 // It removes any characters that are not ASCII letters (a-z, A-Z), digits (0-9),
 // hyphens (-), or underscores (_), ensuring the result is safe for use as a path component

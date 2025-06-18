@@ -140,6 +140,12 @@ func ExampleNumeric() {
 	// Output: 12390
 }
 
+// ExamplePhoneNumber example using PhoneNumber()
+func ExamplePhoneNumber() {
+	fmt.Println(sanitize.PhoneNumber("+1 (234) 567-8900"))
+	// Output: +12345678900
+}
+
 // ExampleNumeric example using PathName()
 func ExamplePathName() {
 	fmt.Println(sanitize.PathName("/This-Works_Now-123/!"))

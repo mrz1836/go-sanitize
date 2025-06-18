@@ -148,6 +148,13 @@ func BenchmarkNumeric(b *testing.B) {
 	}
 }
 
+// BenchmarkPhoneNumber benchmarks the PhoneNumber method
+func BenchmarkPhoneNumber(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_ = sanitize.PhoneNumber("+1 (234) 567-8900")
+	}
+}
+
 // BenchmarkPathName benchmarks the PathName method
 func BenchmarkPathName(b *testing.B) {
 	for i := 0; i < b.N; i++ {

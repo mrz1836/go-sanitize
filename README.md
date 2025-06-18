@@ -153,6 +153,7 @@ View the generated [documentation](https://pkg.go.dev/github.com/mrz1836/go-sani
 - [`HTML`](sanitize.go): Strip HTML tags
 - [`IPAddress`](sanitize.go): Return sanitized and valid IPv4 or IPv6 address
 - [`Numeric`](sanitize.go): Remove all but numeric digits
+- [`PhoneNumber`](sanitize.go): Keep digits and plus signs for phone numbers
 - [`PathName`](sanitize.go): Sanitize to a path-friendly name
 - [`Punctuation`](sanitize.go): Allow letters, numbers and basic punctuation
 - [`ScientificNotation`](sanitize.go): Keep characters valid in scientific notation
@@ -333,6 +334,7 @@ Performance benchmarks for the core functions in this library, executed on an Ap
 | [IPAddress](sanitize_benchmark_test.go)               | 11,802,175 |   101.4 |   48 |         3 |
 | [IPAddress_IPV6](sanitize_benchmark_test.go)          | 2,997,530  |   384.0 |  112 |         3 |
 | [Numeric](sanitize_benchmark_test.go)                 | 27,050,888 |    44.0 |   16 |         1 |
+| [PhoneNumber](sanitize_benchmark_test.go)             | 9,693,738  |   127.9 |   24 |         1 |
 | [PathName](sanitize_benchmark_test.go)                | 15,465,885 |   78.74 |   24 |         1 |
 | [Punctuation](sanitize_benchmark_test.go)             | 9,166,885  |   130.7 |   48 |         1 |
 | [ScientificNotation](sanitize_benchmark_test.go)      | 19,580,979 |   61.32 |   24 |         1 |
