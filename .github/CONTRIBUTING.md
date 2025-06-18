@@ -16,3 +16,7 @@ This project follows [effective Go standards](https://golang.org/doc/effective_g
 - [godoc](https://godoc.org/golang.org/x/tools/cmd/godoc)
 - [golangci-lint](https://golangci-lint.run/)
 - [GoReportCard.com](https://goreportcard.com/)
+
+## Additional guidelines
+
+For more detailed contribution standards and workflow information, see [AGENTS.md](AGENTS.md).
