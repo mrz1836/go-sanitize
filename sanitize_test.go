@@ -174,8 +174,8 @@ func TestCustom(t *testing.T) {
 	}
 }
 
-// TestCustomCompiled_Functions tests the custom sanitize method with precompiled regex
-func TestCustomCompiled_Functions(t *testing.T) {
+// TestCustomCompiled tests the custom compiled sanitize method
+func TestCustomCompiled(t *testing.T) {
 	t.Run("CustomCompiled", func(t *testing.T) {
 		tests := []struct {
 			name     string
@@ -186,11 +186,13 @@ func TestCustomCompiled_Functions(t *testing.T) {
 			{"alpha numeric", "Works 123!", "Works123", regexp.MustCompile(`[^a-zA-Z0-9]`)},
 			{"decimal", "ThisWorks1.23!", "1.23", regexp.MustCompile(`[^0-9.-]`)},
 			{"numbers and letters", "ThisWorks1.23!", "ThisWorks123", regexp.MustCompile(`[^0-9a-zA-Z]`)},
+			{"CustomCompiled_UnicodePattern", "Héllo 世界!123", "Héllo 世界", regexp.MustCompile(`[^\p{L}\s]`)},
+			{"CustomCompiled_OverlappingMatches", "ababa", "ba", regexp.MustCompile("aba")},
 		}
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
 				output := sanitize.CustomCompiled(tt.input, tt.re)
-				assert.Equal(t, tt.expected, output)
+				require.Equal(t, tt.expected, output)
 			})
 		}
 	})
@@ -211,29 +213,13 @@ func TestCustomCompiled_Functions(t *testing.T) {
 		//nolint:gosmopolitan // test includes Unicode characters
 		output := sanitize.Custom("Héllo 世界!123", `[^\p{L}\s]`)
 		//nolint:gosmopolitan // test includes Unicode characters
-		assert.Equal(t, "Héllo 世界", output)
+		require.Equal(t, "Héllo 世界", output)
 	})
 
 	t.Run("Custom_OverlappingMatches", func(t *testing.T) {
 		output := sanitize.Custom("ababa", "aba")
-		assert.Equal(t, "ba", output)
+		require.Equal(t, "ba", output)
 	})
-
-	t.Run("CustomCompiled_UnicodePattern", func(t *testing.T) {
-		re := regexp.MustCompile(`[^\p{L}\s]`)
-		//nolint:gosmopolitan // test includes Unicode characters
-		output := sanitize.CustomCompiled("Héllo 世界!123", re)
-		//nolint:gosmopolitan // test includes Unicode characters
-		assert.Equal(t, "Héllo 世界", output)
-	})
-}
-
-// TestCustomCompiled_OverlappingMatches verifies that overlapping matches are
-// handled as expected when using a precompiled regex.
-func TestCustomCompiled_OverlappingMatches(t *testing.T) {
-	re := regexp.MustCompile("aba")
-	output := sanitize.CustomCompiled("ababa", re)
-	assert.Equal(t, "ba", output)
 }
 
 // TestDecimal tests the decimal sanitize method
@@ -270,9 +256,7 @@ func TestDecimal(t *testing.T) {
 
 // TestDomain tests the domain sanitize method
 func TestDomain(t *testing.T) {
-
 	t.Run("valid cases", func(t *testing.T) {
-
 		var tests = []struct {
 			name         string
 			input        string
@@ -662,6 +646,9 @@ func TestPhoneNumber(t *testing.T) {
 		{"Letters and ext", "(555)555-5555 ext. 123", "5555555555123"},
 		{"Multiple plus", "++123++", "++123++"},
 		{"empty string", "", ""},
+		{"spaces only", "   ", ""},
+		{"symbols only", "!@#$%^&*()", ""},
+		{"invalid characters", "123-abc-4567", "1234567"},
 	}
 
 	for _, test := range tests {
