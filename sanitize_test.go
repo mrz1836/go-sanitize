@@ -666,6 +666,12 @@ func TestPathName(t *testing.T) {
 		{"unicode chars", "naïve.txt", "navetxt"},
 		{"spaces", "dir name/file", "dirnamefile"},
 		{"valid symbols", "filename-123_ABC", "filename-123_ABC"},
+
+		// Additional edge cases
+		{"leading period", ".hiddenfile", "hiddenfile"},
+		{"leading dash", "-dashfile", "-dashfile"},
+		{"consecutive specials", "file--name__", "file--name__"},
+		{"combining characters", "cafe\u0301.txt", "cafetxt"},
 	}
 
 	for _, test := range tests {
