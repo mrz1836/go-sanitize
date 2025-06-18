@@ -174,66 +174,58 @@ func TestCustom(t *testing.T) {
 	}
 }
 
-// TestCustomCompiled verifies CustomCompiled using a precompiled regex
-func TestCustomCompiled(t *testing.T) {
-	tests := []struct {
-		name     string
-		input    string
-		expected string
-		re       *regexp.Regexp
-	}{
-		{"alpha numeric", "Works 123!", "Works123", regexp.MustCompile(`[^a-zA-Z0-9]`)},
-		{"decimal", "ThisWorks1.23!", "1.23", regexp.MustCompile(`[^0-9.-]`)},
-		{"numbers and letters", "ThisWorks1.23!", "ThisWorks123", regexp.MustCompile(`[^0-9a-zA-Z]`)},
-	}
+// TestCustomCompiled_Functions tests the custom sanitize method with precompiled regex
+func TestCustomCompiled_Functions(t *testing.T) {
+	t.Run("CustomCompiled", func(t *testing.T) {
+		tests := []struct {
+			name     string
+			input    string
+			expected string
+			re       *regexp.Regexp
+		}{
+			{"alpha numeric", "Works 123!", "Works123", regexp.MustCompile(`[^a-zA-Z0-9]`)},
+			{"decimal", "ThisWorks1.23!", "1.23", regexp.MustCompile(`[^0-9.-]`)},
+			{"numbers and letters", "ThisWorks1.23!", "ThisWorks123", regexp.MustCompile(`[^0-9a-zA-Z]`)},
+		}
+		for _, tt := range tests {
+			t.Run(tt.name, func(t *testing.T) {
+				output := sanitize.CustomCompiled(tt.input, tt.re)
+				assert.Equal(t, tt.expected, output)
+			})
+		}
+	})
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			output := sanitize.CustomCompiled(tt.input, tt.re)
-			assert.Equal(t, tt.expected, output)
+	t.Run("CustomCompiled_NilRegex", func(t *testing.T) {
+		require.Panics(t, func() {
+			sanitize.CustomCompiled("panic", nil)
 		})
-	}
-}
-
-// TestCustomCompiled_NilRegex verifies that CustomCompiled panics when the regex is nil
-func TestCustomCompiled_NilRegex(t *testing.T) {
-	require.Panics(t, func() {
-		sanitize.CustomCompiled("panic", nil)
 	})
-}
 
-// TestCustom_InvalidRegexPanics verifies that Custom panics when given
-// an invalid regular expression pattern.
-func TestCustom_InvalidRegexPanics(t *testing.T) {
-	require.Panics(t, func() {
-		sanitize.Custom("invalid", "(")
+	t.Run("Custom_InvalidRegexPanics", func(t *testing.T) {
+		require.Panics(t, func() {
+			sanitize.Custom("invalid", "(")
+		})
 	})
-}
 
-// TestCustom_UnicodePattern ensures Unicode characters are preserved when
-// the regex allows them.
-func TestCustom_UnicodePattern(t *testing.T) {
-	//nolint:gosmopolitan // test includes Unicode characters
-	output := sanitize.Custom("Héllo 世界!123", `[^\p{L}\s]`)
-	//nolint:gosmopolitan // test includes Unicode characters
-	assert.Equal(t, "Héllo 世界", output)
-}
+	t.Run("Custom_UnicodePattern", func(t *testing.T) {
+		//nolint:gosmopolitan // test includes Unicode characters
+		output := sanitize.Custom("Héllo 世界!123", `[^\p{L}\s]`)
+		//nolint:gosmopolitan // test includes Unicode characters
+		assert.Equal(t, "Héllo 世界", output)
+	})
 
-// TestCustom_OverlappingMatches validates behavior when the pattern could
-// match overlapping segments.
-func TestCustom_OverlappingMatches(t *testing.T) {
-	output := sanitize.Custom("ababa", "aba")
-	assert.Equal(t, "ba", output)
-}
+	t.Run("Custom_OverlappingMatches", func(t *testing.T) {
+		output := sanitize.Custom("ababa", "aba")
+		assert.Equal(t, "ba", output)
+	})
 
-// TestCustomCompiled_UnicodePattern ensures Unicode patterns work with
-// precompiled regular expressions.
-func TestCustomCompiled_UnicodePattern(t *testing.T) {
-	re := regexp.MustCompile(`[^\p{L}\s]`)
-	//nolint:gosmopolitan // test includes Unicode characters
-	output := sanitize.CustomCompiled("Héllo 世界!123", re)
-	//nolint:gosmopolitan // test includes Unicode characters
-	assert.Equal(t, "Héllo 世界", output)
+	t.Run("CustomCompiled_UnicodePattern", func(t *testing.T) {
+		re := regexp.MustCompile(`[^\p{L}\s]`)
+		//nolint:gosmopolitan // test includes Unicode characters
+		output := sanitize.CustomCompiled("Héllo 世界!123", re)
+		//nolint:gosmopolitan // test includes Unicode characters
+		assert.Equal(t, "Héllo 世界", output)
+	})
 }
 
 // TestCustomCompiled_OverlappingMatches verifies that overlapping matches are
