@@ -926,6 +926,10 @@ func TestXML(t *testing.T) {
 		{"unclosed tag", `<tag>unclosed`, "unclosed"},
 		{"xml header and comment", `<?xml version='1.0'?><!--comment--><a>1</a>`, "1"},
 		{"cdata removed", `<a><![CDATA[test]]></a>`, ""},
+		{"namespaced tag", `<ns:tag>value</ns:tag>`, "value"},
+		{"namespaced root", `<root xmlns:ns='urn'><ns:tag>val</ns:tag></root>`, "val"},
+		{"processing instruction", `<?xml-stylesheet type='text/xsl' href='style.xsl'?><data>something</data>`, "something"},
+		{"malformed nested", `<a><b>value</a></b>`, "value"},
 	}
 
 	for _, test := range tests {
