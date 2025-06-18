@@ -98,6 +98,12 @@ jobs:
         run: go mod download
 
       # ————————————————————————————————————————————————————————————————
+      # 4.5. Verify that the Makefile help target works
+      # ————————————————————————————————————————————————————————————————
+      - name: Verify make help works
+        run: make help
+
+      # ————————————————————————————————————————————————————————————————
       # 5. Cache golangci-lint analysis
       # ————————————————————————————————————————————————————————————————
       - name: Cache golangci-lint cache
