@@ -334,7 +334,7 @@ Performance benchmarks for the core functions in this library, executed on an Ap
 | [IPAddress](sanitize_benchmark_test.go)               | 11,802,175 |   101.4 |   48 |         3 |
 | [IPAddress_IPV6](sanitize_benchmark_test.go)          | 2,997,530  |   384.0 |  112 |         3 |
 | [Numeric](sanitize_benchmark_test.go)                 | 27,050,888 |    44.0 |   16 |         1 |
-| [PhoneNumber](sanitize_benchmark_test.go)             | 9,693,738  |   127.9 |   24 |         1 |
+| [PhoneNumber](sanitize_benchmark_test.go)             | 18,070,621 |   66.33 |   24 |         1 |
 | [PathName](sanitize_benchmark_test.go)                | 15,465,885 |   78.74 |   24 |         1 |
 | [Punctuation](sanitize_benchmark_test.go)             | 9,166,885  |   130.7 |   48 |         1 |
 | [ScientificNotation](sanitize_benchmark_test.go)      | 19,580,979 |   61.32 |   24 |         1 |
