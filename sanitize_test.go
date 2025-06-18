@@ -592,6 +592,9 @@ func TestNumeric(t *testing.T) {
 		{"phone format", "(123) 456-7890", "1234567890"},
 		{"hex prefix", "0xFF 55", "055"},
 		{"spaces only", "   ", ""},
+		{"leading plus", "+12345", "12345"},
+		{"mixed letters digits", "abc123def456", "123456"},
+		{"long numeric string", strings.Repeat("9", 100), strings.Repeat("9", 100)},
 	}
 
 	for _, test := range tests {
