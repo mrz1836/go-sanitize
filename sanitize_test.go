@@ -501,6 +501,11 @@ func TestHTML(t *testing.T) {
 		{"partial closing", "<div>test</div", "test</div"},
 		{"html comments", "<!-- comment -->text", "text"},
 		{"script tag remains", "<script>alert('x')</script>", "alert('x')"},
+		{"comment with script", "<!--comment--><script>alert('x')</script>text", "alert('x')text"},
+		{"script with comment", "<script><!--evil-->alert('x')</script>", "alert('x')"},
+		{"comment around script", "<!-- <script>alert('x')</script> -->text", "alert('x') -->text"},
+		{"unusual attributes", "<div data-x='1' onload='y'>hello</div>", "hello"},
+		{"nested unclosed", "<div><span>text", "text"},
 	}
 
 	for _, test := range tests {
