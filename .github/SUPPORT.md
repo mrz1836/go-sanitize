@@ -1,20 +1,23 @@
-# Support Guidelines
+# Support
 
-This document explains how to get help with **go-sanitize**.
+Need help with **go-sanitize**? The guidelines below outline the best ways to get assistance and contribute effectively.
 
 ## Questions and Discussion
 - Search existing [discussions](https://github.com/mrz1836/go-sanitize/discussions) for similar topics.
-- If you cannot find an answer, start a new discussion.
+- Start a new discussion if you cannot find an answer.
 
 ## Reporting Issues
-- Look through the [issue tracker](https://github.com/mrz1836/go-sanitize/issues) for existing bugs.
-- Open a new issue if your problem has not been reported and provide steps to reproduce.
+- Review the [issue tracker](https://github.com/mrz1836/go-sanitize/issues) to avoid duplicates.
+- Provide clear steps to reproduce any problem when opening a new issue.
 
 ## Security Vulnerabilities
-- For potential security issues, do **not** open a public issue.
-- Follow the steps in our [security policy](SECURITY.md) instead.
+- Do **not** open a public issue for potential security problems.
+- Follow our [security policy](SECURITY.md) to report confidentially.
+
+## Project Rules and Info
+All coding standards, commit conventions and contribution workflows live in [AGENTS.md](AGENTS.md). Refer to that document first for any project rules or governance information.
 
 ## Direct Contact
-For private inquiries, reach the maintainers at [go-sanitize@mrz1818.com](mailto:go-sanitize@mrz1818.com).
+For private inquiries, email the maintainers at [go-sanitize@mrz1818.com](mailto:go-sanitize@mrz1818.com).
 
 We appreciate your interest and will do our best to help you.
