@@ -12,15 +12,25 @@ export REPO_BRANCH
 endif
 
 # Git availability check
-HAS_GIT := $(shell command -v git 2> /dev/null)
+HAS_GIT := $(shell command -v git 2>/dev/null)
 
+# If Git is available, gather repository information
 ifdef HAS_GIT
-HAS_REPO := $(shell git rev-parse --is-inside-work-tree 2> /dev/null)
+HAS_REPO := $(shell git rev-parse --is-inside-work-tree 2>/dev/null)
 
+# If inside a Git repository, gather repository information
 ifdef HAS_REPO
-REPO_NAME := $(shell basename "$(shell git rev-parse --show-toplevel 2>/dev/null)")
-OWNER := $(shell git config --get remote.origin.url | sed 's/git@$(GIT_DOMAIN)://; s/.*\///; s/\.git$$//')
+
+# Get the top-level directory of the Git repository
+GIT_TOPLEVEL := $(shell git rev-parse --show-toplevel 2>/dev/null)
+
+# Get the repository name and owner
+REPO_NAME := $(shell basename $(GIT_TOPLEVEL))
+GIT_REMOTE_URL := $(shell git config --get remote.origin.url)
+OWNER := $(shell echo $(GIT_REMOTE_URL) | sed -E 's;(git@|https://)[^:/]+[:/]([^/]+)/.*\.git;\2;')
 REPO_OWNER := $(shell echo $(OWNER) | tr A-Z a-z)
+
+# Get the version from the latest tag
 VERSION_SHORT := $(shell git describe --tags --always --abbrev=0)
 
 export REPO_NAME
@@ -28,6 +38,7 @@ export REPO_OWNER
 export VERSION_SHORT
 endif
 endif
+
 
 # Default distribution output directory
 ifndef DISTRIBUTIONS_DIR
