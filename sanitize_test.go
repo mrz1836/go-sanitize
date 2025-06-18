@@ -186,7 +186,7 @@ func TestCustomCompiled(t *testing.T) {
 			{"alpha numeric", "Works 123!", "Works123", regexp.MustCompile(`[^a-zA-Z0-9]`)},
 			{"decimal", "ThisWorks1.23!", "1.23", regexp.MustCompile(`[^0-9.-]`)},
 			{"numbers and letters", "ThisWorks1.23!", "ThisWorks123", regexp.MustCompile(`[^0-9a-zA-Z]`)},
-			{"CustomCompiled_UnicodePattern", "Héllo 世界!123", "Héllo 世界", regexp.MustCompile(`[^\p{L}\s]`)},
+			{"CustomCompiled_UnicodePattern", "Héllo 世界!123", "Héllo 世界", regexp.MustCompile(`[^\p{L}\s]`)}, //nolint:gosmopolitan // test includes Unicode characters
 			{"CustomCompiled_OverlappingMatches", "ababa", "ba", regexp.MustCompile("aba")},
 		}
 		for _, tt := range tests {
