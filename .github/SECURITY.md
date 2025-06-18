@@ -1,35 +1,54 @@
-# Security Policy
+# 🔐 Security Policy
 
-## Supported & Maintained Versions
+Security is a priority. We maintain a proactive stance to identify and fix vulnerabilities in **go-sanitize**.
 
-| Version | Supported          |
-|---------|--------------------|
-| 1.x.x   | :white_check_mark: |
+---
 
-## Reporting a Vulnerability
+## 🛠️ Supported & Maintained Versions
 
-Please email the [project maintainers](mailto:go-sanitize@mrz1818.com) with a detailed
-report. We welcome submissions from independent researchers, industry
-organizations, vendors and customers. Include:
+| Version | Status               |
+|---------|----------------------|
+| 1.x.x   | ✅ Supported & Active |
 
-- A description of the issue and its impact
-- Steps to reproduce or proof of concept
-- Known workarounds or mitigation
+---
 
-Do **not** open a public issue or pull request for security matters.
+## 📨 Reporting a Vulnerability
 
-### Response Expectations
+If you’ve found a security issue, **please don’t open a public issue or PR**.
 
-- **Acknowledgment** within 72 hours of receipt
-- **Status updates** at least every 5 business days
-- **Resolution target** of 30 days for confirmed vulnerabilities
+Instead, send a private email to:
+📧 [go-sanitize@mrz1818.com](mailto:go-sanitize@mrz1818.com)
 
-If you prefer encrypted communication, request our PGP public key in your
-initial email. Official security correspondence will be signed with this key.
+Include the following:
 
-### Security Tooling
+* 🕵️ Description of the issue and its impact
+* 🧪 Steps to reproduce or a working PoC
+* 🔧 Any known workarounds or mitigations
 
-We use [`govulncheck`](https://pkg.go.dev/golang.org/x/vuln/cmd/govulncheck) to
-scan dependencies. You can run `make govulncheck` locally to check your own
-builds.
+We welcome responsible disclosures from researchers, vendors, users, and curious tinkerers alike.
 
+---
+
+## 📅 What to Expect
+
+* 🧾 **Acknowledgment** within 72 hours
+* 📢 **Status updates** every 5 business days
+* ✅ **Resolution target** of 30 days (for confirmed vulnerabilities)
+
+Prefer encrypted comms? Let us know in your initial email—we’ll reply with our PGP public key. All official security responses are signed with it.
+
+---
+
+## 🧪 Security Tooling
+
+We regularly scan for known vulnerabilities using:
+
+* [`govulncheck`](https://pkg.go.dev/golang.org/x/vuln/cmd/govulncheck)
+
+Want to run it yourself?
+
+```sh
+make govulncheck
+```
+
+This will check your local build for known issues in Go modules.
