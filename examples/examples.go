@@ -69,6 +69,10 @@ func main() {
 	numIn := "Phone: 123-456-7890"
 	log.Printf("Numeric(%q) => %q\n", numIn, sanitize.Numeric(numIn))
 
+	// PhoneNumber keeps digits and the plus sign for phone numbers.
+	phoneIn := "+1 (234) 567-8900"
+	log.Printf("PhoneNumber(%q) => %q\n", phoneIn, sanitize.PhoneNumber(phoneIn))
+
 	// PathName removes characters not safe for file names.
 	pathIn := "My File@2025!.txt"
 	log.Printf("PathName(%q) => %q\n", pathIn, sanitize.PathName(pathIn))

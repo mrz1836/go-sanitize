@@ -644,6 +644,34 @@ func TestNumeric(t *testing.T) {
 	}
 }
 
+// TestPhoneNumber tests the phone number sanitize method
+func TestPhoneNumber(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		// Basic cases
+		{"US format", "+1 (234) 567-8900", "+12345678900"},
+		{"International", "+44 20 7946 0958", "+442079460958"},
+		{"Hyphens", "+1-800-555-0123", "+18005550123"},
+		{"Periods", "+1.800.555.0123", "+18005550123"},
+
+		// Edge cases
+		{"No plus", "123-456-7890", "1234567890"},
+		{"Letters and ext", "(555)555-5555 ext. 123", "5555555555123"},
+		{"Multiple plus", "++123++", "++123++"},
+		{"empty string", "", ""},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			output := sanitize.PhoneNumber(test.input)
+			assert.Equal(t, test.expected, output)
+		})
+	}
+}
+
 // TestPathName tests the PathName sanitize method
 func TestPathName(t *testing.T) {
 	tests := []struct {
