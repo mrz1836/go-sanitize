@@ -1,65 +1,66 @@
-## Default to the repo name if empty
+# go.mk — Makefile for Go projects
+
+# Default binary name
 ifndef BINARY_NAME
-	override BINARY_NAME := app
+BINARY_NAME := app
 endif
 
-## Define the binary name
 ifdef CUSTOM_BINARY_NAME
-	override BINARY_NAME := $(CUSTOM_BINARY_NAME)
+BINARY_NAME := $(CUSTOM_BINARY_NAME)
 endif
 
-## Set the binary release names
+# Platform-specific binaries
 DARWIN := $(BINARY_NAME)-darwin
 LINUX := $(BINARY_NAME)-linux
 WINDOWS := $(BINARY_NAME)-windows.exe
 
-## Define the binary name
+# Go build tags
 TAGS :=
 ifdef GO_BUILD_TAGS
-	override TAGS := -tags $(GO_BUILD_TAGS)
+TAGS := -tags $(GO_BUILD_TAGS)
 endif
 
 .PHONY: bench
-bench:  ## Run all benchmarks in the Go application
-	@echo "running benchmarks..."
+bench: ## Run all benchmarks in the Go application
+	@echo "Running benchmarks..."
 	@go test -bench=. -benchmem $(TAGS)
 
 .PHONY: build-go
-build-go:  ## Build the Go application (locally)
-	@echo "building go app..."
+build-go: ## Build the Go application (locally)
+	@echo "Building Go app..."
 	@go build -o bin/$(BINARY_NAME) $(TAGS)
 
 .PHONY: clean-mods
 clean-mods: ## Remove all the Go mod cache
-	@echo "cleaning mods..."
+	@echo "Cleaning Go mod cache..."
 	@go clean -modcache
 
 .PHONY: coverage
-coverage: ## Shows the test coverage
-	@echo "creating coverage report..."
-	@go test -coverprofile=coverage.out ./... $(TAGS) && go tool cover -func=coverage.out $(TAGS)
+coverage: ## Show test coverage
+	@echo "Generating coverage report..."
+	@go test -coverprofile=coverage.out ./... $(TAGS) && go tool cover -func=coverage.out
 
 .PHONY: generate
-generate: ## Runs the go generate command in the base of the repo
-	@echo "generating files..."
+generate: ## Run go generate in the base of the repo
+	@echo "Running go generate..."
 	@go generate -v $(TAGS)
 
 .PHONY: godocs
-godocs: ## Sync the latest tag with GoDocs
-	@echo "syndicating to GoDocs..."
+godocs: ## Trigger GoDocs tag sync
+	@echo "Syndicating to GoDocs..."
 	@if [ -z "$(GIT_DOMAIN)" ] || [ -z "$(REPO_OWNER)" ] || [ -z "$(REPO_NAME)" ] || [ -z "$(VERSION_SHORT)" ]; then \
-	        echo "Missing variables for GoDocs push" && exit 1; \
+		echo "Missing variables for GoDocs push" && exit 1; \
 	fi
-	@curl https://proxy.golang.org/$(GIT_DOMAIN)/$(REPO_OWNER)/$(REPO_NAME)/@v/$(VERSION_SHORT).info
+	@curl -sSf https://proxy.golang.org/$(GIT_DOMAIN)/$(REPO_OWNER)/$(REPO_NAME)/@v/$(VERSION_SHORT).info
 
 .PHONY: install
-install: ## Install the application
-	@echo "installing binary..."
+install: ## Install the application binary
+	@echo "Installing binary..."
 	@go build -o $$GOPATH/bin/$(BINARY_NAME) $(TAGS)
 
 .PHONY: install-go
-install-go: ## Install the application (Using Native Go)
-	@echo "installing package..."
+install-go: ## Install using go install with specific version
+	@echo "Installing with go install..."
 	@go install $(TAGS) $(GIT_DOMAIN)/$(REPO_OWNER)/$(REPO_NAME)@$(VERSION_SHORT)
 
 .PHONY: lint
@@ -91,91 +92,88 @@ lint: ## Run the golangci-lint application (install if not found)
 	golangci-lint run --verbose
 
 .PHONY: run-fuzz-tests
-run-fuzz-tests: ## Runs fuzz tests for all packages
+run-fuzz-tests: ## Run fuzz tests for all packages
 	@for pkg in $(shell go list ./...); do \
-		for fuzz in $$(go test -list ^Fuzz -run=^$${pkg} | grep ^Fuzz); do \
+		for fuzz in $$(go test -list ^Fuzz -run=^$$pkg | grep ^Fuzz); do \
 			echo "Running fuzz test $$fuzz in $$pkg"; \
 			go test -fuzz=$$fuzz -fuzztime=5s $$pkg || exit 1; \
-		done \
+		done; \
 	done
 
 .PHONY: test
-test: ## Runs lint and ALL tests
+test: ## Run lint and all tests
 	@$(MAKE) lint
-	@echo "running tests..."
+	@echo "Running all tests..."
 	@go test ./... -v $(TAGS)
-	@echo "running fuzz tests..."
 	@$(MAKE) run-fuzz-tests
 
 .PHONY: test-unit
 test-unit: ## Runs tests and outputs coverage
-	@echo "running unit tests..."
+	@echo "Running unit tests..."
 	@go test ./... -race -coverprofile=coverage.txt -covermode=atomic $(TAGS)
 
 .PHONY: test-short
-test-short: ## Runs vet, lint and tests (excludes integration tests)
+test-short: ## Run tests excluding integration
 	@$(MAKE) lint
-	@echo "running tests (short)..."
+	@echo "Running short tests..."
 	@go test ./... -v -test.short $(TAGS)
 
 .PHONY: test-ci
-test-ci: ## Runs all tests via CI (exports coverage)
+test-ci: ## CI full test suite with coverage
 	@$(MAKE) lint
-	@echo "running tests (CI)..."
+	@echo "Running CI tests..."
 	@go test ./... -race -coverprofile=coverage.txt -covermode=atomic $(TAGS)
-	@echo "running fuzz tests (CI)..."
 	@$(MAKE) run-fuzz-tests
 
 .PHONY: test-ci-no-race
-test-ci-no-race: ## Runs all tests via CI (no race) (exports coverage)
+test-ci-no-race: ## CI test suite without race detector
 	@$(MAKE) lint
-	@echo "running tests (CI - no race)..."
+	@echo "Running CI tests (no race)..."
 	@go test ./... -coverprofile=coverage.txt -covermode=atomic $(TAGS)
-	@echo "running fuzz tests (CI)..."
 	@$(MAKE) run-fuzz-tests
 
 .PHONY: test-ci-short
-test-ci-short: ## Runs unit tests via CI (exports coverage)
+test-ci-short: ## CI unit-only short tests
 	@$(MAKE) lint
-	@echo "running tests (CI - unit tests only)..."
+	@echo "Running CI short tests..."
 	@go test ./... -test.short -race -coverprofile=coverage.txt -covermode=atomic $(TAGS)
 
 .PHONY: test-no-lint
-test-no-lint: ## Runs just tests
-	@echo "running tests..."
+test-no-lint: ## Run only tests (no lint)
+	@echo "Running tests..."
 	@go test ./... -v $(TAGS)
 
 .PHONY: uninstall
-uninstall: ## Uninstall the application (and remove files)
-	@echo "uninstalling go application..."
-	@test $(BINARY_NAME)
-	@test $(GIT_DOMAIN)
-	@test $(REPO_OWNER)
-	@test $(REPO_NAME)
+uninstall: ## Uninstall the Go binary
+	@echo "Uninstalling binary..."
+	@test -n "$(BINARY_NAME)"
+	@test -n "$(GIT_DOMAIN)"
+	@test -n "$(REPO_OWNER)"
+	@test -n "$(REPO_NAME)"
 	@go clean -i $(GIT_DOMAIN)/$(REPO_OWNER)/$(REPO_NAME)
 	@rm -rf $$GOPATH/bin/$(BINARY_NAME)
 
 .PHONY: update
-update:  ## Update all project dependencies
-	@echo "updating dependencies..."
+update: ## Update dependencies
+	@echo "Updating dependencies..."
 	@go get -u ./... && go mod tidy
 
 .PHONY: update-linter
-update-linter: ## Update the golangci-lint package (macOS only)
-	@echo "upgrading golangci-lint..."
+update-linter: ## Upgrade golangci-lint (macOS only)
+	@echo "Upgrading golangci-lint..."
 	@brew upgrade golangci-lint
 
 .PHONY: vet
-vet: ## Run the Go vet application
-	@echo "running go vet..."
+vet: ## Run go vet
+	@echo "Running go vet..."
 	@go vet -v ./... $(TAGS)
 
 .PHONY: govulncheck-install
-govulncheck-install: ## Install govulncheck for vulnerability scanning
-	@echo "installing govulncheck..."
+govulncheck-install: ## Install govulncheck
+	@echo "Installing govulncheck..."
 	@go install golang.org/x/vuln/cmd/govulncheck@latest
 
 .PHONY: govulncheck
-govulncheck: govulncheck-install ## Scan modules for vulnerabilities using govulncheck
-	@echo "running govulncheck..."
+govulncheck: govulncheck-install ## Scan for vulnerabilities
+	@echo "Running govulncheck..."
 	@govulncheck ./...
