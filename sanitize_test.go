@@ -754,6 +754,11 @@ func TestSingleLine(t *testing.T) {
 		{"only whitespace", "\n\r\t\v\f", "     "},
 		{"mixed whitespace", "Line1\r\nLine2\tLine3\vLine4\f", "Line1  Line2 Line3 Line4 "},
 		{"leading and trailing", "\nStart\t\n", " Start  "},
+
+		// Additional edge cases
+		{"very long input", strings.Repeat("line\n", 1000), strings.Repeat("line ", 1000)},
+		{"unusual control characters", "start\x00middle\x1bend", "start\x00middle\x1bend"},
+		{"non-ASCII whitespace", "hello\u00A0world\u2028line\u2029break", "hello\u00A0world\u2028line\u2029break"},
 	}
 
 	for _, test := range tests {
