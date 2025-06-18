@@ -68,7 +68,6 @@ diff: ## Show git diff and fail if uncommitted changes exist
 help: ## Display this help message
 	@grep -Eh '^(.+):\s*##\s*(.+)' $(MAKEFILE_LIST) | sort | column -t -c 2 -s ':'
 
-
 .PHONY: install-releaser
 install-releaser: ## Install GoReleaser
 	@echo "Installing GoReleaser..."
