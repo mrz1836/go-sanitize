@@ -127,6 +127,11 @@ func main() {
 
 View the generated [documentation](https://pkg.go.dev/github.com/mrz1836/go-sanitize?tab=doc)
 
+> **Heads up!** `go-sanitize` is intentionally light on dependencies. The only
+external package it uses is the excellent `testify` suite—and that's just for
+our tests. You can drop this library into your projects without dragging along
+extra baggage.
+
 <br/>
 
 ### Features
