@@ -1,4 +1,4 @@
-# go-sanitize
+# 🛁 go-sanitize
 > Lightweight Go library providing robust string sanitization and normalization utilities
 
 <table>
