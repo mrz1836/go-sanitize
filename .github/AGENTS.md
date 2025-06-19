@@ -387,16 +387,14 @@ Markdown files (e.g., `README.md`, `AGENTS.md`, `CONTRIBUTING.md`) are first-cla
 ## 🚨 Error Handling (Go)
 
 * Always check errors
-
-```go
-if err != nil {
-  return err
-}
-```
-
+* Use `if err != nil { return err }` for early returns
+* Use `errors.Is()` or `errors.As()` for error type checks
+* Use `fmt.Errorf` for wrapping errors with context
 * Prefer `errors.New()` over `fmt.Errorf`
 * Use custom error types sparingly
 * Avoid returning ambiguous errors; provide context
+* Use `errors.Unwrap()` to access underlying errors when needed
+* Use `errors.Join()` to combine multiple errors when appropriate
 
 <br/>
 
@@ -407,6 +405,8 @@ if err != nil {
 ## 🔀 Commit & Branch Naming Conventions
 
 Clear history ⇒ easy maintenance. Follow these rules for every commit and branch.
+
+<br/><br/>
 
 ### 📌 Commit Message Format
 
@@ -430,6 +430,8 @@ docs(README): improve installation instructions
 ```
 
 > Commits that only tweak whitespace, comments, or docs inside a PR may be squashed; otherwise preserve granular commits.
+
+<br/><br/>
 
 ### 🌱 Branch Naming
 
@@ -460,6 +462,8 @@ docs(README): improve installation instructions
 
 Pull Requests—whether authored by humans or AI agents—must follow a consistent structure to ensure clarity, accountability, and ease of review.
 
+<br/><br/>
+
 ### 🔖 Title Format
 
 ```
@@ -473,6 +477,8 @@ Examples:
 * `[CI] Remove deprecated GitHub Action for testing`
 
 > Use the imperative mood ("Add", "Fix", "Update") to match the style of commit messages and changelogs.
+
+<br/><br/>
 
 ### 📝 Pull Request Description
 
@@ -503,6 +509,8 @@ Every PR must include the following **four** sections in the description:
 > * Performance implications
 > * Changes in developer experience (e.g., local dev setup, CI time)
 
+<br/><br/>
+
 ### 💡 Additional PR Guidelines
 
 * Link related issues with keywords like `Closes #123` or `Fixes #456` if there is a known issue.
@@ -528,6 +536,8 @@ We follow **Semantic Versioning (✧ SemVer)**:
 | **MINOR** | Back‑compatible feature / enhancement | `1.2.0 → 1.3.0` |
 | **PATCH** | Back‑compatible bug fix / docs        | `1.2.3 → 1.2.4` |
 
+<br/><br/>
+
 ### 📦 Tooling
 
 * Releases are driven by **[goreleaser]** and configured in `.goreleaser.yml`.
@@ -535,6 +545,8 @@ We follow **Semantic Versioning (✧ SemVer)**:
 ```bash
   brew install goreleaser
 ````
+
+<br/><br/>
 
 ### 🔄 Workflow
 
@@ -561,6 +573,8 @@ Labels serve as shared vocabulary for categorizing issues, pull requests, and di
 
 Current labels are located in `.github/labels.yml` and automatically synced into GitHub upon updating the `master` branch.
 
+<br/><br/>
+
 ### 🎨 Standard Labels & Usage
 
 | Label Name         | Color     | Description                                                | When to Use                                                                 |
@@ -583,6 +597,7 @@ Current labels are located in `.github/labels.yml` and automatically synced into
 | `work-in-progress` | `#fbca04` | Not ready to merge, actively under development             | Blocks `automerge`, signals in-progress discussion or implementation        |
 | `stale`            | `#c2e0c6` | Inactive, obsolete, or no longer relevant                  | Used for automated cleanup or manual archiving of old PRs/issues            |
 
+<br/><br/>
 
 ### 🧠 Labeling Best Practices
 
@@ -620,6 +635,8 @@ Failing PRs will be blocked. AI agents should iterate until CI passes.
 
 Dependency hygiene is critical for security, reproducibility, and developer experience. Follow these practices to ensure our module stays stable, up to date, and secure.
 
+<br/><br/>
+
 ### 📦 Module Management
 
 * All dependencies must be managed via **Go Modules** (`go.mod`, `go.sum`)
@@ -638,6 +655,8 @@ Dependency hygiene is critical for security, reproducibility, and developer expe
 
 > Avoid unnecessary upgrades near release windows—review major version bumps carefully for breaking changes.
 
+<br/><br/>
+
 ### 🛡️ Security Scanning
 
 * Use [govulncheck](https://pkg.go.dev/golang.org/x/vuln/cmd/govulncheck) to identify known vulnerabilities:
@@ -655,6 +674,8 @@ Dependency hygiene is critical for security, reproducibility, and developer expe
 * Document any intentionally ignored vulnerabilities with clear justification and issue tracking
 
 * We follow the [OpenSSF](https://openssf.org) best practices to ensure this repository remains compliant with industry‑standard open source security guidelines
+
+<br/><br/>
 
 ### 📁 Version Control
 
