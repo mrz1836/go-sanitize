@@ -19,7 +19,7 @@ on:
       - 'v*'             # run only on tags that start with "v"
 
 permissions:
-  contents: write        # upload assets and create the release
+  contents: read         # restrict default token to read-only
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -27,6 +27,8 @@ concurrency:
 
 jobs:
   goreleaser:
+    permissions:
+      contents: write     # required to publish releases
     runs-on: ubuntu-latest
 
     steps:
