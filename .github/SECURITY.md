@@ -4,19 +4,11 @@ Security is a priority. We maintain a proactive stance to identify and fix vulne
 
 <br/>
 
----
-
-<br/>
-
 ## 🛠️ Supported & Maintained Versions
 
 | Version | Status               |
 |---------|----------------------|
 | 1.x.x   | ✅ Supported & Active |
-
-<br/>
-
----
 
 <br/>
 
@@ -37,10 +29,6 @@ We welcome responsible disclosures from researchers, vendors, users, and curious
 
 <br/>
 
----
-
-<br/>
-
 ## 📅 What to Expect
 
 * 🧾 **Acknowledgment** within 72 hours
@@ -48,10 +36,6 @@ We welcome responsible disclosures from researchers, vendors, users, and curious
 * ✅ **Resolution target** of 30 days (for confirmed vulnerabilities)
 
 Prefer encrypted comms? Let us know in your initial email—we’ll reply with our PGP public key. All official security responses are signed with it.
-
-<br/>
-
----
 
 <br/>
 
@@ -71,10 +55,8 @@ This will check your local build for known issues in Go modules.
 
 <br/>
 
----
-
-<br/>
-
 ## 🛡️ Security Standards
 
-We follow the [OpenSSF](https://openssf.org) best practices to ensure this repository remains compliant with industry‑standard open source security guidelines
+We follow the [OpenSSF](https://openssf.org) best practices to ensure this repository remains compliant with industry‑standard open source security guidelines.
+
+<br/>
