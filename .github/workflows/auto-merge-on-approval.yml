@@ -39,11 +39,14 @@ concurrency:
     cancel-in-progress: true
 
 permissions:
-    contents: write
-    pull-requests: write
+    contents: read
+    pull-requests: read
 
 jobs:
     automerge:
+        permissions:
+            contents: write
+            pull-requests: write
         # ← no job‑level bot filter anymore
         runs-on: ubuntu-latest
 
