@@ -156,7 +156,9 @@ Best practices:
 
 * Code coverage thresholds and rules are defined in `codecov.yml`
 * Aim to provide meaningful test coverage for all new logic and edge cases
-* Avoid meaningless coverage (e.g., testing getters/setters or boilerplate)
+* Cover every public function with at least one test
+* Aim for at least 80% coverage across the codebase
+* Use `go test -coverprofile=coverage.out ./...` to generate coverage reports
 
 <br/>
 
