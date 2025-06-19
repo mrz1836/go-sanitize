@@ -1,9 +1,9 @@
 # ------------------------------------------------------------------------------
 #  Gitleaks Scan Workflow
 #
-#  Purpose   : Scan the repository for leaked secrets on a daily schedule.
+#  Purpose: Scan the repository for leaked secrets on a daily schedule.
 #
-#  Triggers  : Runs every day at 04:00 UTC and can be triggered manually.
+#  Triggers: Runs every day at 04:00 UTC and can be triggered manually.
 #
 #  Maintainer: @mrz1836
 # ------------------------------------------------------------------------------
