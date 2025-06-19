@@ -93,7 +93,7 @@ Use `make help` to view the full list of supported commands.
 
 All contributors—human or AI—must follow these standards to ensure high-quality, maintainable, and idiomatic Go code throughout the project.
 
-<br/>
+<br/><br/>
 
 ### 🛠 Formatting & Linting
 
@@ -112,7 +112,7 @@ Editors should honor `.editorconfig` for indentation and whitespace rules, and
 Git respects `.gitattributes` to enforce consistent line endings across
 platforms.
 
-<br/>
+<br/><br/>
 
 ### 🧪 Testing Standards
 
@@ -130,7 +130,7 @@ We use the `testify` suite for unit tests. All tests must follow these conventio
 * **Optionally use** `t.Parallel()` , but try and avoid it unless testing for concurrency issues
 * Avoid flaky, timing-sensitive, or non-deterministic tests
 
-<br/>
+<br/><br/>
 
 ### 🔍 Fuzz Tests (Optional)
 
@@ -150,7 +150,7 @@ go test ./...
 
 > All tests must pass in CI prior to merge.
 
-<br/>
+<br/><br/>
 
 ### 📈 Code Coverage
 
