@@ -4,10 +4,6 @@ Welcome to a modern Go codebase. This library follows best-in-class practices fo
 
 <br/>
 
----
-
-<br/>
-
 ## 📄 Reference Material
 
 When in doubt, check the official docs:
@@ -23,27 +19,15 @@ When in doubt, check the official docs:
 
 <br/>
 
----
-
-<br/>
-
 ## 🧰 AGENTS.md
 
 Everything from naming conventions to pull request etiquette lives in [AGENTS.md](./AGENTS.md). Read it. Bookmark it. Trust it.
 
 <br/>
 
----
-
-<br/>
-
 ## 🎓 Effective Go
 
 We adhere to the patterns and philosophy in [Effective Go](https://golang.org/doc/effective_go.html). Stick to idiomatic code. Avoid cleverness when clarity wins.
-
-<br/>
-
----
 
 <br/>
 
@@ -69,17 +53,9 @@ golangci-lint --version
 
 <br/>
 
----
-
-<br/>
-
 ## 📑 Documentation
 
 All exported code must be documented. Use `godoc`-compatible comments. If your function needs an example, include it. If it doesn’t, question if it should be exported.
-
-<br/>
-
----
 
 <br/>
 
