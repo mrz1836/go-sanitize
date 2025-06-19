@@ -227,37 +227,40 @@ List of all current commands:
 
 <!-- make-help-start -->
 ```text
-all                      Runs multiple commands
-citation                 Update version in CITATION.cff (citation version=X.Y.Z)
-clean-mods               Remove all the Go mod cache
-coverage                 Shows the test coverage
-diff                     Show the git diff
-generate                 Runs the go generate command in the base of the repo
-godocs                   Sync the latest tag with GoDocs
-govulncheck-install      Install govulncheck for vulnerability scanning
-help                     Show this help message
-install                  Install the application
-install-go               Install the application (Using Native Go)
-install-releaser         Install the GoReleaser application
-lint                     Run the golangci-lint application (install if not found)
-release                  Full production release (creates release in GitHub)
-release-snap             Test the full release (build binaries)
-release-test             Full production test release (everything except deploy)
-replace-version          Replaces the version in HTML/JS (pre-deploy)
-run-fuzz-tests           Runs fuzz tests for all packages
-tag                      Generate a new tag and push (tag version=0.0.0)
-tag-remove               Remove a tag if found (tag-remove version=0.0.0)
-tag-update               Update an existing tag to current commit (tag-update version=0.0.0)
-test                     Runs lint and ALL tests
-test-ci                  Runs all tests via CI (exports coverage)
-test-ci-no-race          Runs all tests via CI (no race) (exports coverage)
-test-ci-short            Runs unit tests via CI (exports coverage)
-test-no-lint             Runs just tests
-test-short               Runs vet, lint and tests (excludes integration tests)
-test-unit                Runs tests and outputs coverage
-uninstall                Uninstall the application (and remove files)
-update-linter            Update the golangci-lint package (macOS only)
-vet                      Run the Go vet application
+all                   ## Runs multiple commands
+bench                 ## Run all benchmarks in the Go application
+build-go              ## Build the Go application (locally)
+citation              ## Update version in CITATION.cff (use version=X.Y.Z)
+clean-mods            ## Remove all the Go mod cache
+coverage              ## Show test coverage
+diff                  ## Show git diff and fail if uncommitted changes exist
+generate              ## Run go generate in the base of the repo
+godocs                ## Trigger GoDocs tag sync
+govulncheck-install   ## Install govulncheck
+help                  ## Display this help message
+install-go            ## Install using go install with specific version
+install-releaser      ## Install GoReleaser
+install               ## Install the application binary
+lint                  ## Run the golangci-lint application (install if not found)
+release-snap          ## Build snapshot binaries
+release-test          ## Run release dry-run (no publish)
+release               ## Run production release (requires github_token)
+run-fuzz-tests        ## Run fuzz tests for all packages
+tag-remove            ## Remove local and remote tag (use version=X.Y.Z)
+tag-update            ## Force-update tag to current commit (use version=X.Y.Z)
+tag                   ## Create and push a new tag (use version=X.Y.Z)
+test-ci-no-race       ## CI test suite without race detector
+test-ci-short         ## CI unit-only short tests
+test-ci               ## CI full test suite with coverage
+test-no-lint          ## Run only tests (no lint)
+test-short            ## Run tests excluding integration
+test-unit             ## Runs tests and outputs coverage
+test                  ## Run lint and all tests
+uninstall             ## Uninstall the Go binary
+update-linter         ## Upgrade golangci-lint (macOS only)
+update-releaser       ## Reinstall GoReleaser
+update                ## Update dependencies
+vet                   ## Run go vet
 ```
 <!-- make-help-end -->
 
