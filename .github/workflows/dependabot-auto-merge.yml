@@ -22,8 +22,8 @@ on:
   status: {}
 
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
+  pull-requests: read
 
 # Cancel older runs of the same PR if a new commit is pushed
 concurrency:
@@ -40,6 +40,9 @@ jobs:
   automerge:
     if: github.actor == 'dependabot[bot]' || github.actor == 'dependabot-preview[bot]'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       # --- Check if the PR is a minor/patch version bump ---
       - name: Check version bump
