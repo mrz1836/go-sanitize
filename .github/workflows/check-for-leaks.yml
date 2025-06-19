@@ -1,0 +1,45 @@
+# ------------------------------------------------------------------------------
+#  Gitleaks Scan Workflow
+#
+#  Purpose   : Scan the repository for leaked secrets on a daily schedule.
+#
+#  Triggers  : Runs every day at 04:00 UTC and can be triggered manually.
+#
+#  Maintainer: @mrz1836
+# ------------------------------------------------------------------------------
+
+name: check-for-leaks
+
+on:
+  schedule:
+    # ┌─ min ─┬─ hour ┬─ dom ┬─ mon ┬─ dow ┐
+    - cron: '0 4 * * *'         # Daily at 04:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  gitleaks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run gitleaks scan
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_NOTIFY_USER_LIST: '@mrz1836'
+          GITLEAKS_ENABLE_COMMENTS: 'true'
+          GITLEAKS_CONFIG: '.github/.gitleaks.toml'
+          GITLEAKS_ENABLE_UPLOAD_ARTIFACT: 'true'
+          GITLEAKS_ENABLE_SUMMARY: 'true'
+          GITLEAKS_VERSION: 'latest'
+
