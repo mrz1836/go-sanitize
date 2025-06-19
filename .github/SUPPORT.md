@@ -4,20 +4,12 @@ Need help with **go-sanitize**? You're in the right place. Here’s how to get s
 
 <br/>
 
----
-
-<br/>
-
 ## 💬 Questions & Discussion
 
 Before asking, check the existing threads:
 
 * 🔍 Search [Discussions](https://github.com/mrz1836/go-sanitize/discussions)
 * 🆕 Can’t find what you need? Start a new topic and ask away!
-
-<br/>
-
----
 
 <br/>
 
@@ -36,10 +28,6 @@ More detail = faster fixes ✅
 
 <br/>
 
----
-
-<br/>
-
 ## 🔐 Security Vulnerabilities
 
 Security first:
@@ -49,17 +37,9 @@ Security first:
 
 <br/>
 
----
-
-<br/>
-
 ## 🧭 Project Standards
 
 Everything from commit rules to contributor expectations is in [AGENTS.md](./AGENTS.md). If you’re contributing or troubleshooting, **read it first**.
-
-<br/>
-
----
 
 <br/>
 
@@ -67,10 +47,6 @@ Everything from commit rules to contributor expectations is in [AGENTS.md](./AGE
 
 For sensitive or non-public concerns, reach out to:
 📧 [go-sanitize@mrz1818.com](mailto:go-sanitize@mrz1818.com)
-
-<br/>
-
----
 
 <br/>
 
