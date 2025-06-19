@@ -19,6 +19,9 @@
         <a href="https://github.com/mrz1836/go-sanitize/actions">
           <img src="https://img.shields.io/github/actions/workflow/status/mrz1836/go-sanitize/run-tests.yml?branch=master&logo=github&style=flat" alt="Build status">
         </a><br/>
+		<a href="https://github.com/mrz1836/go-sanitize/actions">
+          <img src="https://github.com/mrz1836/go-sanitize/actions/workflows/codeql-analysis.yml/badge.svg?style=flat" alt="CodeQL">
+        </a><br/>
         <a href="https://github.com/mrz1836/go-sanitize/commits/master">
 		  <img src="https://img.shields.io/github/last-commit/mrz1836/go-sanitize?style=flat&logo=clockify&logoColor=white" alt="Last commit">
 		</a>
@@ -29,9 +32,6 @@
         </a><br/>
 		<a href="https://codecov.io/gh/mrz1836/go-sanitize">
           <img src="https://codecov.io/gh/mrz1836/go-sanitize/branch/master/graph/badge.svg?style=flat" alt="Code coverage">
-        </a><br/>
-        <a href="https://github.com/mrz1836/go-sanitize/actions">
-          <img src="https://github.com/mrz1836/go-sanitize/actions/workflows/codeql-analysis.yml/badge.svg?style=flat" alt="CodeQL">
         </a><br/>
         <a href=".github/SECURITY.md">
           <img src="https://img.shields.io/badge/security-policy-blue?style=flat&logo=springsecurity&logoColor=white" alt="Security policy">
