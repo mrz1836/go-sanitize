@@ -29,7 +29,7 @@ jobs:
 
     steps:
       - name: Close stale issues & PRs
-        uses: actions/stale@v9.1.0   # pin the exact tag for reproducibility
+        uses: actions/stale@5bef64f19d7facfb25b37b414482c7164d639639 # v9.1.0
         with:
           # —————————————————— Core behaviour ——————————————————
           days-before-stale: 60                 # warn after 60 days
