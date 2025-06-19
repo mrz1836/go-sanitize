@@ -41,7 +41,6 @@ jobs:
     if: github.actor == 'dependabot[bot]' || github.actor == 'dependabot-preview[bot]'
     runs-on: ubuntu-latest
     permissions:
-      contents: write
       pull-requests: write
     steps:
       # --- Check if the PR is a minor/patch version bump ---
