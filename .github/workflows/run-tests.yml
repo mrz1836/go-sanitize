@@ -43,11 +43,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       - name: Write go list
         run: go list -json -m all > go.list
       - name: Ask Nancy
-        uses: sonatype-nexus-community/nancy-github-action@v1.0.3
+        uses: sonatype-nexus-community/nancy-github-action@726e338312e68ecdd4b4195765f174d3b3ce1533 # v1.0.3
         continue-on-error: true
         with:
           nancyCommand: sleuth --loud --exclude-vulnerability CVE-2022-32149
@@ -64,7 +64,7 @@ jobs:
       # 1. Check out the code so we can hash go.mod/go.sum for caching
       # ————————————————————————————————————————————————————————————————
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       # ————————————————————————————————————————————————————————————————
       # 2. Install the requested Go version *with built‑in caching enabled*
@@ -73,7 +73,7 @@ jobs:
       #      if you need more than the default `go.sum`
       # ————————————————————————————————————————————————————————————————
       - name: Set up Go ${{ matrix.go-version }}
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
         with:
           go-version: ${{ matrix.go-version }}
           cache: true                   # default, but explicit for clarity
@@ -107,7 +107,7 @@ jobs:
       # 5. Cache golangci-lint analysis
       # ————————————————————————————————————————————————————————————————
       - name: Cache golangci-lint cache
-        uses: actions/cache@v4
+        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
         with:
           path: ~/.cache/golangci-lint
           key: ${{ runner.os }}-golangci-${{ hashFiles('**/*.go', '.golangci.json') }}
