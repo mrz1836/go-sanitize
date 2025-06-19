@@ -136,7 +136,7 @@ jobs:
       # 8. Upload coverage to Codecov
       # ————————————————————————————————————————————————————————————————
       - name: Upload code coverage
-        uses: codecov/codecov-action@v5.4.3
+        uses: codecov/codecov-action@4650159d642e33fdc30954ca22638caf0df6cac8 # v5.4.3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}   # required for private repos
           flags: unittests
