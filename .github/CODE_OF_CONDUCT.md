@@ -8,79 +8,79 @@ Welcome to our humble Go library. We value good ideas, clear communication, and 
 
 <br/>
 
-### 1. 🧠 Final Decisions
+### 🧠 Final Decisions
 
 Project maintainers make the final call. They can revisit and revise past decisions. It keeps things moving.
 
 <br/>
 
-### 2. 🧰 Contributions Welcome
+### 🧰 Contributions Welcome
 
 Pitch in! Collaboration is a team sport. Don't leave others carrying your weight forever.
 
 <br/>
 
-### 3. 🎯 Choose Your Adventure
+### 🎯 Choose Your Adventure
 
 Everyone can tackle whatever challenge they feel ready for. Grab an issue and go!
 
 <br/>
 
-### 4. 🏗️ Earned Roles
+### 🏗️ Earned Roles
 
 Project influence is earned through consistent, quality contributions. Titles mean less than impact.
 
 <br/>
 
-### 5. 🧪 Better > Worse
+### 🧪 Better > Worse
 
 Good code replaces not-so-good code. Technical merit always wins.
 
 <br/>
 
-### 6. 🔒 Keep It On Topic
+### 🔒 Keep It On Topic
 
 This is a space for building software. Let's stay focused.
 
 <br/>
 
-### 7. ⚖️ Take It Elsewhere
+### ⚖️ Take It Elsewhere
 
 If something’s not about the project, take it to another channel. Let's not derail progress.
 
 <br/>
 
-### 8. 🫶 We See People, Not Labels
+### 🫶 We See People, Not Labels
 
 Your identity—race, gender, beliefs, background—is irrelevant here. Code speaks louder.
 
 <br/>
 
-### 9. 💬 Debate Ideas, Not People
+### 💬 Debate Ideas, Not People
 
 Challenge code. Not humans. No exceptions.
 
 <br/>
 
-### 10. 🔍 Be Clear
+### 🔍 Be Clear
 
 If your idea isn't clear, expect questions. If it stays unclear, expect crickets. Help us help you.
 
 <br/>
 
-### 11. 🚫 Illegal is Illegal
+### 🚫 Illegal is Illegal
 
 Anything illegal outside the project is illegal here too. Keep it clean.
 
 <br/>
 
-### 12. 📦 Project-Only Focus
+### 📦 Project-Only Focus
 
 This code of merit only applies to what happens *in* the project.
 
 <br/>
 
-### 13. ✅ Participation = Agreement
+### ✅ Participation = Agreement
 
 By contributing, you're saying, "Yep, I'm in."
 
@@ -88,7 +88,7 @@ By contributing, you're saying, "Yep, I'm in."
 
 ### 14. 🎯 Stick to the Mission
 
-Trying to shift this project away from its purpose? That's not cool and won’t be allowed.
+Trying to shift this project away from its purpose? That's not cool and won't be allowed.
 
 <br/>
 
