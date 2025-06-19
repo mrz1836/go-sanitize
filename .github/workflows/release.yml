@@ -36,7 +36,7 @@ jobs:
       # 1. Check out full history and tags
       # ———————————————————————————————————————————————
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           fetch-depth: 0          # required for changelog generation
 
@@ -44,7 +44,7 @@ jobs:
       # 2. Set up Go with a built‑in module and build cache
       # ———————————————————————————————————————————————
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
         with:
           go-version-file: go.mod # single source of truth
           cache: true
@@ -56,7 +56,7 @@ jobs:
       # 3. (Optional) Pre‑flight config validation
       # ———————————————————————————————————————————————
       - name: GoReleaser config check
-        uses: goreleaser/goreleaser-action@v6
+        uses: goreleaser/goreleaser-action@9c156ee8a17a598857849441385a2041ef570552 # v6.3.0
         with:
           version: v2.0.1         # pin exact or at least major
           args: check
@@ -67,7 +67,7 @@ jobs:
       # 4. Build & publish the release
       # ———————————————————————————————————————————————
       - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v6
+        uses: goreleaser/goreleaser-action@9c156ee8a17a598857849441385a2041ef570552 # v6.3.0
         with:
           version: v2.0.1
           args: release --clean --verbose
