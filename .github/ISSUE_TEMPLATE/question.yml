@@ -10,7 +10,7 @@ body:
       attributes:
           label: What's your question?
           description: A clear and concise question, including references to specific code or files if applicable.
-          placeholder: I'm wondering about the behavior of the sanitize.XYZ function when...
+          placeholder: I'm wondering about the behavior of the package.XYZ function when...
       validations:
           required: true
 
