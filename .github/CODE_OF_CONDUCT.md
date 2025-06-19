@@ -1,6 +1,6 @@
-# 🧭 Code of Merit
+# 🏗️ How We Build Together
 
-Welcome to our humble Go library. We value good ideas, clear communication, and contributions from people who care about great code. This Code of Merit sets the tone for how we collaborate.
+Welcome to our humble Go library. We value good ideas, clear communication, and contributions from people who care about great code. This document sets the tone for how we collaborate.
 
 <br/>
 
