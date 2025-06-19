@@ -2,7 +2,11 @@
 
 Welcome to a modern Go codebase. This library follows best-in-class practices for clarity, performance, and maintainability. Our single source of truth is [AGENTS.md](./AGENTS.md). If anything here ever contradicts it, follow **AGENTS.md**.
 
+<br/>
+
 ---
+
+<br/>
 
 ## 📄 Reference Material
 
@@ -17,19 +21,31 @@ When in doubt, check the official docs:
 * 📊 [golangci-lint](https://golangci-lint.run/)
 * 📈 [Go Report Card](https://goreportcard.com/)
 
+<br/>
+
 ---
+
+<br/>
 
 ## 🧰 AGENTS.md
 
 Everything from naming conventions to pull request etiquette lives in [AGENTS.md](./AGENTS.md). Read it. Bookmark it. Trust it.
 
+<br/>
+
 ---
+
+<br/>
 
 ## 🎓 Effective Go
 
 We adhere to the patterns and philosophy in [Effective Go](https://golang.org/doc/effective_go.html). Stick to idiomatic code. Avoid cleverness when clarity wins.
 
+<br/>
+
 ---
+
+<br/>
 
 ## 🔍 golangci-lint
 
@@ -51,12 +67,20 @@ curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/insta
 golangci-lint --version
 ```
 
+<br/>
+
 ---
+
+<br/>
 
 ## 📑 Documentation
 
 All exported code must be documented. Use `godoc`-compatible comments. If your function needs an example, include it. If it doesn’t, question if it should be exported.
 
+<br/>
+
 ---
+
+<br/>
 
 Happy coding — keep it clean, idiomatic, and readable. ✨

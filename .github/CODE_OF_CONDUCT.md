@@ -2,7 +2,11 @@
 
 Welcome to our humble Go library. We value good ideas, clear communication, and contributions from people who care about great code. This Code of Merit sets the tone for how we collaborate.
 
+<br/>
+
 ---
+
+<br/>
 
 ### 1. 🧠 Final Decisions
 
@@ -60,6 +64,10 @@ By contributing, you're saying, "Yep, I'm in."
 
 Trying to shift this project away from its purpose? That's not cool and won’t be allowed.
 
+<br/>
+
 ---
+
+<br/>
 
 Thanks for keeping things fun, focused, and respectful. Let's build something awesome together!

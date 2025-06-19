@@ -10,7 +10,11 @@ It is designed to help AI assistants (e.g., Codex, Claude, Cursor, Sweep AI) and
 
 Additional `AGENTS.md` files **may exist in subdirectories** to provide more contextual or specialized guidance. These local agent files are allowed to **extend or override** the root rules to fit the needs of specific packages, services, or engineering domains—while still respecting the spirit of consistency and quality defined here.
 
+<br/>
+
 ---
+
+<br/>
 
 ## 🔍 Project Overview
 
@@ -24,7 +28,11 @@ Additional `AGENTS.md` files **may exist in subdirectories** to provide more con
 
 By using `go-sanitize`, developers can greatly reduce security risks from untrusted sources, handle complex input edge cases, and maintain clarity and consistency across Go projects.
 
+<br/>
+
 ---
+
+<br/>
 
 ## 📁 Directory Structure
 | Directory   | Description                                             |
@@ -34,7 +42,11 @@ By using `go-sanitize`, developers can greatly reduce security risks from untrus
 | `examples/` | Example program demonstrating package usage             |
 | `.` (root)  | Source files and tests for the `sanitize` package       |
 
+<br/>
+
 ---
+
+<br/>
 
 ### 📚 Related Governance Documents
 
@@ -49,7 +61,11 @@ For more detailed guidance and supporting documentation, refer to the following 
 * `SECURITY.md` — Vulnerability reporting and security process
 * `SUPPORT.md` — How to get help or request new features
 
+<br/>
+
 ---
+
+<br/>
 
 ## 🛠 Makefile Overview
 
@@ -67,7 +83,11 @@ building binaries, and updating dependencies. Targets such as `lint`, `test`,
 
 Use `make help` to view the full list of supported commands.
 
+<br/>
+
 ---
+
+<br/>
 
 ## 🧪 Development, Testing & Coverage Standards
 
@@ -130,7 +150,11 @@ go test ./...
 * Aim to provide meaningful test coverage for all new logic and edge cases
 * Avoid meaningless coverage (e.g., testing getters/setters or boilerplate)
 
+<br/>
+
 ---
+
+<br/>
 
 ## ✍️ Naming Conventions
 
@@ -168,7 +192,11 @@ Follow Go naming idioms and the standards outlined in [Effective Go](https://go.
 * Single-method: use `-er` suffix (e.g., `Reader`, `Closer`)
 * Multi-method: use role-based names (e.g., `FileSystem`, `StateManager`)
 
+<br/>
+
 ---
+
+<br/>
 
 ## 📘 Commenting Standards
 
@@ -192,7 +220,6 @@ Great engineers write great comments. You're not here to state the obvious—you
 
   > Treat them like UX copy. Make them clear, concise, and professional. You're writing for peers, not compilers.
 
----
 
 ### 🔤 Function Comments (Exported)
 
@@ -236,7 +263,6 @@ Here is a template for function comments that is recommended to use:
 // - [Mention if this function is part of a larger workflow or job system]
 ```
 
----
 
 ### 📦 Package-Level Comments
 
@@ -274,7 +300,6 @@ Here is a template for package comments that is recommended to use:
 package PackageName
 ```
 
----
 
 ### 🧱 Inline Comments
 
@@ -285,9 +310,9 @@ Use inline comments **strategically**, not excessively.
 * Avoid obvious noise:
 
 🚫 `i++ // increment i`
+
 ✅ `// Skip empty rows to avoid panic on CSV parse`
 
----
 
 ### ⚙️ Comment Style
 
@@ -299,8 +324,6 @@ Use inline comments **strategically**, not excessively.
     * (or) they reference an issue
     * They include a timestamp or owner
 
----
-
 ### 🧬 AI Agent Directives
 
 If you're an AI contributing code:
@@ -310,15 +333,17 @@ If you're an AI contributing code:
 * Avoid hallucinating context—if you're unsure, omit or tag with `// AI: review this logic`
 * Flag areas of uncertainty or external dependency (e.g., "// AI: relies on external config structure")
 
----
-
 ### 🔥 Comment Hygiene
 
 * Remove outdated comments aggressively.
 * Keep comments synced with refactoring.
 * Use `//nolint:<linter> // message` only with clear, justified context and explanation.
 
+<br/>
+
 ---
+
+<br/>
 
 ## 📝 Modifying Markdown Documents
 
@@ -334,7 +359,11 @@ Markdown files (e.g., `README.md`, `AGENTS.md`, `CONTRIBUTING.md`) are first-cla
 
 > Markdown updates should be treated with the same care as code—clean, purposeful, and reviewed.
 
+<br/>
+
 ---
+
+<br/>
 
 ## 🚨 Error Handling (Go)
 
@@ -350,7 +379,11 @@ if err != nil {
 * Use custom error types sparingly
 * Avoid returning ambiguous errors; provide context
 
+<br/>
+
 ---
+
+<br/>
 
 ## 🔀 Commit & Branch Naming Conventions
 
@@ -398,7 +431,11 @@ docs(README): improve installation instructions
 
 > CI rely on these prefixes for auto labeling and workflow routing—stick to them.
 
+<br/>
+
 ---
+
+<br/>
 
 ## ✅ Pull Request Conventions
 
@@ -417,8 +454,6 @@ Examples:
 * `[CI] Remove deprecated GitHub Action for testing`
 
 > Use the imperative mood ("Add", "Fix", "Update") to match the style of commit messages and changelogs.
-
----
 
 ### 📝 Pull Request Description
 
@@ -449,8 +484,6 @@ Every PR must include the following **four** sections in the description:
 > * Performance implications
 > * Changes in developer experience (e.g., local dev setup, CI time)
 
----
-
 ### 💡 Additional PR Guidelines
 
 * Link related issues with keywords like `Closes #123` or `Fixes #456` if there is a known issue.
@@ -459,7 +492,11 @@ Every PR must include the following **four** sections in the description:
 * Releases are deployed using **goreleaser**.
 * Rules for the release build are located in `.goreleaser.yml` and executed via `.github/workflows/release.yml`.
 
+<br/>
+
 ---
+
+<br/>
 
 ## 🚀 Release Workflow & Versioning
 
@@ -493,7 +530,11 @@ We follow **Semantic Versioning (✧ SemVer)**:
 
 [goreleaser]: https://github.com/goreleaser/goreleaser
 
+<br/>
+
 ---
+
+<br/>
 
 ## 🏷️ Labeling Conventions (GitHub)
 
@@ -523,7 +564,6 @@ Current labels are located in `.github/labels.yml` and automatically synced into
 | `work-in-progress` | `#fbca04` | Not ready to merge, actively under development             | Blocks `automerge`, signals in-progress discussion or implementation        |
 | `stale`            | `#c2e0c6` | Inactive, obsolete, or no longer relevant                  | Used for automated cleanup or manual archiving of old PRs/issues            |
 
----
 
 ### 🧠 Labeling Best Practices
 
@@ -532,7 +572,11 @@ Current labels are located in `.github/labels.yml` and automatically synced into
 * Combine labels as needed (e.g., `feature` + `ui-ux` + `test`).
 * Don't forget to remove outdated labels (e.g., `work-in-progress` → after merge readiness).
 
+<br/>
+
 ---
+
+<br/>
 
 ## 🧩 CI & Validation
 
@@ -547,7 +591,11 @@ CI automatically runs on every PR to verify:
 
 Failing PRs will be blocked. AI agents should iterate until CI passes.
 
+<br/>
+
 ---
+
+<br/>
 
 ## 🔐 Dependency Management
 
@@ -597,7 +645,11 @@ Dependency hygiene is critical for security, reproducibility, and developer expe
 
 > Changes to dependencies should be explained in the PR description and ideally linked to the reason (e.g., bug fix, security advisory, feature requirement).
 
+<br/>
+
 ---
+
+<br/>
 
 ## 🛡️Security Considerations & Vulnerability Reporting
 
@@ -613,7 +665,11 @@ Security is a first-class requirement. If you discover a vulnerability—no matt
 
 > For general hardening guidance (e.g., `govulncheck`, dependency pinning), see the [🔐Dependency Management](#-dependency-management) section.
 
+<br/>
+
 ---
+
+<br/>
 
 ## 🕓 Change Log (AGENTS.md)
 

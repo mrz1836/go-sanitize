@@ -2,7 +2,11 @@
 
 Thanks for taking the time to contribute! This project thrives on clear, well-tested, idiomatic Go code. Here's how you can help:
 
+<br/>
+
 ---
+
+<br/>
 
 ## 📦 How to Contribute
 
@@ -14,7 +18,11 @@ Thanks for taking the time to contribute! This project thrives on clear, well-te
 
 More info on [pull requests](http://help.github.com/pull-requests/).
 
+<br/>
+
 ---
+
+<br/>
 
 ## 🧪 Testing
 
@@ -32,7 +40,11 @@ Tests should be:
 
 Use `require` over `assert` where possible (we lint for this).
 
+<br/>
+
 ---
+
+<br/>
 
 ## 🧹 Coding Conventions
 
@@ -44,12 +56,20 @@ We follow [Effective Go](https://golang.org/doc/effective_go.html), plus:
 
 Format your code with `gofmt`, lint with `golangci-lint`, and keep your diffs minimal.
 
+<br/>
+
 ---
+
+<br/>
 
 ## 📚 More Guidance
 
 For detailed workflows, commit standards, branch naming, PR templates, and more—read [AGENTS.md](./AGENTS.md). It’s the rulebook.
 
+<br/>
+
 ---
+
+<br/>
 
 Let’s build something great. 💪
