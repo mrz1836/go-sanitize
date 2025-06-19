@@ -419,14 +419,14 @@ Clear history ⇒ easy maintenance. Follow these rules for every commit and bran
 ```
 
 * **`<type>`** — `feat`, `fix`, `docs`, `test`, `refactor`, `chore`, `build`, `ci`
-* **`<scope>`** — Affected subsystem or package (e.g., `api`, `sanitize`, `deps`). Omit if global.
+* **`<scope>`** — Affected subsystem or package (e.g., `api`, `deps`). Omit if global.
 * **Short description** — ≤ 50 chars, imperative mood ("add pagination", "fix panic")
 * **Body** (optional) — What & why, links to issues (`Closes #123`), and breaking‑change note (`BREAKING CHANGE:`)
 
 **Examples**
 
 ```
-feat(sanitizer): add new sanitization method Thing()
+feat(package): add new method called: Thing()
 fix(generator): handle malformed JSON input gracefully
 docs(README): improve installation instructions
 ```
