@@ -86,7 +86,7 @@ By contributing, you're saying, "Yep, I'm in."
 
 <br/>
 
-### 14. 🎯 Stick to the Mission
+### 🎯 Stick to the Mission
 
 Trying to shift this project away from its purpose? That's not cool and won't be allowed.
 
