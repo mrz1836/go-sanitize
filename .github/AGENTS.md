@@ -587,6 +587,8 @@ Dependency hygiene is critical for security, reproducibility, and developer expe
 
 * Document any intentionally ignored vulnerabilities with clear justification and issue tracking
 
+* We follow the [OpenSSF](https://openssf.org) best practices to ensure this repository remains compliant with industry‑standard open source security guidelines
+
 ### 📁 Version Control
 
 * Never manually edit `go.sum`
@@ -618,14 +620,15 @@ Security is a first-class requirement. If you discover a vulnerability—no matt
 This section tracks notable updates to `AGENTS.md`, including the date, author, and purpose of each revision. 
 All contributors are expected to append entries here when making meaningful changes to agent behavior, conventions, or policies.
 
-| Date       | Author   | Summary of Changes                                                             |
-|------------|----------|--------------------------------------------------------------------------------|
-| 2025-06-18 | @mrz1836 | Added requirement to pin GitHub Action versions
-| 2025-06-17 | @mrz1836 | Documented Go Fuzz test guidance                                               |
-| 2025-06-16 | @mrz1836 | Adapted to fix this project go-sanitize                                        |
-| 2025-06-04 | @mrz1836 | Documented citation and configuration files for contributors                   |
-| 2025-06-03 | @mrz1836 | Major rewrite: clarified commenting standards and merged scope/purpose         |
-| 2025-06-03 | @mrz1836 | Combined testing and development sections; improved formatting & test guidance |
-| 2025-06-03 | @mrz1836 | Enhanced dependency management practices and security scanning advice          |
 
+| Date       | Author   | Summary of Changes |
+|------------|----------|-------------------------------------------------------|
+| 2025-06-19 | @mrz1836 | Documented OpenSSF compliance in security guidance |
+| 2025-06-18 | @mrz1836 | Added requirement to pin GitHub Action versions |
+| 2025-06-17 | @mrz1836 | Documented Go Fuzz test guidance |
+| 2025-06-16 | @mrz1836 | Adapted to fix this project go-sanitize |
+| 2025-06-04 | @mrz1836 | Documented citation and configuration files for contributors |
+| 2025-06-03 | @mrz1836 | Major rewrite: clarified commenting standards and merged scope/purpose |
+| 2025-06-03 | @mrz1836 | Combined testing and development sections; improved formatting & test guidance |
+| 2025-06-03 | @mrz1836 | Enhanced dependency management practices and security scanning advice |
 > For minor edits (typos, formatting), this log update is optional. For all behavioral or structural changes, log entries are **required**.
