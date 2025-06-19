@@ -46,7 +46,7 @@ jobs:
     automerge:
         permissions:
             pull-requests: write
-        # ← no job‑level bot filter anymore
+
         runs-on: ubuntu-latest
 
         steps:
