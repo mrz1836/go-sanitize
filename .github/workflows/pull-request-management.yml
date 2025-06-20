@@ -105,7 +105,12 @@ jobs:
                 });
               }
             } catch (error) {
-              if (core && typeof core.setFailed === 'function') {
+              if (
+                error.message.includes('Resource not accessible by integration') &&
+                context.actor !== context.repo.owner
+              ) {
+                console.warn('Skipping assignee due to limited token permissions.');
+              } else if (core && typeof core.setFailed === 'function') {
                 core.setFailed(`Failed to assign PR: ${error.message}`);
               } else {
                 console.error('Failed to assign PR:', error);
