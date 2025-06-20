@@ -110,11 +110,21 @@ jobs:
               const isFromFork = context.actor !== context.repo.owner;
 
               if (isIntegrationError && isFromFork) {
-                console.warn(`Skipping assignee due to limited token permissions. actor: ${context.actor}, repo.owner: ${context.repo.owner}`);
+                console.warn(
+                  `Skipping assignee due to limited token permissions and possible fork. actor: ${context.actor}, repo.owner: ${context.repo.owner}`
+                );
+              } else if (isIntegrationError) {
+                  console.warn(
+                    `Skipping assignee due to limited token permissions. actor: ${context.actor}, repo.owner: ${context.repo.owner}`
+                  );
               } else if (core && typeof core.setFailed === 'function') {
-                core.setFailed(`Failed to assign PR: ${error.message} (actor: ${context.actor}, repo.owner: ${context.repo.owner})`);
+                core.setFailed(
+                  `Failed to assign PR: ${error.message} (actor: ${context.actor}, repo.owner: ${context.repo.owner})`
+                );
               } else {
-                console.error(`Failed to assign PR: ${error.message} (actor: ${context.actor}, repo.owner: ${context.repo.owner})`);
+                console.error(
+                  `Failed to assign PR: ${error.message} (actor: ${context.actor}, repo.owner: ${context.repo.owner})`
+                );
               }
             }
 
