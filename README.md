@@ -273,7 +273,7 @@ vet                   ## Run go vet
 |------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------|
 | [auto-merge-on-approval.yml](.github/workflows/auto-merge-on-approval.yml)   | Automatically merges PRs after approval and all required checks, following strict rules.                               |
 | [check-for-leaks.yml](.github/workflows/check-for-leaks.yml)                 | Runs gitleaks to detect secrets on a daily schedule.                                                                   |
-| [clean-runner-cache.yml](.github/workflows/clean-runner-cache.yml)           | Removes GitHub Actions caches tied to closed pull requests.                                |
+| [clean-runner-cache.yml](.github/workflows/clean-runner-cache.yml)           | Removes GitHub Actions caches tied to closed pull requests.                                                            |
 | [codeql-analysis.yml](.github/workflows/codeql-analysis.yml)                 | Analyzes code for security vulnerabilities using GitHub CodeQL.                                                        |
 | [delete-merged-branches.yml](.github/workflows/delete-merged-branches.yml)   | Deletes feature branches after their pull requests are merged.                                                         |
 | [dependabot-auto-merge.yml](.github/workflows/dependabot-auto-merge.yml)     | Automatically merges Dependabot PRs that meet all requirements.                                                        |
