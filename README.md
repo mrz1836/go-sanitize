@@ -227,7 +227,6 @@ List of all current commands:
 
 <!-- make-help-start -->
 ```text
-all                   ## Runs multiple commands
 bench                 ## Run all benchmarks in the Go application
 build-go              ## Build the Go application (locally)
 citation              ## Update version in CITATION.cff (use version=X.Y.Z)

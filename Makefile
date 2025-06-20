@@ -13,7 +13,3 @@ endif
 ifeq ($(REPO_OWNER),)
 	REPO_OWNER="mrz1836"
 endif
-
-.PHONY: all
-all: ## Runs multiple commands
-	@$(MAKE) test
