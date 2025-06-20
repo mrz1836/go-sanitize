@@ -61,6 +61,9 @@
         </a>
       </td>
       <td valign="top" align="left">
+        <a href="https://dependents.info/mrz1836/go-sanitize">
+          <img src="https://dependents.info/mrz1836/go-sanitize/badge" />
+        </a><br/>
         <a href="https://github.com/mrz1836/go-sanitize/graphs/contributors">
           <img src="https://img.shields.io/github/contributors/mrz1836/go-sanitize?style=flat&logo=contentful&logoColor=white" alt="Contributors">
         </a><br/>
@@ -78,18 +81,32 @@
 <br/>
 
 ## 🗂️ Table of Contents
-* [Installation](#-installation)
-* [Usage](#-usage)
-* [Documentation](#-documentation)
-* [Examples & Tests](#-examples--tests)
-* [Benchmarks](#-benchmarks)
-* [Code Standards](#-code-standards)
-* [AI Compliance](#-ai-compliance)
-* [Maintainers](#-maintainers)
-* [Contributing](#-contributing)
-* [License](#-license)
+- [🛁 go-sanitize](#-go-sanitize)
+  - [🗂️ Table of Contents](#️-table-of-contents)
+  - [🧑‍💻 Used by](#-used-by)
+  - [📦 Installation](#-installation)
+  - [💡 Usage](#-usage)
+  - [📚 Documentation](#-documentation)
+    - [Features](#features)
+    - [Functions](#functions)
+    - [Additional Documentation \& Repository Management](#additional-documentation--repository-management)
+  - [🧪 Examples \& Tests](#-examples--tests)
+  - [⚡ Benchmarks](#-benchmarks)
+    - [Benchmark Results](#benchmark-results)
+  - [🛠️ Code Standards](#️-code-standards)
+  - [🤖 AI Compliance](#-ai-compliance)
+  - [👥 Maintainers](#-maintainers)
+  - [🤝 Contributing](#-contributing)
+    - [How can I help?](#how-can-i-help)
+  - [📝 License](#-license)
 
 <br/>
+
+## 🧑‍💻 Used by
+
+<a href="https://dependents.info/mrz1836/go-sanitize">
+ <img src="https://dependents.info/mrz1836/go-sanitize/image" />
+</a>
 
 ## 📦 Installation
 
