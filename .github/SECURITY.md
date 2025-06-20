@@ -45,14 +45,16 @@ All official security responses are signed with it.
 We regularly scan for known vulnerabilities using:
 
 * [`govulncheck`](https://pkg.go.dev/golang.org/x/vuln/cmd/govulncheck)
+* **ask nancy**: As part of our CI (see `run-tests.yml`), we run [nancy](https://github.com/sonatype-nexus-community/nancy) to check Go dependencies for vulnerabilities against the OSS Index. This helps us catch issues in third-party packages early.
 
-Want to run it yourself?
+Want to run these yourself?
 
 ```sh
 make govulncheck
+# or run nancy via the CI workflow
 ```
 
-This will check your local build for known issues in Go modules.
+This will check your local build for known issues in Go modules and dependencies.
 
 <br/>
 
