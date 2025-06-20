@@ -14,7 +14,7 @@ Features:
 - Handle XSS attack strings
 
 Usage:
-To use this package, import it and call the desired sanitization function with the input data. Each function is documented with examples in the `sanitize_test.go` file.
+To use this package, import it and call the desired sanitization function with the input data. Each function is documented with examples in the `sanitize_example_test.go` file.
 
 If you have any suggestions or comments, please feel free to open an issue on this project's GitHub page.
 */
