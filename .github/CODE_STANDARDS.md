@@ -35,20 +35,12 @@ We adhere to the patterns and philosophy in [Effective Go](https://golang.org/do
 
 We lint all the things. Our active ruleset lives in [`.golangci.json`](../.golangci.json).
 
-### ☕️ macOS install
+### 🌎 macOS, Linux or Windows
+
+Running `make lint` will detect if it's installed. If not, it will attempt to automatically install it for you.
 
 ```sh
-brew install golangci-lint
-```
-
-### 🌎 Linux or Windows
-
-```sh
-# binary will be $(go env GOPATH)/bin/golangci-lint
-curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh \
-  | sh -s -- -b $(go env GOPATH)/bin v2.1.6
-
-golangci-lint --version
+make lint
 ```
 
 <br/>
