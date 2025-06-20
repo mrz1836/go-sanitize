@@ -44,8 +44,8 @@ All official security responses are signed with it.
 
 We regularly scan for known vulnerabilities using:
 
-* [`govulncheck`](https://pkg.go.dev/golang.org/x/vuln/cmd/govulncheck)
-* **ask nancy**: As part of our CI (see `run-tests.yml`), we run [nancy](https://github.com/sonatype-nexus-community/nancy) to check Go dependencies for vulnerabilities against the OSS Index. This helps us catch issues in third-party packages early.
+* [`govulncheck`](https://pkg.go.dev/golang.org/x/vuln/cmd/govulncheck): Checks Go code and dependencies for known vulnerabilities using the Go vulnerability database.
+* [`ask nancy`](https://github.com/sonatype-nexus-community/nancy): As part of our CI (see `run-tests.yml`), we run [nancy](https://github.com/sonatype-nexus-community/nancy) to check Go dependencies for vulnerabilities against the OSS Index. This helps us catch issues in third-party packages early.
 
 Want to run these yourself?
 
