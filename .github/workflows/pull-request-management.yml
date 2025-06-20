@@ -109,11 +109,11 @@ jobs:
                 error.message.includes('Resource not accessible by integration') &&
                 context.actor !== context.repo.owner
               ) {
-                console.warn('Skipping assignee due to limited token permissions.');
+                console.warn(`Skipping assignee due to limited token permissions. actor: ${context.actor}, repo.owner: ${context.repo.owner}`);
               } else if (core && typeof core.setFailed === 'function') {
-                core.setFailed(`Failed to assign PR: ${error.message}`);
+                core.setFailed(`Failed to assign PR: ${error.message} (actor: ${context.actor}, repo.owner: ${context.repo.owner})`);
               } else {
-                console.error('Failed to assign PR:', error);
+                console.error(`Failed to assign PR: ${error.message} (actor: ${context.actor}, repo.owner: ${context.repo.owner})`);
               }
             }
 
