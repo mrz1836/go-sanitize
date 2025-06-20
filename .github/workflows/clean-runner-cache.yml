@@ -1,9 +1,9 @@
 # ------------------------------------------------------------------------------
 #  Clean Runner Cache Workflow
 #
-#  Purpose   : Remove GitHub Actions runner caches when a pull request is closed.
+#  Purpose: Remove GitHub Actions runner caches when a pull request is closed.
 #
-#  Triggers  : On pull request close events.
+#  Triggers: On pull request close events.
 #
 #  Maintainer: @mrz1836
 # ------------------------------------------------------------------------------
@@ -28,18 +28,23 @@ jobs:
     permissions:
       actions: write
     steps:
+      ## Install GitHub CLI for cache management
+      - name: Install GitHub CLI
+        run: sudo apt-get update && sudo apt-get install -y gh
+
+      ## Fetch the list of cache keys and delete them
       - name: Cleanup caches
         run: |
           echo "Fetching list of cache keys"
-          cacheKeysForPR=$(gh cache list --ref "$BRANCH" --limit 100 --json id --jq '.[].id')
+          cacheKeysForPR=$(gh cache list --ref "$BRANCH" --limit 100 --json id,key,ref | jq -r '.[] | select(.ref == env.BRANCH) | .id')
 
           # Setting this to not fail the workflow while deleting cache keys.
           set +e
           echo "Deleting caches..."
           for cacheKey in $cacheKeysForPR
           do
-              gh cache delete "$cacheKey"
-          done
+              gh cache delete "$cacheKey" || echo "Failed to delete cache $cacheKey"
+            done
           echo "Done"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
