@@ -1,9 +1,9 @@
 # ------------------------------------------------------------------------------------
 #  Release Workflow
 #
-#  Purpose   : Build & publish releases via GoReleaser whenever a semver tag is pushed.
+#  Purpose: Build & publish releases via GoReleaser whenever a semver tag is pushed.
 #
-#  Triggers  : On push of tags that start with "v" (e.g., v1.2.3)
+#  Triggers: On push of tags that start with "v" (e.g., v1.2.3)
 #
 #  Maintainer: @mrz1836
 # ------------------------------------------------------------------------------------
