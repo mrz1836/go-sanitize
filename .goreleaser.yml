@@ -7,8 +7,6 @@ version: 2
 before:
   hooks:
     - make test
-snapshot:
-  name_template: "{{ .Tag }}"
 changelog:
   sort: asc
   filters:
