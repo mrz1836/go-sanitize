@@ -69,7 +69,7 @@ jobs:
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@9c156ee8a17a598857849441385a2041ef570552 # v6.3.0
         with:
-          version: v2.0.1
+          version: v2.10.2      # pin exact or at least major (6/20/2025)
           args: release --clean --verbose
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
