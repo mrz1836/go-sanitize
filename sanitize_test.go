@@ -191,16 +191,16 @@ func TestCustomCompiled(t *testing.T) {
 		}
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
-				output := sanitize.CustomCompiled(tt.input, tt.re)
+				output, err := sanitize.CustomCompiled(tt.input, tt.re)
+				require.NoError(t, err)
 				require.Equal(t, tt.expected, output)
 			})
 		}
 	})
 
 	t.Run("CustomCompiled_NilRegex", func(t *testing.T) {
-		require.Panics(t, func() {
-			sanitize.CustomCompiled("panic", nil)
-		})
+		_, err := sanitize.CustomCompiled("panic", nil)
+		require.ErrorIs(t, err, sanitize.ErrNilRegexp)
 	})
 
 	t.Run("Custom_InvalidRegexPanics", func(t *testing.T) {

@@ -60,7 +60,7 @@ func BenchmarkCustom(b *testing.B) {
 func BenchmarkCustomCompiled(b *testing.B) {
 	re := regexp.MustCompile(`[^a-zA-Z0-9]`)
 	for i := 0; i < b.N; i++ {
-		_ = sanitize.CustomCompiled("This is the test string 12345.", re)
+		_, _ = sanitize.CustomCompiled("This is the test string 12345.", re)
 	}
 }
 

@@ -31,7 +31,11 @@ func main() {
 
 	// CustomCompiled uses a precompiled regular expression for speed.
 	re := regexp.MustCompile(`[^a-zA-Z]`)
-	log.Printf("CustomCompiled(%q) => %q\n", customIn, sanitize.CustomCompiled(customIn, re))
+	cleanedCustom, err := sanitize.CustomCompiled(customIn, re)
+	if err != nil {
+		log.Fatalf("custom compiled error: %v", err)
+	}
+	log.Printf("CustomCompiled(%q) => %q\n", customIn, cleanedCustom)
 
 	// Decimal keeps digits and decimal separators.
 	decIn := "$ -99.99!"
