@@ -48,7 +48,7 @@ jobs:
             # -----------------------------------------------------------------------
             - name: Locate pull request
               id: pr
-              uses: actions/github-script@v7
+              uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
               with:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
                   script: |
@@ -96,7 +96,7 @@ jobs:
             - name: Validate Dependabot author
               id: author
               if: steps.pr.outputs.found == 'true'
-              uses: actions/github-script@v7
+              uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
               with:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
                   script: |
@@ -115,7 +115,7 @@ jobs:
             - name: Check version bump
               id: bump
               if: steps.author.outputs.allowed == 'true'
-              uses: actions/github-script@v7
+              uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
               with:
                   script: |
                       const title = '${{ steps.pr.outputs.title }}';
@@ -131,7 +131,7 @@ jobs:
             # -----------------------------------------------------------------------
             - name: Alert on major version bump
               if: steps.bump.outputs.is_major == 'true'
-              uses: actions/github-script@v7
+              uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
               with:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
                   script: |
@@ -148,7 +148,7 @@ jobs:
             # -----------------------------------------------------------------------
             - name: Auto-approve minor update
               if: steps.bump.outputs.is_minor == 'true'
-              uses: hmarr/auto-approve-action@v4
+              uses: hmarr/auto-approve-action@f0939ea97e9205ef24d872e76833fa908a770363 # v4.0.0
               with:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
                   pull-request-number: ${{ steps.pr.outputs.number }}   # ← NEW
@@ -159,7 +159,7 @@ jobs:
             # -----------------------------------------------------------------------
             - name: Add automerge label
               if: steps.bump.outputs.is_minor == 'true'
-              uses: actions/github-script@v7
+              uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
               with:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
                   script: |
@@ -176,7 +176,7 @@ jobs:
             # -----------------------------------------------------------------------
             -   name: Auto-merge minor update
                 if: steps.bump.outputs.is_minor == 'true'
-                uses: pascalgn/automerge-action@v0.16.4
+                uses: pascalgn/automerge-action@7961b8b5eec56cc088c140b56d864285eabd3f67 # v0.16.4
                 env:
                     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                     MERGE_LABELS: "automerge"   # must match label we just added
