@@ -125,6 +125,7 @@ jobs:
                       core.setOutput('is_minor',  isMinor);
                       core.setOutput('is_major', !isMinor);
 
+
             # -----------------------------------------------------------------------
             # 4. Alert on major bump
             # -----------------------------------------------------------------------
@@ -140,6 +141,7 @@ jobs:
                         issue_number: Number('${{ steps.pr.outputs.number }}'),
                         body: '⚠️ @mrz1836 – this is a **major** version bump and needs manual review.'
                       });
+
 
             # -----------------------------------------------------------------------
             # 5. Auto-approve minor / patch bumps
@@ -168,6 +170,7 @@ jobs:
                         labels: ['automerge']
                       });
 
+
             # -----------------------------------------------------------------------
             # 7. Auto-merge when checks are green
             # -----------------------------------------------------------------------
@@ -177,7 +180,6 @@ jobs:
                 env:
                     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                     MERGE_LABELS: "automerge"   # must match label we just added
-                    MERGE_METHOD_LABEL_REQUIRED: "true"  # only merge if label is present
                     MERGE_METHOD: merge
                     MERGE_COMMIT_MESSAGE: pull-request-title
                     MERGE_RETRIES: "30"      # up to ~30 minutes
