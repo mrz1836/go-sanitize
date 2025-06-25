@@ -1,11 +1,8 @@
 # ------------------------------------------------------------------------------
 #  Dependabot Auto-merge Workflow
 #
-#  Purpose: Automatically merge Dependabot minor version updates after all
-#              required checks pass. Major version updates will trigger an alert
-#              comment for manual review.
-#
-#  Triggers: Pull request events and completed check runs.
+#  Purpose: Automatically merge Dependabot **minor / patch** updates once all
+#           required checks pass.  Major updates only get an alert comment.
 #
 #  Maintainer: @mrz1836
 # ------------------------------------------------------------------------------
@@ -13,129 +10,162 @@
 name: dependabot-auto-merge
 
 on:
-  pull_request_target:
-    types: [opened, synchronize, reopened, ready_for_review]
-  pull_request_review:
-    types: [submitted]
-  check_suite:
-    types: [completed]
-  status: {}
+    pull_request_target:
+        types: [opened, synchronize, reopened, ready_for_review]
+    pull_request_review:
+        types: [submitted]
+    check_suite:
+        types: [completed]
+    status: {}               # receives completed status checks
 
+# The default token starts with read-only scopes – restrict globally, then grant
+# just what each job needs
 permissions:
-  contents: read
-  pull-requests: read
+    contents: read
+    pull-requests: read
 
-# Cancel older runs of the same PR if a new commit is pushed
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+    group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+    cancel-in-progress: true
 
 jobs:
-  # ------------------------------------------------------------------------------
-  # Auto-merge: Dependabot PR Automation
-  #
-  # This job automatically approves and merges minor/patch version bump PRs from
-  # Dependabot. For major version bumps, it alerts @mrz1836 for manual review.
-  # ------------------------------------------------------------------------------
-  automerge:
-    runs-on: ubuntu-latest
-    permissions:
-      pull-requests: write
-    steps:
-      - name: Locate pull request
-        id: pr
-        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const owner = context.payload.repository.owner.login;
-            const repo = context.payload.repository.name;
-            let pr = context.payload.pull_request;
-            if (!pr) {
-              const sha = context.payload.check_suite?.head_sha || context.payload.sha;
-              if (sha) {
-                const { data: prs } = await github.rest.pulls.list({
-                  owner,
-                  repo,
-                  head: `${owner}:${sha}`,
-                  state: 'open',
-                });
-                pr = prs[0];
-              }
-            }
-            if (!pr) {
-              core.info('PR not found (may be closed), skipping.');
-              return;
-            }
-            core.setOutput('number', pr.number);
-            core.setOutput('actor', pr.user.login);
-            core.setOutput('title', pr.title);
+    automerge:
+        runs-on: ubuntu-latest
 
-      - name: Validate Dependabot author
-        id: check-author
-        if: steps.pr.outputs.number
-        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const actor = '${{ steps.pr.outputs.actor }}';
-            const allowed = ['dependabot[bot]', 'dependabot-preview[bot]'].includes(actor);
-            core.setOutput('allowed', allowed);
-            if (!allowed) {
-              core.info(`PR opened by ${actor} - skipping automerge`);
-            }
+        # Needs to WRITE to pull-requests (approve) and contents (merge)
+        permissions:
+            pull-requests: write
+            contents: write
 
-      - name: Exit if PR not found
-        if: steps.pr.outputs.number == ''
-        run: echo 'PR not found. Exiting.' && exit 0
+        steps:
+            # -----------------------------------------------------------------------
+            # 1. Locate the PR that is relevant to this event
+            # -----------------------------------------------------------------------
+            - name: Locate pull request
+              id: pr
+              uses: actions/github-script@v7
+              with:
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  script: |
+                      const core    = require('@actions/core');
+                      const github  = require('@actions/github');
+                      const ctx     = github.context;
+                      const owner   = ctx.repo.owner;
+                      const repo    = ctx.repo.repo;
 
-      - name: Exit for non Dependabot PR
-        if: steps.check-author.outputs.allowed != 'true'
-        run: echo 'Not a Dependabot PR. Exiting.' && exit 0
+                      let pr = ctx.payload.pull_request;
 
-      # --- Check if the PR is a minor/patch version bump ---
-      - name: Check version bump
-        id: bump
-        if: steps.check-author.outputs.allowed == 'true'
-        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const title = '${{ steps.pr.outputs.title }}';
-            const match = title.match(/from (\d+)(?:\.\d+)* to (\d+)(?:\.\d+)*/i);
-            const minor = match && match[1] === match[2];
-            core.setOutput('is_minor', minor);
+                      // If we were triggered by check_suite / status, find PRs by commit SHA
+                      if (!pr) {
+                        const sha = ctx.payload.check_suite?.head_sha
+                                 || ctx.payload.check_run?.head_sha
+                                 || ctx.payload.sha
+                                 || ctx.payload.after;
+                        if (sha) {
+                          const { data: prs } =
+                            await github.rest.repos.listPullRequestsAssociatedWithCommit({
+                              owner,
+                              repo,
+                              commit_sha: sha
+                            });
+                          pr = prs.find(p => p.state === 'open');
+                        }
+                      }
 
-      # --- Alert on major version bump (requires manual review) ---
-      - name: Alert on major version bump
-        if: steps.bump.outputs.is_minor != 'true' && steps.pr.outputs.number
-        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: Number('${{ steps.pr.outputs.number }}'),
-              body: '⚠️ @mrz1836: this is a major version bump and requires your attention'
-            });
+                      if (!pr) {                     // Nothing to do
+                        core.info('No open PR found – skipping.');
+                        core.setOutput('found', 'false');
+                        return;
+                      }
 
-      # --- Auto approve minor/patch version bump PRs ---
-      - name: Auto approve minor update
-        if: steps.bump.outputs.is_minor == 'true' && steps.pr.outputs.number
-        uses: hmarr/auto-approve-action@f0939ea97e9205ef24d872e76833fa908a770363 # v4.0.0
-        with:
-          review-message: Automatically approving dependabot pull request
+                      core.setOutput('found',  'true');
+                      core.setOutput('number', pr.number);
+                      core.setOutput('actor',  pr.user.login);
+                      core.setOutput('title',  pr.title.replace(/\n/g, ' ')); // single line
 
-      # --- Auto-merge minor/patch version bump PRs ---
-      - name: Auto-merge minor update
-        if: steps.bump.outputs.is_minor == 'true' && steps.pr.outputs.number
-        uses: pascalgn/automerge-action@7961b8b5eec56cc088c140b56d864285eabd3f67 # v0.16.4
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          MERGE_LABELS: ""
-          MERGE_FILTER_AUTHOR: "dependabot[bot],dependabot-preview[bot]"
-          MERGE_METHOD: merge
-          MERGE_COMMIT_MESSAGE: pull-request-title
-          MERGE_RETRIES: "30"
-          MERGE_RETRY_SLEEP: "60000"
+            # Quick exit if we didn’t find a PR
+            - name: Exit when no PR found
+              if: steps.pr.outputs.found != 'true'
+              run: echo "PR not found – exiting."
+
+            # -----------------------------------------------------------------------
+            # 2. Make sure it really is Dependabot
+            # -----------------------------------------------------------------------
+            - name: Validate Dependabot author
+              id: author
+              if: steps.pr.outputs.found == 'true'
+              uses: actions/github-script@v7
+              with:
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  script: |
+                      const core  = require('@actions/core');
+                      const actor = '${{ steps.pr.outputs.actor }}';
+                      const ok    = ['dependabot[bot]', 'dependabot-preview[bot]'].includes(actor);
+                      core.setOutput('allowed', ok);
+                      if (!ok) core.info(`PR opened by ${actor} – skipping automerge.`);
+
+            - name: Exit for non-Dependabot PR
+              if: steps.author.outputs.allowed != 'true'
+              run: echo "Not a Dependabot PR – exiting."
+
+            # -----------------------------------------------------------------------
+            # 3. Decide if the bump is major or minor/patch
+            # -----------------------------------------------------------------------
+            - name: Check version bump
+              id: bump
+              if: steps.author.outputs.allowed == 'true'
+              uses: actions/github-script@v7
+              with:
+                  script: |
+                      const core   = require('@actions/core');
+                      const title  = '${{ steps.pr.outputs.title }}';
+
+                      // Works with titles like:
+                      //   "Bump X from 1.2.3 to 1.3.0"
+                      //   "Bump X from v4 to v4.0.1"
+                      const match = title.match(/from\s+v?(\d+)(?:\.\d+)*\s+to\s+v?(\d+)/i);
+                      const isMinor = !!(match && match[1] === match[2]);
+
+                      core.setOutput('is_minor',  isMinor);
+                      core.setOutput('is_major', !isMinor);
+
+            # -----------------------------------------------------------------------
+            # 4a. Alert when it’s a major version bump
+            # -----------------------------------------------------------------------
+            - name: Alert on major version bump
+              if: steps.bump.outputs.is_major == 'true'
+              uses: actions/github-script@v7
+              with:
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  script: |
+                      await github.rest.issues.createComment({
+                        owner: context.repo.owner,
+                        repo:  context.repo.repo,
+                        issue_number: Number('${{ steps.pr.outputs.number }}'),
+                        body: '⚠️ @mrz1836 – this is a **major** version bump and needs manual review.'
+                      });
+
+            # -----------------------------------------------------------------------
+            # 4b. Auto-approve minor / patch bumps
+            # -----------------------------------------------------------------------
+            - name: Auto-approve minor update
+              if: steps.bump.outputs.is_minor == 'true'
+              uses: hmarr/auto-approve-action@v4
+              with:
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  review-message: Automatically approving Dependabot minor/patch update
+
+            # -----------------------------------------------------------------------
+            # 4c. Auto-merge when everything is green
+            # -----------------------------------------------------------------------
+            - name: Auto-merge minor update
+              if: steps.bump.outputs.is_minor == 'true'
+              uses: pascalgn/automerge-action@v0.16.4
+              env:
+                  GITHUB_TOKEN:            ${{ secrets.GITHUB_TOKEN }}
+                  MERGE_LABELS:            ""
+                  MERGE_FILTER_AUTHOR:     "dependabot[bot],dependabot-preview[bot]"
+                  MERGE_METHOD:            merge
+                  MERGE_COMMIT_MESSAGE:    pull-request-title
+                  MERGE_RETRIES:           "30"        # ~30 min (30 × 60 s)
+                  MERGE_RETRY_SLEEP:       "60000"
