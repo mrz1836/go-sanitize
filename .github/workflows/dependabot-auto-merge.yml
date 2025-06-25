@@ -38,11 +38,27 @@ jobs:
   # Dependabot. For major version bumps, it alerts @mrz1836 for manual review.
   # ------------------------------------------------------------------------------
   automerge:
-    if: github.actor == 'dependabot[bot]' || github.actor == 'dependabot-preview[bot]'
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
     steps:
+      - name: Validate Dependabot author
+        id: check-author
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const actor = context.payload.pull_request.user.login;
+            const allowed = ['dependabot[bot]', 'dependabot-preview[bot]'].includes(actor);
+            core.setOutput('allowed', allowed);
+            if (!allowed) {
+              core.info(`PR opened by ${actor} - skipping automerge`);
+            }
+
+      - name: Exit for non Dependabot PR
+        if: steps.check-author.outputs.allowed != 'true'
+        run: echo 'Not a Dependabot PR. Exiting.' && exit 0
+
       # --- Check if the PR is a minor/patch version bump ---
       - name: Check version bump
         id: bump
