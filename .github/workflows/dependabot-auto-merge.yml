@@ -117,7 +117,7 @@ jobs:
                       core.setOutput('is_major', !isMinor);
 
             # -----------------------------------------------------------------------
-            # 4a. Alert on major bump
+            # 4. Alert on major bump
             # -----------------------------------------------------------------------
             - name: Alert on major version bump
               if: steps.bump.outputs.is_major == 'true'
@@ -133,7 +133,7 @@ jobs:
                       });
 
             # -----------------------------------------------------------------------
-            # 4b. Auto-approve minor / patch bumps
+            # 5. Auto-approve minor / patch bumps
             # -----------------------------------------------------------------------
             - name: Auto-approve minor update
               if: steps.bump.outputs.is_minor == 'true'
@@ -144,16 +144,32 @@ jobs:
                   review-message: Automatically approving Dependabot minor/patch update
 
             # -----------------------------------------------------------------------
-            # 4c. Auto-merge when checks are green
+            # 6. Add the required `automerge` label (used by pascalgn/automerge)
             # -----------------------------------------------------------------------
-            - name: Auto-merge minor update
+            - name: Add automerge label
               if: steps.bump.outputs.is_minor == 'true'
-              uses: pascalgn/automerge-action@v0.16.4
-              env:
-                  GITHUB_TOKEN:         ${{ secrets.GITHUB_TOKEN }}
-                  MERGE_LABELS:         ""
-                  MERGE_FILTER_AUTHOR:  "dependabot[bot],dependabot-preview[bot]"
-                  MERGE_METHOD:         merge
-                  MERGE_COMMIT_MESSAGE: pull-request-title
-                  MERGE_RETRIES:        "30"      # up to ~30 minutes
-                  MERGE_RETRY_SLEEP:    "60000"
+              uses: actions/github-script@v7
+              with:
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  script: |
+                      await github.rest.issues.addLabels({
+                        owner: context.repo.owner,
+                        repo:  context.repo.repo,
+                        issue_number: Number('${{ steps.pr.outputs.number }}'),
+                        labels: ['automerge']
+                      });
+
+            # -----------------------------------------------------------------------
+            # 7. Auto-merge when checks are green
+            # -----------------------------------------------------------------------
+            -   name: Auto-merge minor update
+                if: steps.bump.outputs.is_minor == 'true'
+                uses: pascalgn/automerge-action@v0.16.4
+                env:
+                    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                    MERGE_LABELS: "automerge"   # must match label we just added
+                    MERGE_FILTER_AUTHOR: "dependabot\\[bot\\]|dependabot-preview\\[bot\\]"
+                    MERGE_METHOD: merge
+                    MERGE_COMMIT_MESSAGE: pull-request-title
+                    MERGE_RETRIES: "30"      # up to ~30 minutes
+                    MERGE_RETRY_SLEEP: "60000"
