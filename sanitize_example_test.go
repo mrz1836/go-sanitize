@@ -52,8 +52,9 @@ func ExampleCustom() {
 // ExampleCustomCompiled example using CustomCompiled with an alpha regex
 func ExampleCustomCompiled() {
 	re := regexp.MustCompile(`[^a-zA-Z]`)
-	fmt.Println(sanitize.CustomCompiled("Example String 2!", re))
-	// Output: ExampleString
+	result, err := sanitize.CustomCompiled("Example String 2!", re)
+	fmt.Println(result, err)
+	// Output: ExampleString <nil>
 }
 
 // ExampleCustom_numeric example using Custom() using a numeric regex

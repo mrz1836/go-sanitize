@@ -21,6 +21,7 @@ If you have any suggestions or comments, please feel free to open an issue on th
 package sanitize
 
 import (
+	"errors"
 	"net"
 	"net/url"
 	"regexp"
@@ -37,6 +38,9 @@ var (
 
 // emptySpace is an empty space for replacing
 var emptySpace = []byte("")
+
+// ErrNilRegexp indicates that a nil regular expression was provided.
+var ErrNilRegexp = errors.New("regular expression cannot be nil")
 
 // Alpha returns a string containing only Unicode alphabetic characters from the input.
 // Optionally, it preserves spaces if the `spaces` parameter is set to true.
@@ -208,8 +212,8 @@ func Custom(original string, regExp string) string {
 
 // CustomCompiled returns a sanitized string using a pre-compiled regular
 // expression. This function provides better performance when the same pattern is
-// reused across multiple calls. Passing a nil regular expression will cause a
-// panic.
+// reused across multiple calls. If the provided regular expression is nil, an
+// error is returned.
 //
 // Parameters:
 // - original: The input string to be sanitized.
@@ -217,6 +221,7 @@ func Custom(original string, regExp string) string {
 //
 // Returns:
 // - A sanitized string based on the provided regular expression.
+// - An error if the regular expression is nil.
 //
 // Example:
 //
@@ -228,8 +233,12 @@ func Custom(original string, regExp string) string {
 // See more usage examples in the `sanitize_example_test.go` file.
 // See the benchmarks in the `sanitize_benchmark_test.go` file.
 // See the fuzz tests in the `sanitize_fuzz_test.go` file.
-func CustomCompiled(original string, re *regexp.Regexp) string {
-	return re.ReplaceAllString(original, "")
+func CustomCompiled(original string, re *regexp.Regexp) (string, error) {
+	if re == nil {
+		return "", ErrNilRegexp
+	}
+
+	return re.ReplaceAllString(original, ""), nil
 }
 
 // Decimal returns a sanitized string containing only decimal/float values, including positive and negative numbers.

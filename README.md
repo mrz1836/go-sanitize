@@ -155,7 +155,7 @@ extra baggage.
 - [`BitcoinAddress`](sanitize.go): Filter input to valid Bitcoin address characters
 - [`BitcoinCashAddress`](sanitize.go): Filter input to valid Bitcoin Cash address characters
 - [`Custom`](sanitize.go): Use a custom regex to filter input _(legacy)_
-- [`CustomCompiled`](sanitize.go): Use a precompiled regex to filter input **(suggested)**
+- [`CustomCompiled`](sanitize.go): Use a precompiled regex to filter input and return an error if the regex is nil **(suggested)**
 - [`Decimal`](sanitize.go): Keep only decimal or float characters
 - [`Domain`](sanitize.go): Sanitize domain, optionally preserving case and removing www
 - [`Email`](sanitize.go): Normalize an email address
