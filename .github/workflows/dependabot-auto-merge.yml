@@ -140,6 +140,7 @@ jobs:
               uses: hmarr/auto-approve-action@v4
               with:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
+                  pull-request-number: ${{ steps.pr.outputs.number }}   # ← NEW
                   review-message: Automatically approving Dependabot minor/patch update
 
             # -----------------------------------------------------------------------
