@@ -32,6 +32,9 @@ Tests should be:
 
 Use `require` over `assert` where possible (we lint for this).
 
+This project aims for >= **90% code coverage**. Every code path must be tested to
+keep the Codecov badge green and CI passing.
+
 <br/>
 
 ## 🧹 Coding Conventions
