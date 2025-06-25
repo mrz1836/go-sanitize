@@ -51,7 +51,8 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const title = context.payload.pull_request.title;
-            const minor = /^Bump[^"]+ from ([\d]+)\..+ to \1\./.test(title);
+            const match = title.match(/from (\d+)(?:\.\d+)* to (\d+)(?:\.\d+)*/i);
+            const minor = match && match[1] === match[2];
             core.setOutput('is_minor', minor);
 
       # --- Alert on major version bump (requires manual review) ---
