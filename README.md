@@ -14,10 +14,10 @@
     <tr>
       <td valign="top" align="left">
         <a href="https://github.com/mrz1836/go-sanitize/releases">
-          <img src="https://img.shields.io/github/release-pre/mrz1836/go-sanitize?logo=github&style=flat" alt="Latest release">
+          <img src="https://img.shields.io/github/release-pre/mrz1836/go-sanitize?logo=github&style=flat" alt="Latest Release">
         </a><br/>
         <a href="https://github.com/mrz1836/go-sanitize/actions">
-          <img src="https://img.shields.io/github/actions/workflow/status/mrz1836/go-sanitize/run-tests.yml?branch=master&logo=github&style=flat" alt="Build status">
+          <img src="https://img.shields.io/github/actions/workflow/status/mrz1836/go-sanitize/run-tests.yml?branch=master&logo=github&style=flat" alt="Build Status">
         </a><br/>
 		<a href="https://github.com/mrz1836/go-sanitize/actions">
           <img src="https://github.com/mrz1836/go-sanitize/actions/workflows/codeql-analysis.yml/badge.svg?style=flat" alt="CodeQL">
@@ -31,16 +31,16 @@
           <img src="https://goreportcard.com/badge/github.com/mrz1836/go-sanitize?style=flat" alt="Go Report Card">
         </a><br/>
 		<a href="https://codecov.io/gh/mrz1836/go-sanitize">
-          <img src="https://codecov.io/gh/mrz1836/go-sanitize/branch/master/graph/badge.svg?style=flat" alt="Code coverage">
+          <img src="https://codecov.io/gh/mrz1836/go-sanitize/branch/master/graph/badge.svg?style=flat" alt="Code Coverage">
         </a><br/>
 		<a href="https://scorecard.dev/viewer/?uri=github.com/mrz1836/go-sanitize">
-          <img src="https://api.scorecard.dev/projects/github.com/mrz1836/go-sanitize/badge?logo=springsecurity&logoColor=white" alt="Security policy">
+          <img src="https://api.scorecard.dev/projects/github.com/mrz1836/go-sanitize/badge?logo=springsecurity&logoColor=white" alt="OpenSSF Scorecard">
         </a><br/>
 		<a href=".github/SECURITY.md">
           <img src="https://img.shields.io/badge/security-policy-blue?style=flat&logo=springsecurity&logoColor=white" alt="Security policy">
         </a><br/>
 		<a href="https://www.bestpractices.dev/projects/10766">
-		  <img src="https://www.bestpractices.dev/projects/10766/badge?style=flat&logo=springsecurity&logoColor=white" alt="Best Practices">
+		  <img src="https://www.bestpractices.dev/projects/10766/badge?style=flat&logo=springsecurity&logoColor=white" alt="OpenSSF Best Practices">
 		</a>
       </td>
       <td valign="top" align="left">
