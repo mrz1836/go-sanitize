@@ -4,14 +4,23 @@
 #  Purpose: Automatically merge Dependabot **minor / patch** updates once all
 #           required checks pass.  Major updates only get an alert comment.
 #
+#  Triggers: Pull‑request events, review submissions, and completed checks.
+#
 #  Maintainer: @mrz1836
+#
+#  Rules for Auto‑Merge:
+#    • PR must be opened by Dependabot and found by this workflow
+#    • All required status checks must pass
+#    • Only minor and patch updates are auto-merged
+#    • Major updates will only receive an alert comment
+#    • PR must have the 'automerge' label
 # ------------------------------------------------------------------------------
 
 name: dependabot-auto-merge
 
 on:
     pull_request_target:
-        types: [opened, synchronize, reopened, ready_for_review]
+        types: [opened, synchronize, reopened, ready_for_review, unlocked, edited]
     pull_request_review:
         types: [submitted]
     check_suite:
@@ -168,7 +177,7 @@ jobs:
                 env:
                     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                     MERGE_LABELS: "automerge"   # must match label we just added
-                    MERGE_FILTER_AUTHOR: "dependabot\\[bot\\]|dependabot-preview\\[bot\\]"
+                    MERGE_METHOD_LABEL_REQUIRED: "true"  # only merge if label is present
                     MERGE_METHOD: merge
                     MERGE_COMMIT_MESSAGE: pull-request-title
                     MERGE_RETRIES: "30"      # up to ~30 minutes
