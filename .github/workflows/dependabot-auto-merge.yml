@@ -86,6 +86,10 @@ jobs:
                       core.setOutput('actor',  pr.user.login);
                       core.setOutput('title',  pr.title.replace(/\n/g, ' '));
 
+
+            # -----------------------------------------------------------------------
+            # 1a. Exit when no PR was found
+            # -----------------------------------------------------------------------
             - name: Exit when no PR found
               if: steps.pr.outputs.found != 'true'
               run: echo "PR not found – exiting."
@@ -105,13 +109,17 @@ jobs:
                       core.setOutput('allowed', allowed);
                       if (!allowed) core.info(`PR opened by ${actor} – skipping automerge.`);
 
+
+            # -----------------------------------------------------------------------
+            # 2a. Exit when PR was not opened by Dependabot
+            # -----------------------------------------------------------------------
             - name: Exit for non-Dependabot PR
               if: steps.author.outputs.allowed != 'true'
               run: echo "Not a Dependabot PR – exiting."
 
-            # -----------------------------------------------------------------------
-            # 3. Detect major vs. minor/patch bump
-            # -----------------------------------------------------------------------
+            # ---------------------------------------------------------------------
+            # 3. Detect minor / major / unknown bump
+            # ---------------------------------------------------------------------
             - name: Check version bump
               id: bump
               if: steps.author.outputs.allowed == 'true'
@@ -119,16 +127,27 @@ jobs:
               with:
                   script: |
                       const title = '${{ steps.pr.outputs.title }}';
+
                       // Matches “from 1.2.3 to 1.3.0”, “from v4 to v4.0.1”, etc.
                       const match = title.match(/from\s+v?(\d+)(?:\.\d+)*\s+to\s+v?(\d+)/i);
-                      const isMinor = !!(match && match[1] === match[2]);
-                      core.setOutput('is_minor',  isMinor);
-                      core.setOutput('is_major', !isMinor);
+                      let isMinor   = false;
+                      let isUnknown = false;
+
+                      if (!match) {
+                        isUnknown = true;            // SHA bumps or unparsable versions
+                      } else {
+                        isMinor = match[1] === match[2];
+                      }
+
+                      core.setOutput('is_minor',   isMinor);
+                      core.setOutput('is_major',  !isMinor && !isUnknown);
+                      core.setOutput('is_unknown', isUnknown);
 
 
-            # -----------------------------------------------------------------------
-            # 4. Alert on major bump
-            # -----------------------------------------------------------------------
+
+            # ---------------------------------------------------------------------
+            # 4a. Alert on major bump
+            # ---------------------------------------------------------------------
             - name: Alert on major version bump
               if: steps.bump.outputs.is_major == 'true'
               uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
@@ -140,6 +159,23 @@ jobs:
                         repo:  context.repo.repo,
                         issue_number: Number('${{ steps.pr.outputs.number }}'),
                         body: '⚠️ @mrz1836 – this is a **major** version bump and needs manual review.'
+                      });
+
+
+            # ---------------------------------------------------------------------
+            # 4b. Alert when a version couldn’t be parsed (commit SHA → SHA)
+            # ---------------------------------------------------------------------
+            - name: Alert on undetected version bump
+              if: steps.bump.outputs.is_unknown == 'true'
+              uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+              with:
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  script: |
+                      await github.rest.issues.createComment({
+                        owner: context.repo.owner,
+                        repo:  context.repo.repo,
+                        issue_number: Number('${{ steps.pr.outputs.number }}'),
+                        body: '⚠️ @mrz1836 – Dependabot could not determine version semantics (SHA → SHA). Please review manually.'
                       });
 
 
@@ -169,6 +205,7 @@ jobs:
                         issue_number: Number('${{ steps.pr.outputs.number }}'),
                         labels: ['automerge']
                       });
+
 
 
             # -----------------------------------------------------------------------
