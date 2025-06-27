@@ -13,7 +13,7 @@ updates:
       - "mrz1836"
     # Labels must be created first
     labels:
-      - "update"
+      - "chore"
 
   # Maintain dependencies for GitHub Actions
   - package-ecosystem: "github-actions"
