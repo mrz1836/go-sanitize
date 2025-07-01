@@ -328,6 +328,13 @@ func TestDomain(t *testing.T) {
 				true,
 			},
 			{
+				"testing new domain",
+				"mhj.email",
+				"mhj.email",
+				true,
+				true,
+			},
+			{
 				"domain with tabs and spaces",
 				`		domain.com`,
 				"domain.com",
