@@ -233,33 +233,45 @@ citation              ## Update version in CITATION.cff (use version=X.Y.Z)
 clean-mods            ## Remove all the Go mod cache
 coverage              ## Show test coverage
 diff                  ## Show git diff and fail if uncommitted changes exist
+fumpt                 ## Run fumpt to format Go code
 generate              ## Run go generate in the base of the repo
 godocs                ## Trigger GoDocs tag sync
-govulncheck-install   ## Install govulncheck
+govulncheck-install   ## Install govulncheck (pass VERSION= to override)
+govulncheck           ## Scan for vulnerabilities
 help                  ## Display this help message
 install-go            ## Install using go install with specific version
 install-releaser      ## Install GoReleaser
+install-stdlib        ## Install the Go standard library for the host platform
+install-template      ## Kick-start a fresh copy of go-template (run once!)
 install               ## Install the application binary
+lint-version          ## Show the golangci-lint version
 lint                  ## Run the golangci-lint application (install if not found)
+loc                   ## Total lines of code table
+mod-download          ## Download Go module dependencies
+mod-tidy              ## Clean up go.mod and go.sum
+pre-build             ## Pre-build all packages to warm cache
 release-snap          ## Build snapshot binaries
 release-test          ## Run release dry-run (no publish)
 release               ## Run production release (requires github_token)
-run-fuzz-tests        ## Run fuzz tests for all packages
 tag-remove            ## Remove local and remote tag (use version=X.Y.Z)
 tag-update            ## Force-update tag to current commit (use version=X.Y.Z)
 tag                   ## Create and push a new tag (use version=X.Y.Z)
 test-ci-no-race       ## CI test suite without race detector
-test-ci-short         ## CI unit-only short tests
-test-ci               ## CI full test suite with coverage
+test-ci               ## CI test runs tests with race detection and coverage (no lint - handled separately)
+test-cover-race       ## Runs unit tests with race detector and outputs coverage
+test-cover            ## Unit tests with coverage (no race)
+test-fuzz             ## Run fuzz tests only (no unit tests)
 test-no-lint          ## Run only tests (no lint)
-test-short            ## Run tests excluding integration
-test-unit             ## Runs tests and outputs coverage
-test                  ## Run lint and all tests
+test-parallel         ## Run tests in parallel (faster for large repos)
+test-race             ## Unit tests with race detector (no coverage)
+test-short            ## Run tests excluding integration tests (no lint)
+test                  ## Default testing uses lint + unit tests (fast)
 uninstall             ## Uninstall the Go binary
 update-linter         ## Upgrade golangci-lint (macOS only)
 update-releaser       ## Reinstall GoReleaser
 update                ## Update dependencies
-vet                   ## Run go vet
+vet-parallel          ## Run go vet in parallel (faster for large repos)
+vet                   ## Run go vet only on your module packages
 ```
 <!-- make-help-end -->
 
@@ -269,20 +281,36 @@ vet                   ## Run go vet
 <summary><strong><code>GitHub Workflows</code></strong></summary>
 <br/>
 
-| Workflow Name                                                                | Description                                                                                                            |
-|------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------|
-| [auto-merge-on-approval.yml](.github/workflows/auto-merge-on-approval.yml)   | Automatically merges PRs after approval and all required checks, following strict rules.                               |
-| [check-for-leaks.yml](.github/workflows/check-for-leaks.yml)                 | Runs [gitleaks](https://github.com/gitleaks/gitleaks) to detect secrets on a daily schedule.                           |
-| [clean-runner-cache.yml](.github/workflows/clean-runner-cache.yml)           | Removes GitHub Actions caches tied to closed pull requests.                                                            |
-| [codeql-analysis.yml](.github/workflows/codeql-analysis.yml)                 | Analyzes code for security vulnerabilities using [GitHub CodeQL](https://codeql.github.com/).                          |
-| [delete-merged-branches.yml](.github/workflows/delete-merged-branches.yml)   | Deletes feature branches after their pull requests are merged.                                                         |
-| [dependabot-auto-merge.yml](.github/workflows/dependabot-auto-merge.yml)     | Automatically merges [Dependabot](https://github.com/dependabot) PRs that meet all requirements.                       |
-| [pull-request-management.yml](.github/workflows/pull-request-management.yml) | Labels PRs by branch prefix, assigns a default user if none is assigned, and welcomes new contributors with a comment. |
-| [release.yml](.github/workflows/release.yml)                                 | Builds and publishes releases via [GoReleaser](https://goreleaser.com/intro/) when a semver tag is pushed.             |
-| [run-tests.yml](.github/workflows/run-tests.yml)                             | Runs linter, Go tests and dependency checks on every push and pull request.                                            |
-| [scorecard.yml](.github/workflows/scorecard.yml)                             | Runs [OpenSSF](https://openssf.org/) Scorecard to assess supply chain security.                                        |
-| [stale.yml](.github/workflows/stale.yml)                                     | Warns about (and optionally closes) inactive issues and PRs on a schedule or manual trigger.                           |
-| [sync-labels.yml](.github/workflows/sync-labels.yml)                         | Keeps GitHub labels in sync with the declarative manifest at [`.github/labels.yml`](./.github/labels.yml).             |
+
+### 🎛️ The Workflow Control Center
+
+All GitHub Actions workflows in this repository are powered by a single configuration file: [**.env.shared**](.github/.env.shared) – your one-stop shop for tweaking CI/CD behavior without touching a single YAML file! 🎯
+
+This magical file controls everything from:
+- **🚀 Go version matrix** (test on multiple versions or just one)
+- **🏃 Runner selection** (Ubuntu or macOS, your wallet decides)
+- **🔬 Feature toggles** (coverage, fuzzing, linting, race detection)
+- **🛡️ Security tool versions** (gitleaks, nancy, govulncheck)
+- **🤖 Auto-merge behaviors** (how aggressive should the bots be?)
+- **🏷️ PR management rules** (size labels, auto-assignment, welcome messages)
+
+> **Pro tip:** Want to disable code coverage? Just flip `ENABLE_CODE_COVERAGE=false` in [.env.shared](.github/.env.shared) and push. No YAML archaeology required!
+
+<br/>
+
+| Workflow Name                                                                      | Description                                                                                                            |
+|------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------|
+| [auto-merge-on-approval.yml](.github/workflows/auto-merge-on-approval.yml)         | Automatically merges PRs after approval and all required checks, following strict rules.                               |
+| [codeql-analysis.yml](.github/workflows/codeql-analysis.yml)                       | Analyzes code for security vulnerabilities using [GitHub CodeQL](https://codeql.github.com/).                          |
+| [dependabot-auto-merge.yml](.github/workflows/dependabot-auto-merge.yml)           | Automatically merges [Dependabot](https://github.com/dependabot) PRs that meet all requirements.                       |
+| [fortress.yml](.github/workflows/fortress.yml)                                     | Runs the GoFortress security and testing workflow, including linting, testing, releasing, and vulnerability checks.    |
+| [ossar.yml](.github/workflows/ossar.yml)                                           | Runs [OSSAR](https://github.com/github/ossar-action) static analysis workflow                                          |
+| [pull-request-management.yml](.github/workflows/pull-request-management.yml)       | Labels PRs by branch prefix, assigns a default user if none is assigned, and welcomes new contributors with a comment. |
+| [scorecard.yml](.github/workflows/scorecard.yml)                                   | Runs [OpenSSF](https://openssf.org/) Scorecard to assess supply chain security.                                        |
+| [stale.yml](.github/workflows/stale-check.yml)                                     | Warns about (and optionally closes) inactive issues and PRs on a schedule or manual trigger.                           |
+| [sync-labels.yml](.github/workflows/sync-labels.yml)                               | Keeps GitHub labels in sync with the declarative manifest at [`.github/labels.yml`](./.github/labels.yml).             |
+| [update-python-dependencies.yml](.github/workflows/update-python-dependencies.yml) | Updates Python dependencies for pre-commit hooks in the repository.                                                    |
+| [update-pre-commit-hooks.yml](.github/workflows/update-pre-commit-hooks.yml)       | Automatically update versions for [pre-commit](https://pre-commit.com/) hooks                                          |
 
 </details>
 
@@ -304,12 +332,17 @@ This command ensures all dependencies are brought up to date in a single step, i
 
 ## 🧪 Examples & Tests
 
-All unit tests and [examples](examples) run via [GitHub Actions](https://github.com/mrz1836/go-sanitize/actions) and use [Go version 1.18.x](https://go.dev/doc/go1.18). View the [configuration file](.github/workflows/run-tests.yml).
+All unit tests and [examples](examples) run via [GitHub Actions](https://github.com/mrz1836/go-template/actions) and use [Go version 1.24.x](https://go.dev/doc/go1.24). View the [configuration file](.github/workflows/fortress.yml).
 
-Run all tests:
+Run all tests (fast):
 
 ```bash script
 make test
+```
+
+Run all tests with race detector (slower):
+```bash script
+make test-race
 ```
 
 <br/>

@@ -1,0 +1,411 @@
+# ------------------------------------------------------------------------------------
+#  Setup Configuration (Reusable Workflow) (GoFortress)
+#
+#  Purpose: Set up the CI configuration, parse environment variables, and generate
+#  test matrices for the main workflow. This workflow handles all the initial
+#  configuration logic.
+#
+#  Maintainer: @mrz1836
+#
+# ------------------------------------------------------------------------------------
+
+name: GoFortress (Setup Configuration)
+
+on:
+  workflow_call:
+    inputs:
+      env-json:
+        description: 'JSON string of environment variables'
+        required: true
+        type: string
+      primary-runner:
+        description: 'Primary runner OS'
+        required: true
+        type: string
+    secrets:
+      github-token:
+        description: 'GitHub token for API access'
+        required: true
+    outputs:
+      code-coverage-enabled:
+        description: 'Whether code coverage is enabled'
+        value: ${{ jobs.setup-config.outputs.code-coverage-enabled }}
+      fuzz-testing-enabled:
+        description: 'Whether fuzz testing is enabled'
+        value: ${{ jobs.setup-config.outputs.fuzz-testing-enabled }}
+      go-primary-version:
+        description: 'Primary Go version'
+        value: ${{ jobs.setup-config.outputs.go-primary-version }}
+      go-secondary-version:
+        description: 'Secondary Go version'
+        value: ${{ jobs.setup-config.outputs.go-secondary-version }}
+      go-versions:
+        description: 'Unique Go versions array'
+        value: ${{ jobs.setup-config.outputs.go-versions }}
+      lint-enabled:
+        description: 'Whether linting is enabled'
+        value: ${{ jobs.setup-config.outputs.lint-enabled }}
+      makefile-exists:
+        description: 'Whether Makefile exists'
+        value: ${{ jobs.setup-config.outputs.makefile-exists }}
+      primary-runner:
+        description: 'Primary runner OS'
+        value: ${{ jobs.setup-config.outputs.primary-runner }}
+      race-detection-enabled:
+        description: 'Whether race detection is enabled'
+        value: ${{ jobs.setup-config.outputs.race-detection-enabled }}
+      secondary-runner:
+        description: 'Secondary runner OS'
+        value: ${{ jobs.setup-config.outputs.secondary-runner }}
+      security-scans-enabled:
+        description: 'Whether security scans are enabled'
+        value: ${{ jobs.setup-config.outputs.security-scans-enabled }}
+      start-epoch:
+        description: 'Workflow start epoch time'
+        value: ${{ jobs.setup-config.outputs.start-epoch }}
+      start-time:
+        description: 'Workflow start time'
+        value: ${{ jobs.setup-config.outputs.start-time }}
+      static-analysis-enabled:
+        description: 'Whether static analysis is enabled'
+        value: ${{ jobs.setup-config.outputs.static-analysis-enabled }}
+      test-matrix:
+        description: 'Test matrix JSON'
+        value: ${{ jobs.setup-config.outputs.test-matrix }}
+      warm-cache-matrix:
+        description: 'Warm cache matrix JSON'
+        value: ${{ jobs.setup-config.outputs.warm-cache-matrix }}
+
+permissions:
+  contents: read
+
+jobs:
+  # ----------------------------------------------------------------------------------
+  # Setup the configuration for the CI environment
+  # ----------------------------------------------------------------------------------
+  setup-config:
+    name: 🎯 Setup CI Config
+    runs-on: ${{ inputs.primary-runner }}
+    outputs:
+      code-coverage-enabled: ${{ steps.config.outputs.code-coverage-enabled }}
+      fuzz-testing-enabled: ${{ steps.config.outputs.fuzz-testing-enabled }}
+      go-primary-version: ${{ steps.config.outputs.go-primary-version }}
+      go-secondary-version: ${{ steps.config.outputs.go-secondary-version }}
+      go-versions: ${{ steps.versions.outputs.versions }}
+      lint-enabled: ${{ steps.config.outputs.lint-enabled }}
+      makefile-exists: ${{ steps.config.outputs.makefile-exists }}
+      primary-runner: ${{ steps.config.outputs.primary-runner }}
+      race-detection-enabled: ${{ steps.config.outputs.race-detection-enabled }}
+      secondary-runner: ${{ steps.config.outputs.secondary-runner }}
+      security-scans-enabled: ${{ steps.config.outputs.security-scans-enabled }}
+      start-epoch: ${{ steps.timer.outputs.start-epoch }}
+      start-time: ${{ steps.timer.outputs.start-time }}
+      static-analysis-enabled: ${{ steps.config.outputs.static-analysis-enabled }}
+      test-matrix: ${{ steps.matrix.outputs.matrix }}
+      warm-cache-matrix: ${{ steps.matrix.outputs.matrix }}
+
+    steps:
+      # ————————————————————————————————————————————————————————————————
+      # Start timer to record workflow start time
+      # ————————————————————————————————————————————————————————————————
+      - name: ⏱️ Record start time
+        id: timer
+        run: |
+          START_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          START_EPOCH=$(date +%s)
+          echo "start-time=$START_TIME" >> $GITHUB_OUTPUT
+          echo "start-epoch=$START_EPOCH" >> $GITHUB_OUTPUT
+          echo "🚀 Workflow started at: $START_TIME"
+
+      # ————————————————————————————————————————————————————————————————
+      # Parse environment variables from JSON
+      # ————————————————————————————————————————————————————————————————
+      - name: 🔧 Parse environment variables
+        id: parse-env
+        env:
+          ENV_JSON: ${{ inputs.env-json }}
+        run: |
+          echo "📋 Parsing environment variables..."
+
+          # Extract each variable from JSON and set as output
+          echo "$ENV_JSON" | jq -r 'to_entries | .[] | "\(.key)=\(.value)"' | while IFS='=' read -r key value; do
+            echo "$key=$value" >> $GITHUB_ENV
+          done
+
+          echo "✅ Environment variables parsed successfully"
+
+      # ————————————————————————————————————————————————————————————————
+      # Checkout code (sparse checkout)
+      # ————————————————————————————————————————————————————————————————
+      - name: 📥 Checkout (sparse)
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          sparse-checkout: |
+            Makefile
+            go.mod
+            go.sum
+
+      # ————————————————————————————————————————————————————————————————
+      # Get Go versions and set up the matrix
+      # ————————————————————————————————————————————————————————————————
+      - name: 🔍 Get Unique Go Versions
+        id: versions
+        run: |
+          # Create array of unique versions
+          VERSIONS=$(jq -n \
+          --arg v1 "${{ env.GO_PRIMARY_VERSION }}" \
+          --arg v2 "${{ env.GO_SECONDARY_VERSION }}" \
+          '[$v1, $v2] | unique | sort')
+
+          VERSIONS=$(echo "$VERSIONS" | jq -c .)
+          echo "versions=$VERSIONS" >> "$GITHUB_OUTPUT"
+          echo "✅ Unique Go versions: $VERSIONS"
+
+      # ————————————————————————————————————————————————————————————————
+      # Generate the test matrix based on Go versions and runner OSes
+      # ————————————————————————————————————————————————————————————————
+      - name: 🔧 Generate Optimized Matrix
+        id: matrix
+        shell: bash
+        run: |
+          echo "🎯 Generating test matrix..."
+
+          # ------------------------------------------------------------
+          # Prepare runner list (max 2)
+          # ------------------------------------------------------------
+          PRIMARY="${{ env.PRIMARY_RUNNER }}"
+          SECONDARY="${{ env.SECONDARY_RUNNER }}"
+          RUNNERS=("$PRIMARY")
+          if [[ "$SECONDARY" != "$PRIMARY" ]]; then
+            RUNNERS+=("$SECONDARY")
+          fi
+
+          # ------------------------------------------------------------
+          # Get Go versions from previous step
+          # ------------------------------------------------------------
+          VERSIONS='${{ steps.versions.outputs.versions }}'
+          VERSION_COUNT=$(echo "$VERSIONS" | jq 'length')
+
+          # Start with an empty matrix
+          MATRIX='{"include": []}'
+
+          # ------------------------------------------------------------
+          # Build the matrix
+          # ------------------------------------------------------------
+          for OS in "${RUNNERS[@]}"; do
+            if [[ "$OS" == *"ubuntu"* ]]; then
+              OS_SHORT="Linux"
+            else
+              OS_SHORT="macOS"
+            fi
+
+            for i in $(seq 0 $((VERSION_COUNT - 1))); do
+              GO_VERSION=$(echo "$VERSIONS" | jq -r ".[$i]")
+              IS_PRIMARY=$([[ "$GO_VERSION" == "${{ env.GO_PRIMARY_VERSION }}" ]] && echo "true" || echo "false")
+
+              # Determine name and fuzz setting
+              if [[ "$OS_SHORT" == "Linux" && "$IS_PRIMARY" == "true" ]]; then
+                RUN_FUZZ=${{ env.ENABLE_FUZZ_TESTING }}
+                NAME="$OS_SHORT (Primary Go $GO_VERSION)"
+              else
+                RUN_FUZZ="false"
+                if [[ "$VERSION_COUNT" -eq 1 ]]; then
+                  NAME="$OS_SHORT"
+                else
+                  NAME="$OS_SHORT Go $GO_VERSION"
+                fi
+              fi
+
+              # Append to matrix
+              MATRIX=$(echo "$MATRIX" | jq \
+                --arg os "$OS" \
+                --arg go "$GO_VERSION" \
+                --arg name "$NAME" \
+                --arg fuzz "$RUN_FUZZ" \
+                '.include += [{
+                  "os": $os,
+                  "go-version": $go,
+                  "name": $name,
+                  "run-fuzz": ($fuzz == "true")
+                }]')
+            done
+          done
+
+          # ------------------------------------------------------------
+          # Output the matrix
+          # ------------------------------------------------------------
+          echo "matrix=$(echo "$MATRIX" | jq -c .)" >> "$GITHUB_OUTPUT"
+          echo "✅ Matrix generated successfully"
+
+      # ————————————————————————————————————————————————————————————————
+      # Configure environment variables
+      # ————————————————————————————————————————————————————————————————
+      - name: 🔧 Configure CI Environment Configuration
+        id: config
+        run: |
+          echo "🎯 Configuring environment variables for CI..."
+
+          # Validate and export Go versions
+          echo "go-primary-version=${{ env.GO_PRIMARY_VERSION }}" >> $GITHUB_OUTPUT
+          echo "go-secondary-version=${{ env.GO_SECONDARY_VERSION }}" >> $GITHUB_OUTPUT
+
+          # Export runners (for reference in steps, not job level)
+          echo "primary-runner=${{ env.PRIMARY_RUNNER }}" >> $GITHUB_OUTPUT
+          echo "secondary-runner=${{ env.SECONDARY_RUNNER }}" >> $GITHUB_OUTPUT
+
+          # Check if Makefile exists
+          if [ -f "Makefile" ]; then
+            echo "makefile-exists=true" >> $GITHUB_OUTPUT
+            echo "✅ Makefile found"
+          else
+            echo "makefile-exists=false" >> $GITHUB_OUTPUT
+            echo "⚠️ No Makefile found"
+            if [ "${{ env.MAKEFILE_REQUIRED }}" == "true" ]; then
+              echo "❌ Makefile is required but not found!"
+              exit 1
+            fi
+          fi
+
+          # Feature flags
+          echo "code-coverage-enabled=${{ env.ENABLE_CODE_COVERAGE }}" >> $GITHUB_OUTPUT
+          echo "lint-enabled=${{ env.ENABLE_LINT }}" >> $GITHUB_OUTPUT
+          echo "race-detection-enabled=${{ env.ENABLE_RACE_DETECTION }}" >> $GITHUB_OUTPUT
+          echo "security-scans-enabled=${{ env.ENABLE_SECURITY_SCANS }}" >> $GITHUB_OUTPUT
+          echo "static-analysis-enabled=${{ env.ENABLE_STATIC_ANALYSIS }}" >> $GITHUB_OUTPUT
+          echo "fuzz-testing-enabled=${{ env.ENABLE_FUZZ_TESTING }}" >> $GITHUB_OUTPUT
+
+      # ————————————————————————————————————————————————————————————————
+      # Build the final summary of the configuration
+      # ————————————————————————————————————————————————————————————————
+      - name: 📋 Build Configuration Summary
+        id: config-summary
+        env:
+          ENV_JSON: ${{ inputs.env-json }}
+        run: |
+          UNIQUE_GO_VERSIONS='${{ steps.versions.outputs.versions }}'
+          MATRIX_JSON='${{ steps.matrix.outputs.matrix }}'
+
+          # Count environment variables
+          ENV_COUNT=$(echo "$ENV_JSON" | jq 'keys | length')
+
+          # Get current timestamp
+          SUMMARY_TIME=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
+
+          # Start building the summary
+          echo "# 🏰 GoFortress CI Configuration Report" >> $GITHUB_STEP_SUMMARY
+          echo "_Generated at: ${SUMMARY_TIME}_" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Environment Overview
+          echo "## 📊 Environment Overview" >> $GITHUB_STEP_SUMMARY
+          echo "- **Total Environment Variables Loaded**: $ENV_COUNT" >> $GITHUB_STEP_SUMMARY
+          echo "- **Configuration Source**: \`.github/.env.shared\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Workflow Start Time**: ${{ steps.timer.outputs.start-time }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # All Environment Variables
+          echo "## 🔍 Loaded Environment Variables" >> $GITHUB_STEP_SUMMARY
+          echo "<details>" >> $GITHUB_STEP_SUMMARY
+          echo "<summary>Click to expand all $ENV_COUNT environment variables</summary>" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Variable | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|-------|" >> $GITHUB_STEP_SUMMARY
+
+          # Sort and display all env vars
+          echo "$ENV_JSON" | jq -r 'to_entries | sort_by(.key) | .[] | "| **\(.key)** | `\(.value)` |"' >> $GITHUB_STEP_SUMMARY
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "</details>" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Core Configuration
+          echo "## 🎯 Core CI Configuration" >> $GITHUB_STEP_SUMMARY
+          echo "| Setting | Value | Description |" >> $GITHUB_STEP_SUMMARY
+          echo "|---------|-------|-------------|" >> $GITHUB_STEP_SUMMARY
+          echo "| **Primary Runner** | \`${{ env.PRIMARY_RUNNER }}\` | Main OS for CI jobs |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Secondary Runner** | \`${{ env.SECONDARY_RUNNER }}\` | Additional OS for compatibility testing |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Primary Go Version** | \`${{ env.GO_PRIMARY_VERSION }}\` | Main Go version for builds |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Secondary Go Version** | \`${{ env.GO_SECONDARY_VERSION }}\` | Additional Go version for testing |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Unique Go Versions** | $UNIQUE_GO_VERSIONS | Deduplicated list of Go versions |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Feature Flags
+          echo "## 🚀 Feature Flags" >> $GITHUB_STEP_SUMMARY
+          echo "| Feature | Status | Impact |" >> $GITHUB_STEP_SUMMARY
+          echo "|---------|--------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| **Code Coverage** | $([ "${{ env.ENABLE_CODE_COVERAGE }}" == "true" ] && echo "✅ Enabled" || echo "❌ Disabled") | Code coverage reports will $([ "${{ env.ENABLE_CODE_COVERAGE }}" == "true" ] && echo "be generated and uploaded to Codecov" || echo "not be generated") |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Fuzz Testing** | $([ "${{ env.ENABLE_FUZZ_TESTING }}" == "true" ] && echo "✅ Enabled" || echo "❌ Disabled") | Fuzz tests will $([ "${{ env.ENABLE_FUZZ_TESTING }}" == "true" ] && echo "run on Linux with primary Go version" || echo "be skipped") |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Linting** | $([ "${{ env.ENABLE_LINT }}" == "true" ] && echo "✅ Enabled" || echo "❌ Disabled") | golangci-lint will $([ "${{ env.ENABLE_LINT }}" == "true" ] && echo "analyze code quality" || echo "be skipped") |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Race Detection** | $([ "${{ env.ENABLE_RACE_DETECTION }}" == "true" ] && echo "✅ Enabled" || echo "❌ Disabled") | Tests will $([ "${{ env.ENABLE_RACE_DETECTION }}" == "true" ] && echo "run with -race flag" || echo "run without race detection") |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Security Scans** | $([ "${{ env.ENABLE_SECURITY_SCANS }}" == "true" ] && echo "✅ Enabled" || echo "❌ Disabled") | Security tools will $([ "${{ env.ENABLE_SECURITY_SCANS }}" == "true" ] && echo "scan for vulnerabilities" || echo "be skipped") |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Static Analysis** | $([ "${{ env.ENABLE_STATIC_ANALYSIS }}" == "true" ] && echo "✅ Enabled" || echo "❌ Disabled") | Static analysis will $([ "${{ env.ENABLE_STATIC_ANALYSIS }}" == "true" ] && echo "check for code issues" || echo "be skipped") |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Build Requirements
+          echo "## 🔨 Build Requirements" >> $GITHUB_STEP_SUMMARY
+          echo "| Requirement | Status | Details |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------------|--------|---------|" >> $GITHUB_STEP_SUMMARY
+          echo "| **Makefile** | $([ "${{ steps.config.outputs.makefile-exists }}" == "true" ] && echo "✅ Found" || echo "⚠️ Not Found") | Required: $([ "${{ env.MAKEFILE_REQUIRED }}" == "true" ] && echo "Yes" || echo "No") |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Verbose Output** | $([ "${{ env.ENABLE_VERBOSE_TEST_OUTPUT }}" == "true" ] && echo "✅ Enabled" || echo "❌ Disabled") | Test output verbosity |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Custom Project Variables
+          echo "## 🎨 Custom Project Configuration" >> $GITHUB_STEP_SUMMARY
+          PROJECT_VARS=$(echo "$ENV_JSON" | jq -r 'to_entries | map(select(.key | startswith("CUSTOM_"))) | length')
+          if [ "$PROJECT_VARS" -gt 0 ]; then
+            echo "Found **$PROJECT_VARS** CUSTOM-specific environment variables:" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "| Variable | Value |" >> $GITHUB_STEP_SUMMARY
+            echo "|----------|-------|" >> $GITHUB_STEP_SUMMARY
+            echo "$ENV_JSON" | jq -r 'to_entries | map(select(.key | startswith("CUSTOM_"))) | sort_by(.key) | .[] | "| **\(.key)** | `\(.value)` |"' >> $GITHUB_STEP_SUMMARY
+          else
+            echo "_No project-specific (CUSTOM_*) variables found._" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Security Tools Configuration
+          echo "## 🔒 Security Tools Configuration" >> $GITHUB_STEP_SUMMARY
+          echo "| Tool | Version | Configuration |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|---------|---------------|" >> $GITHUB_STEP_SUMMARY
+          echo "| **Gitleaks** | \`${{ env.GITLEAKS_VERSION }}\` | Notify: \`${{ env.GITLEAKS_NOTIFY_USER_LIST }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Govulncheck** | \`${{ env.GOVULNCHECK_VERSION }}\` | Go vulnerability scanner |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Nancy** | \`${{ env.NANCY_VERSION }}\` | Excludes: \`${{ env.NANCY_EXCLUDES }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Test Matrix
+          echo "## 🧪 Generated Test Matrix" >> $GITHUB_STEP_SUMMARY
+          MATRIX_COUNT=$(echo "$MATRIX_JSON" | jq '.include | length')
+          echo "**Total test configurations**: $MATRIX_COUNT" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| # | OS | Go Version | Configuration Name | Fuzz Testing |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|----|-----------|--------------------|--------------|" >> $GITHUB_STEP_SUMMARY
+
+          echo "$MATRIX_JSON" | jq -r '.include | to_entries | .[] | "| \(.key + 1) | \(.value.os) | \(.value["go-version"]) | \(.value.name) | \(if .value["run-fuzz"] then "✅ Yes" else "❌ No" end) |"' >> $GITHUB_STEP_SUMMARY
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # GitHub Token Configuration
+          echo "## 🔑 Authentication" >> $GITHUB_STEP_SUMMARY
+          echo "| Setting | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|---------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| **Preferred Token** | \`${{ env.PREFERRED_GITHUB_TOKEN }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Token Type** | $([ "${{ env.PREFERRED_GITHUB_TOKEN }}" == "GH_PAT_TOKEN" ] && echo "Personal Access Token (5000 req/hour)" || echo "Default GITHUB_TOKEN (1000 req/hour)") |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Summary Statistics
+          echo "## 📈 Configuration Statistics" >> $GITHUB_STEP_SUMMARY
+          ENABLED_FEATURES=$(echo "$ENV_JSON" | jq -r '[to_entries | .[] | select(.key | startswith("ENABLE_")) | select(.value == "true")] | length')
+          DISABLED_FEATURES=$(echo "$ENV_JSON" | jq -r '[to_entries | .[] | select(.key | startswith("ENABLE_")) | select(.value == "false")] | length')
+
+          echo "- **Enabled Features**: $ENABLED_FEATURES" >> $GITHUB_STEP_SUMMARY
+          echo "- **Disabled Features**: $DISABLED_FEATURES" >> $GITHUB_STEP_SUMMARY
+          echo "- **Test Matrix Combinations**: $MATRIX_COUNT" >> $GITHUB_STEP_SUMMARY
+          echo "- **Unique Go Versions**: $(echo "$UNIQUE_GO_VERSIONS" | jq 'length')" >> $GITHUB_STEP_SUMMARY
+          echo "- **Runner Operating Systems**: $([ "${{ env.PRIMARY_RUNNER }}" == "${{ env.SECONDARY_RUNNER }}" ] && echo "1" || echo "2")" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Footer
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "🎯 **Configuration completed successfully** at $(date -u +"%H:%M:%S UTC")" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "_GoFortress CI/CD Pipeline - Built Strong. Tested Harder._" >> $GITHUB_STEP_SUMMARY

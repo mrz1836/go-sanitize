@@ -1,0 +1,72 @@
+# ------------------------------------------------------------------------------------
+#  Load Environment Variables Composite Action
+#
+#  Purpose: Loads and parses the .github/.env.shared file into JSON format
+#           for use across all GitHub Actions workflows
+#
+#  Outputs:
+#    env-json: JSON object containing all environment variables from .env.shared
+#
+#  Usage:
+#    - uses: ./.github/actions/load-env
+#      id: load-env
+#
+#  Maintainer: @mrz1836
+#
+# ------------------------------------------------------------------------------------
+
+name: 'Load Environment Variables'
+description: 'Loads environment variables from .github/.env.shared and outputs as JSON'
+
+outputs:
+  env-json:
+    description: 'JSON object containing all environment variables'
+    value: ${{ steps.load-env.outputs.env-json }}
+  primary-runner:
+    description: 'Primary runner OS extracted from environment variables'
+    value: ${{ steps.load-env.outputs.primary-runner }}
+
+runs:
+  using: "composite"
+  steps:
+    # ————————————————————————————————————————————————————————————————
+    # Load and parse environment file
+    # ————————————————————————————————————————————————————————————————
+    - name: 🔧 Load environment variables
+      id: load-env
+      shell: bash
+      run: |
+        echo "📋 Loading environment variables from .github/.env.shared..."
+
+        # Convert .env file to JSON for easy passing between jobs
+        # Strip inline comments and process the file
+        ENV_JSON=$(cat .github/.env.shared | \
+          grep -v '^#' | \
+          grep -v '^$' | \
+          sed 's/#.*$//' | \
+          sed 's/[[:space:]]*$//' | \
+          jq -Rs 'split("\n") | map(select(length > 0) | split("=") | select(length == 2) | {(.[0]): .[1]}) | add')
+
+        # Check to make sure we have an ENV and it is not empty
+        if [[ -z "$ENV_JSON" ]]; then
+            echo "❌ ERROR: Environment variables are empty or not set." >&2
+            exit 1
+        fi
+
+        # Properly escape the JSON for GitHub Actions output
+        echo "env-json<<EOF" >> $GITHUB_OUTPUT
+        echo "$ENV_JSON" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+        echo "✅ Environment variables loaded successfully"
+
+        # Log count of variables loaded (for debugging)
+        VAR_COUNT=$(echo "$ENV_JSON" | jq 'keys | length')
+        echo "📊 Loaded $VAR_COUNT environment variables"
+
+        # Parse env for the primary_runner
+        PRIMARY_RUNNER=$(echo "$ENV_JSON" | jq -r '.PRIMARY_RUNNER')
+        if [[ -z "$PRIMARY_RUNNER" ]]; then
+            echo "❌ PRIMARY_RUNNER is not set in the environment file." >&2
+            exit 1
+        fi
+        echo "primary-runner=$PRIMARY_RUNNER" >> $GITHUB_OUTPUT

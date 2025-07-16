@@ -1,0 +1,28 @@
+{
+	"[go]": {
+		"editor.formatOnSave": true,
+		"editor.codeActionsOnSave": {
+			"source.organizeImports": "explicit"
+		}
+	},
+	"[go.mod]": {
+		"editor.formatOnSave": true,
+		"editor.codeActionsOnSave": {
+			"source.organizeImports": "explicit"
+		}
+	},
+	"go.useLanguageServer": true,
+	"gopls": {
+		"formatting.local": "github.com/mrz1836/go-template",
+		"formatting.gofumpt": true
+	},
+	"go.lintTool": "golangci-lint",
+	"go.lintFlags": [
+		"--verbose"
+	],
+	"[go][go.mod]": {
+		"editor.codeActionsOnSave": {
+			"source.organizeImports": "explicit"
+		}
+	}
+}

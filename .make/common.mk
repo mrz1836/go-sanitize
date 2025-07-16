@@ -73,6 +73,28 @@ install-releaser: ## Install GoReleaser
 	@echo "Installing GoReleaser..."
 	@curl -sSfL https://install.goreleaser.com/github.com/goreleaser/goreleaser@latest | sh
 
+## LOC_TEST is the number of lines in test files (ignoring full-line comments and blank lines)
+LOC_TEST := $(shell find . -name '*_test.go' \
+	-not -path './vendor/*' \
+	-not -path './third_party/*' \
+	-exec grep -vE '^\s*//|^\s*$$' {} + | wc -l)
+
+## LOC_GO is the number of lines in non-test Go files
+LOC_GO := $(shell find . -name '*.go' ! -name '*_test.go' \
+	-not -path './vendor/*' \
+	-not -path './third_party/*' \
+	-exec grep -vE '^\s*//|^\s*$$' {} + | wc -l)
+
+## DATE is the current date in YYYY-MM-DD format
+DATE     := $(shell date +%Y-%m-%d)
+
+.PHONY: loc
+loc: ## Total lines of code table
+	@echo "| Type       | Total Lines | Date        |"
+	@echo "|------------|-------------|-------------|"
+	@echo "| Test Files | $(LOC_TEST) | $(DATE)     |"
+	@echo "| Go Files   | $(LOC_GO)   | $(DATE)     |"
+
 .PHONY: release
 release: ## Run production release (requires github_token)
 	@echo "Running release..."

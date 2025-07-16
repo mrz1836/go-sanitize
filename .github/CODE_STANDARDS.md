@@ -1,10 +1,40 @@
-# 🚀 Code Standards
+# ✅ Code Standards
 
-Welcome to a modern Go codebase. This library follows best-in-class practices for clarity, performance, and maintainability. Our single source of truth is [AGENTS.md](./AGENTS.md). If anything here ever contradicts it, follow **AGENTS.md**.
+Welcome to a modern Go codebase. 
+
+This library follows best-in-class practices for clarity, performance, and maintainability.
 
 <br/>
 
-## 📄 Reference Material
+## 🎓 Effective Go
+
+We adhere to the patterns and philosophy in [Effective Go](https://golang.org/doc/effective_go.html). 
+
+Stick to idiomatic code. Avoid cleverness when clarity wins.
+
+<br/>
+
+## 🧰 Project Conventions
+
+Everything lives in our [AGENTS.md](./AGENTS.md) file. Read it. Bookmark it. Trust it.
+
+Here’s a quick overview of what you'll find:
+- Directory structure and related governance docs
+- Naming conventions for code and files
+- Commenting standards and templates
+- Development, testing, and coverage standards
+- Error handling practices in Go
+- Commit and branch naming conventions
+- Pull request conventions and required sections
+- Labeling conventions for GitHub issues/PRs
+- Makefile and build system overview
+- And more!
+
+This is intended for AI agents like [GPT](https://chatgpt.com/) and [Claude](https://claude.ai), but also for us human developers too!
+
+<br/>
+
+## 📄 Golang Reference Material
 
 When in doubt, check the official docs:
 
@@ -16,38 +46,6 @@ When in doubt, check the official docs:
 * 🔧 [gofmt](https://golang.org/cmd/gofmt/)
 * 📊 [golangci-lint](https://golangci-lint.run/)
 * 📈 [Go Report Card](https://goreportcard.com/)
-
-<br/>
-
-## 🧰 AGENTS.md
-
-Everything from naming conventions to pull request etiquette lives in [AGENTS.md](./AGENTS.md). Read it. Bookmark it. Trust it.
-
-<br/>
-
-## 🎓 Effective Go
-
-We adhere to the patterns and philosophy in [Effective Go](https://golang.org/doc/effective_go.html). Stick to idiomatic code. Avoid cleverness when clarity wins.
-
-<br/>
-
-## 🔍 golangci-lint
-
-We lint all the things. Our active ruleset lives in [`.golangci.json`](../.golangci.json).
-
-### 🌎 macOS, Linux or Windows
-
-Running `make lint` will detect if it's installed. If not, it will attempt to automatically install it for you.
-
-```sh
-make lint
-```
-
-<br/>
-
-## 📑 Documentation
-
-All exported code must be documented. Use `godoc`-compatible comments. If your function needs an example, include it. If it doesn’t, question if it should be exported.
 
 <br/>
 

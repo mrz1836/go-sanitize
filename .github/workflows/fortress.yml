@@ -1,0 +1,278 @@
+# ------------------------------------------------------------------------------------
+#  🏰 GoFortress - Enterprise-grade CI/CD fortress for Go applications
+#
+#  Built Strong. Tested Harder.
+#
+#  GoFortress transforms your Go development pipeline into an impenetrable fortress
+#  of quality. Like a medieval fortress with multiple layers of defense, GoFortress
+#  employs multi-stage verification to ensure your code is battle-tested before deployment.
+#
+#  Your Code's Defense System:
+#  🏰 Fortress of Go: Multi-stage CI/CD pipeline for Go applications
+#  🛡️ Security Ramparts: Nancy, Govulncheck, Gitleaks guard against threats
+#  🏗️ Quality Battlements: Static analysis and comprehensive linting
+#  ⚔️ Testing Garrison: Multi-OS, multi-version matrices with race detection
+#  🎯 Performance Watchtowers: Real-time metrics and cache optimization
+#  🚀 Release Citadel: Automated versioning and changelog generation
+#
+#  Maintainer: @mrz1836
+#
+#  Copyright 2025 @mrz1836
+#  SPDX-License-Identifier: MIT
+#
+#  This file is licensed under the MIT License.
+#  Attribution is requested if reused: Created by @mrz1836
+#
+# ------------------------------------------------------------------------------------
+
+name: GoFortress
+
+# ————————————————————————————————————————————————————————————————
+# Trigger Configuration
+# ————————————————————————————————————————————————————————————————
+on:
+  push:
+    branches:
+      - master # Main branch for production
+    tags:
+      - 'v*'   # Tags starting with 'v' (e.g., v1.0.0) trigger the workflow
+  pull_request:
+    branches:
+      - '**'   # All branches for PRs
+
+# ————————————————————————————————————————————————————————————————
+# Permissions
+# ————————————————————————————————————————————————————————————————
+permissions:
+  contents: read
+
+# ————————————————————————————————————————————————————————————————
+# Concurrency Control
+# ————————————————————————————————————————————————————————————————
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ----------------------------------------------------------------------------------
+  # Load Environment Variables and Setup Configuration
+  # ----------------------------------------------------------------------------------
+  load-env:
+    name: 🌍 Load Environment Variables
+    runs-on: ubuntu-24.04
+    outputs:
+      env-json: ${{ steps.load-env.outputs.env-json }}
+      primary-runner: ${{ steps.load-env.outputs.primary-runner }}
+    steps:
+      # ————————————————————————————————————————————————————————————————
+      # Check out code to access env file
+      # ————————————————————————————————————————————————————————————————
+      - name: 📥 Checkout code (sparse)
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          sparse-checkout: |
+            .github/.env.shared
+            .github/actions/load-env
+
+      # ————————————————————————————————————————————————————————————————
+      # Load and parse environment file
+      # ————————————————————————————————————————————————————————————————
+      - name: 🌍 Load environment variables
+        uses: ./.github/actions/load-env
+        id: load-env
+  # ----------------------------------------------------------------------------------
+  # Setup Configuration Workflow
+  # ----------------------------------------------------------------------------------
+  setup:
+    name: 🎯 Setup Configuration
+    needs: [ load-env ]
+    uses: ./.github/workflows/fortress-setup-config.yml
+    with:
+      env-json: ${{ needs.load-env.outputs.env-json }}
+      primary-runner: ${{ needs.load-env.outputs.primary-runner }}
+    secrets:
+      github-token: ${{ secrets.GH_PAT_TOKEN != '' && secrets.GH_PAT_TOKEN || secrets.GITHUB_TOKEN }}
+  # ----------------------------------------------------------------------------------
+  # Test Makefile
+  # ----------------------------------------------------------------------------------
+  test-makefile:
+    name: 📋 Test Makefile
+    needs: [ load-env, setup ]
+    uses: ./.github/workflows/fortress-test-makefile.yml
+    with:
+      env-json: ${{ needs.load-env.outputs.env-json }}
+      primary-runner: ${{ needs.setup.outputs.primary-runner }}
+  # ----------------------------------------------------------------------------------
+  # Warm Go Caches
+  # ----------------------------------------------------------------------------------
+  warm-cache:
+    name: 💾 Warm Cache (${{ matrix.name }})
+    needs: [ load-env, setup, test-makefile ]
+    strategy:
+      fail-fast: true
+      matrix: ${{ fromJson(needs.setup.outputs.warm-cache-matrix) }}
+    runs-on: ${{ matrix.os }}
+    steps:
+      # ————————————————————————————————————————————————————————————————
+      # Checkout code to access local action
+      # ————————————————————————————————————————————————————————————————
+      - name: 📥 Checkout code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          sparse-checkout: |
+            .github/actions/warm-cache
+            go.mod
+            go.sum
+
+      # ————————————————————————————————————————————————————————————————
+      # Extract verbose flag from env-json
+      # ————————————————————————————————————————————————————————————————
+      - name: 🔁 Extract ENABLE_VERBOSE
+        id: extract
+        run: |
+          echo "enable_verbose=$(echo '${{ needs.load-env.outputs.env-json }}' | jq -r '.ENABLE_VERBOSE_TEST_OUTPUT')" >> "$GITHUB_OUTPUT"
+
+      # ————————————————————————————————————————————————————————————————
+      # Warm the Go caches using local action
+      # ————————————————————————————————————————————————————————————————
+      - name: 🔥 Warm Go Caches
+        uses: ./.github/actions/warm-cache # Might not resolve as it's a composite action
+        with:
+          go-version: ${{ matrix.go-version }}
+          matrix-os: ${{ matrix.os }}
+          matrix-name: ${{ matrix.name }}
+          enable-verbose: ${{ steps.extract.outputs.enable_verbose }}
+          go-primary-version: ${{ needs.setup.outputs.go-primary-version }}
+          go-secondary-version: ${{ needs.setup.outputs.go-secondary-version }}
+  # ----------------------------------------------------------------------------------
+  # Security Scans
+  # ----------------------------------------------------------------------------------
+  security:
+    name: 🔒 Security Scans
+    needs: [ load-env, setup, warm-cache, test-makefile ]
+    if: needs.setup.outputs.security-scans-enabled == 'true'
+    uses: ./.github/workflows/fortress-security-scans.yml
+    with:
+      env-json: ${{ needs.load-env.outputs.env-json }}
+      go-primary-version: ${{ needs.setup.outputs.go-primary-version }}
+      primary-runner: ${{ needs.setup.outputs.primary-runner }}
+    secrets:
+      github-token: ${{ secrets.GH_PAT_TOKEN != '' && secrets.GH_PAT_TOKEN || secrets.GITHUB_TOKEN }}
+      gitleaks-license: ${{ secrets.GITLEAKS_LICENSE }}
+  # ----------------------------------------------------------------------------------
+  # Code Quality Checks
+  # ----------------------------------------------------------------------------------
+  code-quality:
+    name: 📊 Code Quality
+    needs: [ load-env, setup, warm-cache, test-makefile ]
+    uses: ./.github/workflows/fortress-code-quality.yml
+    with:
+      env-json: ${{ needs.load-env.outputs.env-json }}
+      go-primary-version: ${{ needs.setup.outputs.go-primary-version }}
+      lint-enabled: ${{ needs.setup.outputs.lint-enabled }}
+      primary-runner: ${{ needs.setup.outputs.primary-runner }}
+      static-analysis-enabled: ${{ needs.setup.outputs.static-analysis-enabled }}
+    secrets:
+      github-token: ${{ secrets.GH_PAT_TOKEN != '' && secrets.GH_PAT_TOKEN || secrets.GITHUB_TOKEN }}
+  # ----------------------------------------------------------------------------------
+  # Test Suite
+  # ----------------------------------------------------------------------------------
+  test-suite:
+    name: 🧪 Test Suite
+    needs: [ load-env, setup, warm-cache, test-makefile ]
+    uses: ./.github/workflows/fortress-test-suite.yml
+    with:
+      code-coverage-enabled: ${{ needs.setup.outputs.code-coverage-enabled }}
+      env-json: ${{ needs.load-env.outputs.env-json }}
+      fuzz-testing-enabled: ${{ needs.setup.outputs.fuzz-testing-enabled }}
+      go-primary-version: ${{ needs.setup.outputs.go-primary-version }}
+      go-secondary-version: ${{ needs.setup.outputs.go-secondary-version }}
+      primary-runner: ${{ needs.setup.outputs.primary-runner }}
+      race-detection-enabled: ${{ needs.setup.outputs.race-detection-enabled }}
+      test-matrix: ${{ needs.setup.outputs.test-matrix }}
+    secrets:
+      github-token: ${{ secrets.GH_PAT_TOKEN != '' && secrets.GH_PAT_TOKEN || secrets.GITHUB_TOKEN }}
+      codecov-token: ${{ secrets.CODECOV_TOKEN }}
+  # ----------------------------------------------------------------------------------
+  # Final Status Check
+  # ----------------------------------------------------------------------------------
+  status-check:
+    name: 🎯 All Tests Passed
+    if: ${{ always() }}
+    needs: [ setup, test-makefile, security, code-quality, test-suite ]
+    runs-on: ${{ needs.setup.outputs.primary-runner }}
+    steps:
+      # ————————————————————————————————————————————————————————————————
+      # Build a summary table for the UI (always runs)
+      # ————————————————————————————————————————————————————————————————
+      - name: 📊 Build results summary
+        run: |
+          {
+            echo "## 🚦 Workflow Results"
+            echo ""
+            echo "| Component | Result |"
+            echo "|-----------|--------|"
+            echo "| 🎯 Setup | ${{ needs.setup.result }} |"
+            echo "| 📋 Makefile | ${{ needs.test-makefile.result }} |"
+            echo "| 🔒 Security | ${{ needs.security.result }} |"
+            echo "| 📊 Code Quality | ${{ needs.code-quality.result }} |"
+            echo "| 🧪 Test Suite | ${{ needs.test-suite.result }} |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # ————————————————————————————————————————————————————————————————
+      # Fail the workflow *only* when a dependency actually failed/canceled
+      # - 'skipped' is OK (e.g. feature flag off)
+      # ————————————————————————————————————————————————————————————————
+      - name: ❌ Fail if any required job errored
+        if: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}
+        run: |
+          echo "❌ One or more jobs failed or were cancelled – see summary above." >&2
+          exit 1
+
+      # ————————————————————————————————————————————————————————————————
+      # Succeed if all required jobs passed or were skipped
+      # ————————————————————————————————————————————————————————————————
+      - name: ✅ Mark workflow success
+        if: ${{ !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled') }}
+        run: |
+          echo "🎉 All required checks passed (skipped jobs are considered OK)."
+
+  # ----------------------------------------------------------------------------------
+  # Release Version
+  # ----------------------------------------------------------------------------------
+  release:
+    name: 🚀 Release Version
+    needs: [ load-env, setup, status-check ]
+    # Only run on successful tag pushes
+    if: startsWith(github.ref, 'refs/tags/v') && needs.status-check.result == 'success'
+    uses: ./.github/workflows/fortress-release.yml
+    with:
+      env-json: ${{ needs.load-env.outputs.env-json }}
+      primary-runner: ${{ needs.setup.outputs.primary-runner }}
+      go-primary-version: ${{ needs.setup.outputs.go-primary-version }}
+      golangci-lint-version: ${{ needs.code-quality.outputs.golangci-lint-version }}
+    secrets:
+      github-token: ${{ secrets.GH_PAT_TOKEN != '' && secrets.GH_PAT_TOKEN || secrets.GITHUB_TOKEN }}
+      slack-webhook: ${{ secrets.SLACK_WEBHOOK || '' }}
+    permissions:
+      contents: write
+  # ----------------------------------------------------------------------------------
+  # Performance Summary Report
+  # ----------------------------------------------------------------------------------
+  performance-summary:
+    name: 📊 Performance Summary
+    if: always()
+    needs: [ load-env,  setup, test-makefile, security, code-quality, test-suite, release ]
+    uses: ./.github/workflows/fortress-performance-summary.yml
+    with:
+      code-quality-result: ${{ needs.code-quality.result }}
+      env-json: ${{ needs.load-env.outputs.env-json }}
+      primary-runner: ${{ needs.setup.outputs.primary-runner }}
+      release-result: ${{ needs.release.result }}
+      security-result: ${{ needs.security.result }}
+      setup-result: ${{ needs.setup.result }}
+      start-epoch: ${{ needs.setup.outputs.start-epoch }}
+      start-time: ${{ needs.setup.outputs.start-time }}
+      test-makefile-result: ${{ needs.test-makefile.result }}
+      test-matrix: ${{ needs.setup.outputs.test-matrix }}
+      test-suite-result: ${{ needs.test-suite.result }}

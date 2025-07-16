@@ -1,0 +1,269 @@
+# ------------------------------------------------------------------------------------
+#  Performance Summary (Reusable Workflow) (GoFortress)
+#
+#  Purpose: Generate a comprehensive performance summary report for the entire
+#  workflow run, including timing metrics, cache statistics, and test results.
+#
+#  Maintainer: @mrz1836
+#
+# ------------------------------------------------------------------------------------
+
+name: GoFortress (Performance Summary)
+
+on:
+  workflow_call:
+    inputs:
+      start-epoch:
+        description: 'Workflow start epoch time'
+        required: true
+        type: string
+      start-time:
+        description: 'Workflow start time'
+        required: true
+        type: string
+      setup-result:
+        description: 'Setup job result'
+        required: true
+        type: string
+      test-makefile-result:
+        description: 'Test Makefile job result'
+        required: true
+        type: string
+      security-result:
+        description: 'Security job result'
+        required: true
+        type: string
+      code-quality-result:
+        description: 'Code quality job result'
+        required: true
+        type: string
+      test-suite-result:
+        description: 'Test suite job result'
+        required: true
+        type: string
+      release-result:
+        description: 'Result of the release job'
+        required: false
+        type: string
+        default: 'skipped'
+      test-matrix:
+        description: 'Test matrix JSON'
+        required: true
+        type: string
+      env-json:
+        description: 'JSON string of environment variables'
+        required: true
+        type: string
+      primary-runner:
+        description: 'Primary runner OS'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  # ----------------------------------------------------------------------------------
+  # Performance Summary Report
+  # ----------------------------------------------------------------------------------
+  performance-summary:
+    name: 📊 Performance Summary Report
+    runs-on: ${{ inputs.primary-runner }}
+    steps:
+      # ————————————————————————————————————————————————————————————————
+      # Parse environment variables
+      # ————————————————————————————————————————————————————————————————
+      - name: 🔧 Parse environment variables
+        env:
+          ENV_JSON: ${{ inputs.env-json }}
+        run: |
+          echo "📋 Setting environment variables..."
+          echo "$ENV_JSON" | jq -r 'to_entries | .[] | "\(.key)=\(.value)"' | while IFS='=' read -r key value; do
+            echo "$key=$value" >> $GITHUB_ENV
+          done
+
+      # ————————————————————————————————————————————————————————————————
+      # Download all statistics artifacts
+      # ————————————————————————————————————————————————————————————————
+      - name: 📥 Download performance artifacts
+        if: always()
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+        with:
+          pattern: '*-stats-*'
+          merge-multiple: true
+
+      # ————————————————————————————————————————————————————————————————
+      # Generate performance report
+      # ————————————————————————————————————————————————————————————————
+      - name: 📊 Generate Performance Report
+        id: generate-performance-report
+        run: |
+          # Calculate total duration
+          START_EPOCH=${{ inputs.start-epoch }}
+          END_EPOCH=$(date +%s)
+          TOTAL_DURATION=$((END_EPOCH - START_EPOCH))
+          TOTAL_MINUTES=$((TOTAL_DURATION / 60))
+          TOTAL_SECONDS=$((TOTAL_DURATION % 60))
+
+          # Store as outputs for later use
+          echo "total_minutes=$TOTAL_MINUTES" >> $GITHUB_OUTPUT
+          echo "total_seconds=$TOTAL_SECONDS" >> $GITHUB_OUTPUT
+          echo "total_duration=$TOTAL_DURATION" >> $GITHUB_OUTPUT
+
+          # Start performance summary
+          {
+            echo "## 📊 Workflow Performance Metrics"
+            echo ""
+            echo "### ⏱️ Overall Timing"
+            echo "| Metric | Value |"
+            echo "|--------|-------|"
+            echo "| **Total Duration** | ${TOTAL_MINUTES}m ${TOTAL_SECONDS}s |"
+            echo "| **Start Time** | ${{ inputs.start-time }} |"
+            echo "| **End Time** | $(date -u +"%Y-%m-%dT%H:%M:%SZ") |"
+            echo "| **Workflow** | ${{ github.workflow }} |"
+            echo "| **Run Number** | ${{ github.run_number }} |"
+            echo "| **Trigger** | ${{ github.event_name }} |"
+            echo ""
+
+            # Process cache statistics if available
+            if ls cache-stats-*.json >/dev/null 2>&1; then
+              echo "### 💾 Cache Performance" >> $GITHUB_STEP_SUMMARY
+              echo "| OS | Go Version | Module Cache | Build Cache | Module Size | Build Size |" >> $GITHUB_STEP_SUMMARY
+              echo "|----|------------|--------------|-------------|-------------|------------|" >> $GITHUB_STEP_SUMMARY
+
+              TOTAL_CACHE_HITS=0
+              TOTAL_CACHE_ATTEMPTS=0
+
+              for stats_file in cache-stats-*.json; do
+                if [ -f "$stats_file" ]; then
+                  OS=$(jq -r '.os' "$stats_file")
+                  GO_VER=$(jq -r '.go_version' "$stats_file")
+                  GOMOD_HIT=$(jq -r '.gomod_cache_hit' "$stats_file")
+                  GOBUILD_HIT=$(jq -r '.gobuild_cache_hit' "$stats_file")
+                  GOMOD_SIZE=$(jq -r '.cache_size_gomod' "$stats_file")
+                  GOBUILD_SIZE=$(jq -r '.cache_size_gobuild' "$stats_file")
+
+                  GOMOD_ICON=$([[ "$GOMOD_HIT" == "true" ]] && echo "✅ Hit" || echo "❌ Miss")
+                  GOBUILD_ICON=$([[ "$GOBUILD_HIT" == "true" ]] && echo "✅ Hit" || echo "❌ Miss")
+
+                  echo "| $OS | $GO_VER | $GOMOD_ICON | $GOBUILD_ICON | $GOMOD_SIZE | $GOBUILD_SIZE |" >> $GITHUB_STEP_SUMMARY
+
+                  [[ "$GOMOD_HIT" == "true" ]] && TOTAL_CACHE_HITS=$((TOTAL_CACHE_HITS + 1))
+                  [[ "$GOBUILD_HIT" == "true" ]] && TOTAL_CACHE_HITS=$((TOTAL_CACHE_HITS + 1))
+                  TOTAL_CACHE_ATTEMPTS=$((TOTAL_CACHE_ATTEMPTS + 2))
+                fi
+              done
+            fi
+
+            # Process test statistics if available
+            if ls test-stats-*.json >/dev/null 2>&1; then
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "### 🧪 Test Execution Performance" >> $GITHUB_STEP_SUMMARY
+              echo "| Test Suite | Duration | Tests | Examples | Status | Race | Coverage | Fuzz |" >> $GITHUB_STEP_SUMMARY
+              echo "|------------|----------|-------|----------|--------|------|----------|------|" >> $GITHUB_STEP_SUMMARY
+
+              for stats_file in test-stats-*.json; do
+                if [ -f "$stats_file" ]; then
+                  NAME=$(jq -r '.name' "$stats_file")
+                  DURATION=$(jq -r '.duration_seconds' "$stats_file")
+                  TEST_COUNT=$(jq -r '.test_count' "$stats_file")
+                  EXAMPLE_COUNT=$(jq -r '.example_count' "$stats_file")
+                  STATUS=$(jq -r '.status' "$stats_file")
+                  RACE_ENABLED=$(jq -r '.race_enabled' "$stats_file")
+                  COVERAGE_ENABLED=$(jq -r '.coverage_enabled' "$stats_file")
+                  FUZZ_RUN=$(jq -r '.fuzz_run' "$stats_file")
+
+                  DURATION_MIN=$((DURATION / 60))
+                  DURATION_SEC=$((DURATION % 60))
+
+                  COVERAGE_ICON=$([[ "$COVERAGE_ENABLED" == "true" ]] && echo "✅" || echo "❌")
+                  FUZZ_ICON=$([[ "$FUZZ_RUN" == "true" ]] && echo "🔍" || echo "")
+                  RACE_ICON=$([[ "$RACE_ENABLED" == "true" ]] && echo "✅" || echo "❌")
+                  STATUS_ICON=$([[ "$STATUS" == "success" ]] && echo "✅" || echo "❌")
+
+                  echo "| $NAME | ${DURATION_MIN}m ${DURATION_SEC}s | $TEST_COUNT | $EXAMPLE_COUNT | $STATUS_ICON | $RACE_ICON | $COVERAGE_ICON | $FUZZ_ICON |" >> $GITHUB_STEP_SUMMARY
+                fi
+              done
+
+              DISPLAYED_LOC_SUMMARY=false
+
+              for stats_file in test-stats-*.json; do
+                if [ -f "$stats_file" ] && [ "$DISPLAYED_LOC_SUMMARY" = false ]; then
+                  LOC_SUMMARY=$(jq -r '.loc_summary' "$stats_file")
+                  echo "" >> $GITHUB_STEP_SUMMARY
+                  echo "### 📊 Lines of Code Summary" >> $GITHUB_STEP_SUMMARY
+                  echo "$LOC_SUMMARY" >> $GITHUB_STEP_SUMMARY
+                  DISPLAYED_LOC_SUMMARY=true
+                fi
+              done
+            fi
+
+            echo "### 🔧 Job Results Summary"
+            echo "| Job | Status | Result |"
+            echo "|-----|--------|--------|"
+            echo "| 🎯 Setup Configuration | ${{ inputs.setup-result }} | $([ "${{ inputs.setup-result }}" = "success" ] && echo "✅" || echo "❌") |"
+            echo "| 📋 Test Makefile | ${{ inputs.test-makefile-result }} | $([ "${{ inputs.test-makefile-result }}" = "success" ] && echo "✅" || echo "❌") |"
+            echo "| 🔒 Security Scans | ${{ inputs.security-result }} | $([ "${{ inputs.security-result }}" = "success" ] && echo "✅" || echo "❌") |"
+            echo "| 📊 Code Quality | ${{ inputs.code-quality-result }} | $([ "${{ inputs.code-quality-result }}" = "success" ] && echo "✅" || echo "❌") |"
+            echo "| 🧪 Test Suite | ${{ inputs.test-suite-result }} | $([ "${{ inputs.test-suite-result }}" = "success" ] && echo "✅" || echo "❌") |"
+            # Only show release row if it was attempted
+            if [[ "${{ inputs.release-result }}" != "skipped" ]]; then
+              echo "| 🚀 Release | ${{ inputs.release-result }} | $([ "${{ inputs.release-result }}" = "success" ] && echo "✅" || echo "❌") |"
+            fi
+
+            echo ""
+
+            # Add release-specific information if this was a tag push
+            if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+              echo "## 📦 Release Information"
+              if [[ "${{ inputs.release-result }}" == "success" ]]; then
+                echo "✅ Release ${{ github.ref_name }} created successfully!"
+                echo "[View Release](https://github.com/${{ github.repository }}/releases/tag/${{ github.ref_name }})"
+              elif [[ "${{ inputs.release-result }}" == "skipped" ]]; then
+                echo "⏭️ Release was skipped (likely due to test failures)"
+              elif [[ "${{ inputs.release-result }}" == "failure" ]]; then
+                echo "❌ Release creation failed - check logs for details"
+              fi
+              echo ""
+            fi
+
+            echo ""
+
+            echo "### 🚀 Performance Insights"
+            if [[ $TOTAL_DURATION -gt 600 ]]; then
+              echo "- ⚠️  **Warning**: Workflow took longer than 10 minutes (${TOTAL_MINUTES}m ${TOTAL_SECONDS}s)"
+            elif [[ $TOTAL_DURATION -gt 180 && $TOTAL_DURATION -le 300 ]]; then
+              echo "- 🎉  **Great Job**: Workflow completed in under 5 minutes (${TOTAL_MINUTES}m ${TOTAL_SECONDS}s)!"
+            elif [[ $TOTAL_DURATION -le 180 ]]; then
+              echo "- 🚀  **Excellent Performance**: Workflow completed in under 3 minutes!"
+            else
+              echo "- ℹ️  Workflow completed in ${TOTAL_MINUTES}m ${TOTAL_SECONDS}s."
+            fi
+            echo "- **Parallel Jobs**: Multiple jobs ran in parallel to optimize execution time"
+            echo "- **Matrix Strategy**: Tests ran across $(echo '${{ inputs.test-matrix }}' | jq '.include | length') configurations"
+            if [ "${{ env.ENABLE_VERBOSE_TEST_OUTPUT }}" != "true" ]; then
+              echo "- **Verbose Output**: Disabled to speed up test execution"
+            else
+              echo "- **Verbose Output**: Enabled for detailed test logs"
+            fi
+
+            # Add failure analysis if any job failed
+            FAILED_JOBS=""
+            [ "${{ inputs.setup-result }}" != "success" ] && [ "${{ inputs.setup-result }}" != "skipped" ] && FAILED_JOBS="${FAILED_JOBS}Setup Configuration, "
+            [ "${{ inputs.test-makefile-result }}" != "success" ] && [ "${{ inputs.test-makefile-result }}" != "skipped" ] && FAILED_JOBS="${FAILED_JOBS}Test Makefile, "
+            [ "${{ inputs.security-result }}" != "success" ] && [ "${{ inputs.security-result }}" != "skipped" ] && FAILED_JOBS="${FAILED_JOBS}Security Scans, "
+            [ "${{ inputs.code-quality-result }}" != "success" ] && [ "${{ inputs.code-quality-result }}" != "skipped" ] && FAILED_JOBS="${FAILED_JOBS}Code Quality, "
+            [ "${{ inputs.test-suite-result }}" != "success" ] && [ "${{ inputs.test-suite-result }}" != "skipped" ] && FAILED_JOBS="${FAILED_JOBS}Test Suite, "
+            [ "${{ inputs.release-result }}" != "success" ] && [ "${{ inputs.release-result }}" != "skipped" ] && FAILED_JOBS="${FAILED_JOBS}Release, "
+
+            if [ -n "$FAILED_JOBS" ]; then
+              FAILED_JOBS=${FAILED_JOBS%, }  # Remove trailing comma
+              echo ""
+              echo "### ❌ Failed Jobs"
+              echo "The following jobs did not complete successfully:"
+              echo "- ${FAILED_JOBS}"
+            fi
+
+          } >> $GITHUB_STEP_SUMMARY
+
+          echo "✅ Performance summary report generated successfully"

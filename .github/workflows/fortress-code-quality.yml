@@ -1,0 +1,282 @@
+# ------------------------------------------------------------------------------------
+#  Code Quality (Reusable Workflow) (GoFortress)
+#
+#  Purpose: Run code quality checks including Go vet (static analysis) and
+#  golangci-lint (comprehensive linting).
+#
+#  Maintainer: @mrz1836
+#
+# ------------------------------------------------------------------------------------
+
+name: GoFortress (Code Quality)
+
+on:
+  workflow_call:
+    inputs:
+      env-json:
+        description: 'JSON string of environment variables'
+        required: true
+        type: string
+      primary-runner:
+        description: 'Primary runner OS'
+        required: true
+        type: string
+      go-primary-version:
+        description: 'Primary Go version'
+        required: true
+        type: string
+      lint-enabled:
+        description: 'Whether linting is enabled'
+        required: true
+        type: string
+      static-analysis-enabled:
+        description: 'Whether static analysis is enabled'
+        required: true
+        type: string
+    outputs:
+      golangci-lint-version:
+        description: 'Version of golangci-lint used in the workflow'
+        value: ${{ jobs.lint.outputs.golangci-lint-version }}
+    secrets:
+      github-token:
+        description: 'GitHub token for API access'
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  # ----------------------------------------------------------------------------------
+  # Go Vet (Static Analysis)
+  # ----------------------------------------------------------------------------------
+  govet:
+    name: 📊 Govet (Static Analysis)
+    if: ${{ inputs.static-analysis-enabled == 'true' }}
+    runs-on: ${{ inputs.primary-runner }}
+    steps:
+      # ————————————————————————————————————————————————————————————————
+      # Parse environment variables
+      # ————————————————————————————————————————————————————————————————
+      - name: 🔧 Parse environment variables
+        env:
+          ENV_JSON: ${{ inputs.env-json }}
+        run: |
+          echo "📋 Setting environment variables..."
+          echo "$ENV_JSON" | jq -r 'to_entries | .[] | "\(.key)=\(.value)"' | while IFS='=' read -r key value; do
+            echo "$key=$value" >> $GITHUB_ENV
+          done
+
+      # ————————————————————————————————————————————————————————————————
+      # Checkout code and set up Go environment
+      # ————————————————————————————————————————————————————————————————
+      - name: 📥 Checkout code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: 🔧 Set Go cache paths (cross-platform)
+        run: |
+          echo "🔧 Setting up Go cache paths..."
+          echo "GOCACHE=$HOME/.cache/go-build"        >> $GITHUB_ENV
+          echo "GOMODCACHE=$HOME/go/pkg/mod"          >> $GITHUB_ENV
+          echo "GOLANGCI_LINT_CACHE=$HOME/.cache/golangci-lint" >> $GITHUB_ENV
+
+      # ————————————————————————————————————————————————————————————————
+      # Restore Go module and build caches
+      # ————————————————————————————————————————————————————————————————
+      - name: 💾 Restore Go module cache
+        id: restore-gomod
+        uses: actions/cache/restore@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ inputs.primary-runner }}-gomod-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ inputs.primary-runner }}-gomod-
+
+      # ————————————————————————————————————————————————————————————————
+      # # Restore the build cache and test cache
+      # ————————————————————————————————————————————————————————————————
+      - name: 💾 Restore Go build cache
+        id: restore-gobuild
+        uses: actions/cache/restore@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/.cache/go-build/test
+          key: ${{ inputs.primary-runner }}-gobuild-${{ inputs.go-primary-version }}-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ inputs.primary-runner }}-gobuild-${{ inputs.go-primary-version }}-
+
+      # ————————————————————————————————————————————————————————————————
+      # Set up Go environment
+      # ————————————————————————————————————————————————————————————————
+      - name: 🏗️ Set up Go
+        id: setup-go-vet
+        uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
+        with:
+          go-version: ${{ inputs.go-primary-version }}
+          cache: false # we handle caches ourselves
+
+      # ————————————————————————————————————————————————————————————————
+      # Run go vet with parallel execution
+      # ————————————————————————————————————————————————————————————————
+      - name: 🔍 Go vet (parallel)
+        run: |
+          echo "🚀 Running static analysis with go vet (parallel mode)..."
+          make vet-parallel
+          echo "✅ Static analysis completed successfully"
+
+      # ————————————————————————————————————————————————————————————————
+      # Summary of Go vet results
+      # ————————————————————————————————————————————————————————————————
+      - name: 📊 Job Summary
+        run: |
+          echo "## 📊 Go Vet Static Analysis Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| 🔍 Analysis Details | ✅ Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| **Tool** | go vet (Official Go Static Analyzer) |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Execution** | 🚀 Project packages only |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Scope** | ./... (excludes dependencies) |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Result** | ✅ No issues found |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "🎯 **All packages passed static analysis checks.**" >> $GITHUB_STEP_SUMMARY
+
+  # ----------------------------------------------------------------------------------
+  # Lint (Code Linting)
+  # ----------------------------------------------------------------------------------
+  lint:
+    name: ✨ Lint Code
+    if: ${{ inputs.lint-enabled == 'true' }}
+    runs-on: ${{ inputs.primary-runner }}
+    outputs:
+      golangci-lint-version: ${{ steps.golangci-lint-version.outputs.version }}
+    steps:
+      # ————————————————————————————————————————————————————————————————
+      # Parse environment variables
+      # ————————————————————————————————————————————————————————————————
+      - name: 🔧 Parse environment variables
+        env:
+          ENV_JSON: ${{ inputs.env-json }}
+        run: |
+          echo "📋 Setting environment variables..."
+          echo "$ENV_JSON" | jq -r 'to_entries | .[] | "\(.key)=\(.value)"' | while IFS='=' read -r key value; do
+            echo "$key=$value" >> $GITHUB_ENV
+          done
+
+      # ————————————————————————————————————————————————————————————————
+      # Checkout code and set up Go environment
+      # ————————————————————————————————————————————————————————————————
+      - name: 📥 Checkout code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: 🔧 Set Go cache paths (cross-platform)
+        run: |
+          echo "🔧 Setting up Go cache paths..."
+          echo "GOCACHE=$HOME/.cache/go-build"        >> $GITHUB_ENV
+          echo "GOMODCACHE=$HOME/go/pkg/mod"          >> $GITHUB_ENV
+          echo "GOLANGCI_LINT_CACHE=$HOME/.cache/golangci-lint" >> $GITHUB_ENV
+
+      # ————————————————————————————————————————————————————————————————
+      # Extract golangci-lint version from Makefile
+      # ————————————————————————————————————————————————————————————————
+      - name: 🔍 Extract golangci-lint version from Makefile
+        id: golangci-lint-version
+        run: |
+          VERSION=$(make lint-version)
+          if [ -z "$VERSION" ]; then
+            echo "❌ GOLANGCI_LINT_VERSION is not set in the Makefile"
+            exit 1
+          fi
+          echo "✅ Found golangci-lint version: $VERSION"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      # ————————————————————————————————————————————————————————————————
+      # Restore Go module and build caches
+      # ————————————————————————————————————————————————————————————————
+      - name: 💾 Restore Go module cache
+        id: restore-gomod
+        uses: actions/cache/restore@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ inputs.primary-runner }}-gomod-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ inputs.primary-runner }}-gomod-
+
+      # ————————————————————————————————————————————————————————————————
+      # Restore the build cache and test cache
+      # ————————————————————————————————————————————————————————————————
+      - name: 💾 Restore Go build cache
+        id: restore-gobuild
+        uses: actions/cache/restore@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/.cache/go-build/test
+          key: ${{ inputs.primary-runner }}-gobuild-${{ inputs.go-primary-version }}-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ inputs.primary-runner }}-gobuild-${{ inputs.go-primary-version }}-
+
+      # ————————————————————————————————————————————————————————————————
+      # Set up Go environment
+      # ————————————————————————————————————————————————————————————————
+      - name: 🏗️ Set up Go
+        id: setup-go-lint
+        uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
+        with:
+          go-version: ${{ inputs.go-primary-version }}
+          cache: false
+
+      # ————————————————————————————————————————————————————————————————
+      # Restore Cache golangci-lint
+      # ————————————————————————————————————————————————————————————————
+      - name: 💾 Cache golangci-lint analysis
+        id: cache-golangci-lint
+        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+        with:
+          path: ${{ env.GOLANGCI_LINT_CACHE }}
+          key: ${{ inputs.primary-runner }}-golangci-lint-analysis-${{ hashFiles('.golangci.json', '**/go.sum') }}-${{ steps.golangci-lint-version.outputs.version }}
+          restore-keys: |
+            ${{ inputs.primary-runner }}-golangci-lint-analysis-${{ hashFiles('.golangci.json', '**/go.sum') }}
+            ${{ inputs.primary-runner }}-golangci-lint-analysis-
+
+      - name: 🔍 Debug cache usage
+        run: |
+          echo "🔍 Module cache size: $(du -sh $GOMODCACHE 2>/dev/null | cut -f1 || echo 'N/A')"
+          echo "🔍 Build cache size: $(du -sh $GOCACHE 2>/dev/null | cut -f1 || echo 'N/A')"
+          echo "🔍 Lint cache size: $(du -sh $GOLANGCI_LINT_CACHE 2>/dev/null | cut -f1 || echo 'N/A')"
+          echo "🔍 Checking if vendor directory exists: $(ls -la | grep vendor || echo 'No vendor directory')"
+
+      # ————————————————————————————————————————————————————————————————
+      # Run golangci-lint
+      # ————————————————————————————————————————————————————————————————
+      - name: ✨ Run golangci-lint
+        run: |
+          echo "🧹 Running code linting with golangci-lint..."
+          echo "💾 Golangci-lint cache location: $GOLANGCI_LINT_CACHE"
+          echo "📁 Module cache path: $GOMODCACHE"
+
+          # Export the cache directory for golangci-lint
+          export GOLANGCI_LINT_CACHE=$GOLANGCI_LINT_CACHE
+
+          # Running lint with version from Makefile
+          echo "🔧 Using golangci-lint version: ${{ steps.golangci-lint-version.outputs.version }}"
+
+          # Run with your makefile
+          make lint
+
+          echo "✅ Code linting completed successfully"
+
+      # ————————————————————————————————————————————————————————————————
+      # Summary of golangci-lint results
+      # ————————————————————————————————————————————————————————————————
+      - name: 📊 Job Summary
+        run: |
+          echo "## ✨ Code Linting Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| 🧹 Linting Details | ✅ Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| **Configuration** | Custom ruleset via .golangci.json |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Version** | ${{ steps.golangci-lint-version.outputs.version }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Cache** | 💾 Analysis cache enabled |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Result** | ✅ All checks passed |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "🎯 **Code quality standards met - no linting issues found.**" >> $GITHUB_STEP_SUMMARY

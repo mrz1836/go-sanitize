@@ -1,0 +1,241 @@
+# ------------------------------------------------------------------------------------
+#  Version Release (Reusable Workflow) (GoFortress)
+#
+#  Purpose: Build & publish releases via GoReleaser when called from the orchestrator.
+#  This is a reusable workflow that handles the release process after successful tests.
+#
+#  Maintainer: @mrz1836
+#
+# ------------------------------------------------------------------------------------
+
+name: GoFortress (Version Release)
+
+# ————————————————————————————————————————————————————————————————
+# Workflow Call Configuration
+# ————————————————————————————————————————————————————————————————
+on:
+  workflow_call:
+    inputs:
+      env-json:
+        description: 'Environment configuration in JSON format'
+        required: true
+        type: string
+      primary-runner:
+        description: 'Primary runner OS to use'
+        required: true
+        type: string
+      go-primary-version:
+        description: 'Primary Go version'
+        required: true
+        type: string
+      golangci-lint-version:
+        description: 'Version of golangci-lint to use'
+        required: true
+        type: string
+    secrets:
+      github-token:
+        description: 'GitHub token for authentication'
+        required: true
+      slack-webhook:
+        description: 'Slack webhook URL for notifications'
+        required: true
+
+# ————————————————————————————————————————————————————————————————
+# Permissions
+# ————————————————————————————————————————————————————————————————
+permissions:
+  contents: read
+
+jobs:
+  # ----------------------------------------------------------------------------------
+  # Release Job
+  # ----------------------------------------------------------------------------------
+  release:
+    name: 🚀 Build and Release
+    runs-on: ${{ inputs.primary-runner }}
+    permissions:
+      contents: write  # Required to create releases
+    steps:
+      # ————————————————————————————————————————————————————————————————
+      # Checkout code and set up Go environment
+      # ————————————————————————————————————————————————————————————————
+      - name: 📥 Checkout code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0  # Required for changelog generation
+          token: ${{ secrets.github-token }}
+
+      - name: 🔧 Set Go cache paths (cross-platform)
+        run: |
+          echo "🔧 Setting up Go cache paths..."
+          echo "GOCACHE=$HOME/.cache/go-build"        >> $GITHUB_ENV
+          echo "GOMODCACHE=$HOME/go/pkg/mod"          >> $GITHUB_ENV
+          echo "GOLANGCI_LINT_CACHE=$HOME/.cache/golangci-lint" >> $GITHUB_ENV
+
+      # ————————————————————————————————————————————————————————————————
+      # Validate version tag format
+      # ————————————————————————————————————————————————————————————————
+      - name: 🏷️ Validate version tag
+        id: validate-tag
+        run: |
+          echo "🔍 Validating version tag format..."
+
+          TAG="${{ github.ref_name }}"
+
+          # Check if tag matches semantic versioning pattern
+          if [[ ! "$TAG" =~ ^v([0-9]+)\.([0-9]+)\.([0-9]+)(-[a-zA-Z0-9\.\-]+)?(\+[a-zA-Z0-9\.\-]+)?$ ]]; then
+            echo "❌ ERROR: Tag '$TAG' does not follow semantic versioning (v1.2.3)" >&2
+            exit 1
+          fi
+
+          # Extract version components
+          MAJOR="${BASH_REMATCH[1]}"
+          MINOR="${BASH_REMATCH[2]}"
+          PATCH="${BASH_REMATCH[3]}"
+          PRERELEASE="${BASH_REMATCH[4]}"
+
+          echo "✅ Valid semantic version: v$MAJOR.$MINOR.$PATCH"
+          [[ -n "$PRERELEASE" ]] && echo "   Pre-release: $PRERELEASE"
+
+          # Set outputs
+          echo "version=$TAG" >> $GITHUB_OUTPUT
+          echo "version_without_v=${TAG#v}" >> $GITHUB_OUTPUT
+          echo "is_prerelease=$([[ -n "$PRERELEASE" ]] && echo 'true' || echo 'false')" >> $GITHUB_OUTPUT
+
+      # ————————————————————————————————————————————————————————————————
+      # Extract GoReleaser version from environment
+      # ————————————————————————————————————————————————————————————————
+      - name: 🔧 Extract GoReleaser version
+        id: extract-goreleaser
+        run: |
+          GORELEASER_VERSION=$(echo '${{ inputs.env-json }}' | jq -r '.GORELEASER_VERSION // "v2.10.2"')
+          echo "✅ Using GoReleaser version: $GORELEASER_VERSION"
+          echo "version=$GORELEASER_VERSION" >> $GITHUB_OUTPUT
+
+      # ————————————————————————————————————————————————————————————————
+      # Restore Go module and build caches
+      # ————————————————————————————————————————————————————————————————
+      - name: 💾 Restore Go module cache
+        id: restore-gomod
+        uses: actions/cache/restore@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ inputs.primary-runner }}-gomod-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ inputs.primary-runner }}-gomod-
+
+      # ————————————————————————————————————————————————————————————————
+      # Restore build cache from a warm-cache job
+      # ————————————————————————————————————————————————————————————————
+      - name: 💾 Restore Go build cache
+        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/.cache/go-build/test
+          key: ${{ inputs.primary-runner }}-gobuild-${{ inputs.go-primary-version }}-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ inputs.primary-runner }}-gobuild-${{ inputs.go-primary-version }}-
+
+      # ————————————————————————————————————————————————————————————————
+      # Restore Cache golangci-lint
+      # ————————————————————————————————————————————————————————————————
+      - name: 💾 Cache golangci-lint analysis
+        id: cache-golangci-lint
+        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+        with:
+          path: ${{ env.GOLANGCI_LINT_CACHE }}
+          key: ${{ inputs.primary-runner }}-golangci-lint-analysis-${{ hashFiles('.golangci.json', '**/go.sum') }}-${{ inputs.golangci-lint-version }}
+          restore-keys: |
+            ${{ inputs.primary-runner }}-golangci-lint-analysis-${{ hashFiles('.golangci.json', '**/go.sum') }}
+            ${{ inputs.primary-runner }}-golangci-lint-analysis-
+
+      # ————————————————————————————————————————————————————————————————
+      # Set up Go environment
+      # ————————————————————————————————————————————————————————————————
+      - name: 🏗️ Set up Go
+        id: setup-go-test
+        uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
+        with:
+          go-version: ${{ inputs.go-primary-version }}
+          cache: false # we handle caches ourselves
+
+      # ————————————————————————————————————————————————————————————————
+      # Pre-flight config validation
+      # ————————————————————————————————————————————————————————————————
+      - name: 🔍 Validate GoReleaser configuration
+        uses: goreleaser/goreleaser-action@9c156ee8a17a598857849441385a2041ef570552 # v6.3.0
+        with:
+          version: ${{ steps.extract-goreleaser.outputs.version }}
+          args: check --verbose
+        env:
+          GITHUB_TOKEN: ${{ secrets.github-token }}
+          SLACK_WEBHOOK: ${{ secrets.slack-webhook }}   # used only if referenced in .goreleaser.yml
+
+      # ————————————————————————————————————————————————————————————————
+      # Extract changelog information
+      # ————————————————————————————————————————————————————————————————
+      - name: 📝 Extract changelog information
+        id: changelog
+        run: |
+          echo "📋 Extracting changelog information..."
+
+          # Get previous tag for comparison
+          PREVIOUS_TAG=$(git describe --tags --abbrev=0 ${{ github.ref_name }}^ 2>/dev/null || echo "")
+
+          if [[ -n "$PREVIOUS_TAG" ]]; then
+            echo "📊 Comparing with previous tag: $PREVIOUS_TAG"
+            COMMIT_COUNT=$(git rev-list --count ${PREVIOUS_TAG}..${{ github.ref_name }})
+            echo "🔸 Total commits since $PREVIOUS_TAG: $COMMIT_COUNT"
+            echo "previous_tag=$PREVIOUS_TAG" >> $GITHUB_OUTPUT
+          else
+            echo "ℹ️ No previous tag found - this appears to be the first release"
+            echo "previous_tag=" >> $GITHUB_OUTPUT
+          fi
+
+      # ————————————————————————————————————————————————————————————————
+      # Build and publish the release
+      # ————————————————————————————————————————————————————————————————
+      - name: 🚀 Run GoReleaser
+        id: goreleaser
+        uses: goreleaser/goreleaser-action@9c156ee8a17a598857849441385a2041ef570552 # v6.3.0
+        with:
+          version: ${{ steps.extract-goreleaser.outputs.version }}
+          args: release --clean --verbose
+        env:
+          GITHUB_TOKEN: ${{ secrets.github-token }}
+          SLACK_WEBHOOK: ${{ secrets.slack-webhook }}   # used only if referenced in .goreleaser.yml
+
+      # ————————————————————————————————————————————————————————————————
+      # Generate release summary
+      # ————————————————————————————————————————————————————————————————
+      - name: 📊 Generate release summary
+        if: always()
+        run: |
+          echo "# 🚀 Release Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## 📦 Release Information" >> $GITHUB_STEP_SUMMARY
+          echo "| Property | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Version | \`${{ steps.validate-tag.outputs.version }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Pre-release | ${{ steps.validate-tag.outputs.is_prerelease }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Repository | ${{ github.repository }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Release URL | [View Release](https://github.com/${{ github.repository }}/releases/tag/${{ github.ref_name }}) |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [[ -n "${{ steps.changelog.outputs.previous_tag }}" ]]; then
+            echo "## 📝 Changelog" >> $GITHUB_STEP_SUMMARY
+            echo "Comparing: \`${{ steps.changelog.outputs.previous_tag }}\` → \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          # Add status
+          if [[ "${{ steps.goreleaser.outcome }}" == "success" ]]; then
+            echo "✅ **Release completed successfully!**" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "🎉 Your release is now available at: https://github.com/${{ github.repository }}/releases/tag/${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Release workflow encountered issues**" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Please check the workflow logs for more details." >> $GITHUB_STEP_SUMMARY
+          fi

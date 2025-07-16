@@ -1,9 +1,8 @@
 gha_enabled: true
 branch: master
-blocked_dirs: []
+blocked_dirs: [ ]
 draft: false
 description: |
-  go-sanitize is a lightweight Go library providing robust string sanitization and normalization utilities
   Sweep AI must follow the repository guidelines in .github/AGENTS.md.
 rules:
   - "Read .github/AGENTS.md first; it overrides these rules."
