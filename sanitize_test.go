@@ -88,7 +88,7 @@ func TestAlphaNumeric(t *testing.T) {
 
 // TestBitcoinAddress will test all permutations
 func TestBitcoinAddress(t *testing.T) {
-	var tests = []struct {
+	tests := []struct {
 		name     string
 		input    string
 		expected string
@@ -119,7 +119,7 @@ func TestBitcoinAddress(t *testing.T) {
 
 // TestBitcoinCashAddress will test all permutations of using BitcoinCashAddress()
 func TestBitcoinCashAddress(t *testing.T) {
-	var tests = []struct {
+	tests := []struct {
 		name     string
 		input    string
 		expected string
@@ -155,7 +155,7 @@ func TestBitcoinCashAddress(t *testing.T) {
 
 // TestCustom tests the custom sanitize method
 func TestCustom(t *testing.T) {
-	var tests = []struct {
+	tests := []struct {
 		name     string
 		input    string
 		expected string
@@ -257,7 +257,7 @@ func TestDecimal(t *testing.T) {
 // TestDomain tests the domain sanitize method
 func TestDomain(t *testing.T) {
 	t.Run("valid cases", func(t *testing.T) {
-		var tests = []struct {
+		tests := []struct {
 			name         string
 			input        string
 			expected     string
@@ -359,8 +359,7 @@ func TestDomain(t *testing.T) {
 	})
 
 	t.Run("invalid cases", func(t *testing.T) {
-
-		var tests = []struct {
+		tests := []struct {
 			name         string
 			input        string
 			expected     string
@@ -394,7 +393,7 @@ func TestDomain(t *testing.T) {
 
 // TestEmail tests the email sanitize method
 func TestEmail(t *testing.T) {
-	var tests = []struct {
+	tests := []struct {
 		name         string
 		input        string
 		expected     string
@@ -441,7 +440,7 @@ func TestEmail(t *testing.T) {
 
 // TestFirstToUpper tests the first to upper method
 func TestFirstToUpper(t *testing.T) {
-	var tests = []struct {
+	tests := []struct {
 		name     string
 		input    string
 		expected string
@@ -513,7 +512,7 @@ func TestFormalName(t *testing.T) {
 
 // TestHTML tests the HTML sanitize method
 func TestHTML(t *testing.T) {
-	var tests = []struct {
+	tests := []struct {
 		name     string
 		input    string
 		expected string
@@ -543,7 +542,7 @@ func TestHTML(t *testing.T) {
 
 // TestIPAddress tests the ip address sanitize method
 func TestIPAddress(t *testing.T) {
-	var tests = []struct {
+	tests := []struct {
 		name     string
 		input    string
 		expected string
@@ -781,7 +780,7 @@ func TestScientificNotation(t *testing.T) {
 
 // TestScripts tests the script removal
 func TestScripts(t *testing.T) {
-	var tests = []struct {
+	tests := []struct {
 		name     string
 		input    string
 		expected string
@@ -936,7 +935,7 @@ func TestURL(t *testing.T) {
 
 // TestXML tests the XML sanitize method
 func TestXML(t *testing.T) {
-	var tests = []struct {
+	tests := []struct {
 		name     string
 		input    string
 		expected string
@@ -959,7 +958,6 @@ func TestXML(t *testing.T) {
 			output := sanitize.XML(test.input)
 			assert.Equal(t, test.expected, output)
 		})
-
 	}
 }
 
