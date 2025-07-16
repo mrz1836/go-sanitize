@@ -32,3 +32,6 @@ coverage.txt
 
 # Fuzz Tests
 testdata
+
+# AI Generated Files
+.claude
