@@ -22,12 +22,14 @@ func FuzzAlpha_Basic(f *testing.F) {
 	for _, tc := range seed {
 		f.Add(tc.input, tc.spaces)
 	}
+
 	f.Fuzz(func(t *testing.T, input string, spaces bool) {
 		out := sanitize.Alpha(input, spaces)
 		for _, r := range out {
 			if spaces && r == ' ' {
 				continue
 			}
+
 			require.Truef(t, unicode.IsLetter(r),
 				"invalid rune %q in %q (input: %q, spaces: %v)", r, out, input, spaces)
 		}
@@ -52,6 +54,7 @@ func FuzzAlphaNumeric(f *testing.F) {
 			if spaces && r == ' ' {
 				continue
 			}
+
 			require.Truef(t, unicode.IsLetter(r) || unicode.IsDigit(r),
 				"invalid rune %q in %q (input: %q, spaces: %v)", r, out, input, spaces)
 		}
@@ -93,6 +96,7 @@ func FuzzBitcoinCashAddress(f *testing.F) {
 	for _, tc := range seed {
 		f.Add(tc)
 	}
+
 	f.Fuzz(func(t *testing.T, input string) {
 		out := sanitize.BitcoinCashAddress(input)
 		for _, r := range out {
@@ -191,11 +195,13 @@ func FuzzFirstToUpper(f *testing.F) {
 	f.Fuzz(func(t *testing.T, input string) {
 		out := sanitize.FirstToUpper(input)
 		inRunes := []rune(input)
+
 		outRunes := []rune(out)
 		if len(inRunes) == 0 {
 			require.Empty(t, outRunes)
 			return
 		}
+
 		require.Len(t, outRunes, len(inRunes))
 		require.Equal(t, unicode.ToUpper(inRunes[0]), outRunes[0])
 		require.Equal(t, inRunes[1:], outRunes[1:])
@@ -217,6 +223,7 @@ func FuzzFormalName(f *testing.F) {
 	for _, tc := range seed {
 		f.Add(tc)
 	}
+
 	f.Fuzz(func(t *testing.T, input string) {
 		out := sanitize.FormalName(input)
 		for _, r := range out {
@@ -237,7 +244,9 @@ func FuzzHTML(f *testing.F) {
 	for _, tc := range seed {
 		f.Add(tc)
 	}
+
 	htmlPattern := regexp.MustCompile(`(?i)<[^>]*>`)
+
 	f.Fuzz(func(t *testing.T, input string) {
 		out := sanitize.HTML(input)
 		require.False(t, htmlPattern.MatchString(out), "output %q still contains HTML tags", out)
@@ -255,6 +264,7 @@ func FuzzIPAddress(f *testing.F) {
 		if out == "" {
 			return
 		}
+
 		ip := net.ParseIP(out)
 		require.NotNilf(t, ip, "output %q is not a valid IP", out)
 		require.Equal(t, ip.String(), out)
@@ -289,6 +299,7 @@ func FuzzPhoneNumber(f *testing.F) {
 	for _, tc := range seed {
 		f.Add(tc)
 	}
+
 	f.Fuzz(func(t *testing.T, input string) {
 		out := sanitize.PhoneNumber(input)
 		for _, r := range out {
@@ -308,6 +319,7 @@ func FuzzPathName(f *testing.F) {
 	for _, tc := range seed {
 		f.Add(tc)
 	}
+
 	f.Fuzz(func(t *testing.T, input string) {
 		out := sanitize.PathName(input)
 		for _, r := range out {
@@ -327,6 +339,7 @@ func FuzzPunctuation(f *testing.F) {
 	for _, tc := range seed {
 		f.Add(tc)
 	}
+
 	f.Fuzz(func(t *testing.T, input string) {
 		out := sanitize.Punctuation(input)
 		for _, r := range out {
@@ -367,7 +380,9 @@ func FuzzScripts(f *testing.F) {
 	for _, tc := range seed {
 		f.Add(tc)
 	}
+
 	scriptPattern := regexp.MustCompile(`(?i)<(script|iframe|embed|object)[^>]*>.*</(script|iframe|embed|object)>`)
+
 	f.Fuzz(func(t *testing.T, input string) {
 		out := sanitize.Scripts(input)
 		require.False(t, scriptPattern.MatchString(out), "output %q still contains script tags", out)

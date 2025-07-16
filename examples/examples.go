@@ -47,6 +47,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("domain error: %v", err)
 	}
+
 	log.Printf("Domain(%q) => %q\n", domainIn, cleanedDomain)
 
 	// Email cleans an email address and forces lowercase.

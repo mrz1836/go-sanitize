@@ -36,9 +36,6 @@ var (
 	scriptRegExp = regexp.MustCompile(`(?i)<(script|iframe|embed|object)[^>]*>.*</(script|iframe|embed|object)>`) // Scripts and embeds
 )
 
-// emptySpace is an empty space for replacing
-var emptySpace = []byte("")
-
 // ErrNilRegexp indicates that a nil regular expression was provided.
 var ErrNilRegexp = errors.New("regular expression cannot be nil")
 
@@ -177,6 +174,7 @@ func BitcoinCashAddress(original string) string {
 			b.WriteRune(r)
 		}
 	}
+
 	return b.String()
 }
 
@@ -205,9 +203,8 @@ func BitcoinCashAddress(original string) string {
 // See the benchmarks in the `sanitize_benchmark_test.go` file.
 // See the fuzz tests in the `sanitize_fuzz_test.go` file.
 func Custom(original string, regExp string) string {
-
 	// Return the processed string or panic if regex fails
-	return string(regexp.MustCompile(regExp).ReplaceAll([]byte(original), emptySpace))
+	return regexp.MustCompile(regExp).ReplaceAllString(original, "")
 }
 
 // CustomCompiled returns a sanitized string using a pre-compiled regular
@@ -262,11 +259,13 @@ func CustomCompiled(original string, re *regexp.Regexp) (string, error) {
 func Decimal(original string) string {
 	var b strings.Builder
 	b.Grow(len(original))
+
 	for _, r := range original {
 		if unicode.IsDigit(r) || r == '.' || r == '-' {
 			b.WriteRune(r)
 		}
 	}
+
 	return b.String()
 }
 
@@ -361,7 +360,6 @@ func Domain(original string, preserveCase bool, removeWww bool) (string, error) 
 // See the benchmarks in the `sanitize_benchmark_test.go` file.
 // See the fuzz tests in the `sanitize_fuzz_test.go` file.
 func Email(original string, preserveCase bool) string {
-
 	// Skip all work for empty string
 	if original == "" {
 		return original
@@ -383,6 +381,7 @@ func Email(original string, preserveCase bool) string {
 	// Filter to valid email characters
 	var b strings.Builder
 	b.Grow(len(original))
+
 	for _, r := range original {
 		valid := r == '@' || r == '.' || r == '_' || r == '-' || r == '+' ||
 			(r >= '0' && r <= '9') ||
@@ -418,7 +417,6 @@ func Email(original string, preserveCase bool) string {
 // See the benchmarks in the `sanitize_benchmark_test.go` file.
 // See the fuzz tests in the `sanitize_fuzz_test.go` file.
 func FirstToUpper(original string) string {
-
 	// Avoid extra work if string is empty
 	if len(original) == 0 {
 		return original
@@ -471,6 +469,7 @@ func FormalName(original string) string {
 			b.WriteRune(r)
 		}
 	}
+
 	return b.String()
 }
 
@@ -493,7 +492,7 @@ func FormalName(original string) string {
 // See the benchmarks in the `sanitize_benchmark_test.go` file.
 // See the fuzz tests in the `sanitize_fuzz_test.go` file.
 func HTML(original string) string {
-	return string(htmlRegExp.ReplaceAll([]byte(original), emptySpace))
+	return htmlRegExp.ReplaceAllString(original, "")
 }
 
 // IPAddress returns a sanitized IP address string for both IPv4 and IPv6 formats.
@@ -523,6 +522,7 @@ func IPAddress(original string) string {
 			b.WriteRune(r)
 		}
 	}
+
 	ip := net.ParseIP(b.String())
 	if ip == nil {
 		return ""
@@ -592,6 +592,7 @@ func PhoneNumber(original string) string {
 			b.WriteRune(r)
 		}
 	}
+
 	return b.String()
 }
 
@@ -619,6 +620,7 @@ func PhoneNumber(original string) string {
 func PathName(original string) string {
 	var b strings.Builder
 	b.Grow(len(original))
+
 	for _, r := range original {
 		switch {
 		case '0' <= r && r <= '9':
@@ -631,6 +633,7 @@ func PathName(original string) string {
 			b.WriteRune(r)
 		}
 	}
+
 	return b.String()
 }
 
@@ -665,6 +668,7 @@ func Punctuation(original string) string {
 			b.WriteRune(r)
 		}
 	}
+
 	return b.String()
 }
 
@@ -695,6 +699,7 @@ func ScientificNotation(original string) string {
 			b.WriteRune(r)
 		}
 	}
+
 	return b.String()
 }
 
@@ -718,7 +723,7 @@ func ScientificNotation(original string) string {
 // See the benchmarks in the `sanitize_benchmark_test.go` file.
 // See the fuzz tests in the `sanitize_fuzz_test.go` file.
 func Scripts(original string) string {
-	return string(scriptRegExp.ReplaceAll([]byte(original), emptySpace))
+	return scriptRegExp.ReplaceAllString(original, "")
 }
 
 // SingleLine returns a sanitized version of the input string as a single line of text.
@@ -753,6 +758,7 @@ func SingleLine(original string) string {
 			b.WriteRune(r)
 		}
 	}
+
 	return b.String()
 }
 
@@ -778,11 +784,13 @@ func SingleLine(original string) string {
 func Time(original string) string {
 	var b strings.Builder
 	b.Grow(len(original))
+
 	for _, r := range original {
 		if unicode.IsDigit(r) || r == ':' {
 			b.WriteRune(r)
 		}
 	}
+
 	return b.String()
 }
 
@@ -810,6 +818,7 @@ func Time(original string) string {
 func URI(original string) string {
 	var b strings.Builder
 	b.Grow(len(original))
+
 	for _, r := range original {
 		if unicode.IsLetter(r) || unicode.IsDigit(r) ||
 			r == '-' || r == '_' || r == '/' || r == '?' ||
@@ -817,6 +826,7 @@ func URI(original string) string {
 			b.WriteRune(r)
 		}
 	}
+
 	return b.String()
 }
 
@@ -845,6 +855,7 @@ func URI(original string) string {
 func URL(original string) string {
 	var b strings.Builder
 	b.Grow(len(original))
+
 	for _, r := range original {
 		if unicode.IsLetter(r) || unicode.IsDigit(r) ||
 			r == '-' || r == '_' || r == '/' || r == ':' ||

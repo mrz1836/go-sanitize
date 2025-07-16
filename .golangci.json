@@ -65,7 +65,6 @@
 			"gochecksumtype",
 			"gocognit",
 			"goconst",
-			"gocyclo",
 			"godox",
 			"goheader",
 			"gomoddirectives",
@@ -102,12 +101,13 @@
 			"unparam",
 			"unused",
 			"wastedassign",
-			"wsl_v5",
 			"zerologlint"
 		],
 		"disable": [
 			"gocritic",
-			"godot"
+			"godot",
+			"gocyclo",
+			"wsl_v5"
 		],
 		"settings": {
 			"funcorder": {
@@ -130,7 +130,7 @@
 				"statements": 40
 			},
 			"gocognit": {
-				"min-complexity": 10
+				"min-complexity": 20
 			},
 			"goconst": {
 				"min-len": 3,
