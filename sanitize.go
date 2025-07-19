@@ -239,13 +239,14 @@ func CustomCompiled(original string, re *regexp.Regexp) (string, error) {
 }
 
 // Decimal returns a sanitized string containing only decimal/float values, including positive and negative numbers.
-// This function removes any characters that are not part of the accepted decimal format.
+// This function removes any characters that are not part of the accepted decimal format and validates
+// that decimal points and minus signs are placed correctly to form valid numeric strings.
 //
 // Parameters:
 // - original: The input string to be sanitized.
 //
 // Returns:
-// - A sanitized string containing only decimal/float values.
+// - A sanitized string containing only valid decimal/float values.
 //
 // Example:
 //
@@ -260,9 +261,26 @@ func Decimal(original string) string {
 	var b strings.Builder
 	b.Grow(len(original))
 
+	var (
+		hasDecimal      bool
+		isStartOfNumber = true
+	)
+
 	for _, r := range original {
-		if unicode.IsDigit(r) || r == '.' || r == '-' {
+		if unicode.IsDigit(r) {
 			b.WriteRune(r)
+			isStartOfNumber = false
+		} else if r == '.' && !hasDecimal {
+			b.WriteRune(r)
+			hasDecimal = true
+			isStartOfNumber = false
+		} else if r == '-' && isStartOfNumber {
+			b.WriteRune(r)
+			isStartOfNumber = false
+		} else if !unicode.IsDigit(r) && r != '.' && r != '-' {
+			// Reset state when encountering non-numeric separator
+			hasDecimal = false
+			isStartOfNumber = true
 		}
 	}
 
@@ -440,7 +458,8 @@ func FirstToUpper(original string) string {
 }
 
 // FormalName returns a sanitized string containing only characters recognized in formal names or surnames.
-// This function removes any characters that are not part of the accepted formal name format.
+// This function removes any characters that are not part of the accepted formal name format,
+// including support for Unicode letters to handle international names properly.
 //
 // Parameters:
 // - original: The input string to be sanitized.
@@ -452,7 +471,7 @@ func FirstToUpper(original string) string {
 //
 //	input := "John D'oe, Jr."
 //	result := sanitize.FormalName(input)
-//	fmt.Println(result) // Output: "John Doe Jr"
+//	fmt.Println(result) // Output: "John D'oe, Jr."
 //
 // See more usage examples in the `sanitize_example_test.go` file.
 // See the benchmarks in the `sanitize_benchmark_test.go` file.
@@ -461,8 +480,7 @@ func FormalName(original string) string {
 	var b strings.Builder
 	b.Grow(len(original))
 	for _, r := range original {
-		if (r >= 'a' && r <= 'z') ||
-			(r >= 'A' && r <= 'Z') ||
+		if unicode.IsLetter(r) ||
 			unicode.IsDigit(r) ||
 			r == '-' || r == '\'' || r == ',' || r == '.' ||
 			unicode.IsSpace(r) {

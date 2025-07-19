@@ -240,10 +240,16 @@ func TestDecimal(t *testing.T) {
 		{"empty string", "", ""},
 		{"letters only", "abc", ""},
 		{"plus sign", "+100.50", "100.50"},
-		{"multiple decimals", "1.2.3", "1.2.3"},
-		{"embedded minus", "1-2-3", "1-2-3"},
+		{"multiple decimals", "1.2.3", "1.23"},
+		{"embedded minus", "1-2-3", "123"},
 		{"scientific notation", "1e-3", "1-3"},
 		{"comma separated", "1,234.56", "1234.56"},
+		{"leading minus only at start", "abc-123", "-123"},
+		{"multiple minus signs", "--123", "-123"},
+		{"minus in middle ignored", "12-34", "1234"},
+		{"decimal at start", ".123", ".123"},
+		{"multiple decimals in sequence", "1..2", "1.2"},
+		{"separated numbers", "1.2 3.4", "1.23.4"},
 	}
 
 	for _, test := range tests {
@@ -489,7 +495,7 @@ func TestFormalName(t *testing.T) {
 
 		// Edge cases
 		{"empty string", "", ""},
-		{"accented characters", "José María", "Jos Mara"},
+		{"accented characters", "José María", "José María"},
 		{"underscores", "Name_With_Underscore", "NameWithUnderscore"},
 		{"digits", "John Doe 3rd", "John Doe 3rd"},
 		{"newline", "John\nDoe", "John\nDoe"},
@@ -498,8 +504,11 @@ func TestFormalName(t *testing.T) {
 		{"prefix d'", "d'Artagnan", "d'Artagnan"},
 		{"curly apostrophe", "D’Angelo", "DAngelo"},
 		{"multiple spaces", "Van  der  Meer", "Van  der  Meer"},
-		{"accented surname", "Émilie du Châtelet", "milie du Chtelet"},
-		{"foreign letters", "Björk Guðmundsdóttir", "Bjrk Gumundsdttir"},
+		{"accented surname", "Émilie du Châtelet", "Émilie du Châtelet"},
+		{"foreign letters", "Björk Guðmundsdóttir", "Björk Guðmundsdóttir"},
+		{"chinese characters", "李明 Wang", "李明 Wang"}, //nolint:gosmopolitan // test includes Unicode characters
+		{"arabic characters", "أحمد Smith", "أحمد Smith"},
+		{"cyrillic characters", "Владимир Putin", "Владимир Putin"},
 	}
 
 	for _, test := range tests {
