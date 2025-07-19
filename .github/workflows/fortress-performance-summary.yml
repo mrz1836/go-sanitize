@@ -13,49 +13,54 @@ name: GoFortress (Performance Summary)
 on:
   workflow_call:
     inputs:
+      benchmarks-result:
+        description: "Benchmarks job result"
+        required: false
+        type: string
+        default: "skipped"
       start-epoch:
-        description: 'Workflow start epoch time'
+        description: "Workflow start epoch time"
         required: true
         type: string
       start-time:
-        description: 'Workflow start time'
+        description: "Workflow start time"
         required: true
         type: string
       setup-result:
-        description: 'Setup job result'
+        description: "Setup job result"
         required: true
         type: string
       test-makefile-result:
-        description: 'Test Makefile job result'
+        description: "Test Makefile job result"
         required: true
         type: string
       security-result:
-        description: 'Security job result'
+        description: "Security job result"
         required: true
         type: string
       code-quality-result:
-        description: 'Code quality job result'
+        description: "Code quality job result"
         required: true
         type: string
       test-suite-result:
-        description: 'Test suite job result'
+        description: "Test suite job result"
         required: true
         type: string
       release-result:
-        description: 'Result of the release job'
+        description: "Result of the release job"
         required: false
         type: string
-        default: 'skipped'
+        default: "skipped"
       test-matrix:
-        description: 'Test matrix JSON'
+        description: "Test matrix JSON"
         required: true
         type: string
       env-json:
-        description: 'JSON string of environment variables'
+        description: "JSON string of environment variables"
         required: true
         type: string
       primary-runner:
-        description: 'Primary runner OS'
+        description: "Primary runner OS"
         required: true
         type: string
 
@@ -89,7 +94,7 @@ jobs:
         if: always()
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
-          pattern: '*-stats-*'
+          pattern: "*-stats-*"
           merge-multiple: true
 
       # ————————————————————————————————————————————————————————————————
@@ -126,7 +131,8 @@ jobs:
             echo ""
 
             # Process cache statistics if available
-            if ls cache-stats-*.json >/dev/null 2>&1; then
+            # Use a more robust file existence check
+            if compgen -G "cache-stats-*.json" >/dev/null 2>&1; then
               echo "### 💾 Cache Performance" >> $GITHUB_STEP_SUMMARY
               echo "| OS | Go Version | Module Cache | Build Cache | Module Size | Build Size |" >> $GITHUB_STEP_SUMMARY
               echo "|----|------------|--------------|-------------|-------------|------------|" >> $GITHUB_STEP_SUMMARY
@@ -155,8 +161,54 @@ jobs:
               done
             fi
 
+            # Process benchmark statistics if available
+            # Use a more robust file existence check
+            if compgen -G "benchmark-stats-*.json" >/dev/null 2>&1; then
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "### 🏃 Benchmark Performance" >> $GITHUB_STEP_SUMMARY
+              echo "| Benchmark Suite | Duration | Benchmarks | Status |" >> $GITHUB_STEP_SUMMARY
+              echo "|-----------------|----------|------------|--------|" >> $GITHUB_STEP_SUMMARY
+
+              for stats_file in benchmark-stats-*.json; do
+                if [ -f "$stats_file" ]; then
+                  NAME=$(jq -r '.name' "$stats_file")
+                  DURATION=$(jq -r '.duration_seconds' "$stats_file")
+                  BENCHMARK_COUNT=$(jq -r '.benchmark_count' "$stats_file")
+                  STATUS=$(jq -r '.status' "$stats_file")
+                  BENCHMARK_SUMMARY=$(jq -r '.benchmark_summary' "$stats_file")
+
+                  DURATION_MIN=$((DURATION / 60))
+                  DURATION_SEC=$((DURATION % 60))
+                  STATUS_ICON=$([[ "$STATUS" == "success" ]] && echo "✅" || echo "❌")
+
+                  echo "| $NAME | ${DURATION_MIN}m ${DURATION_SEC}s | $BENCHMARK_COUNT | $STATUS_ICON |" >> $GITHUB_STEP_SUMMARY
+                fi
+              done
+
+              # Display detailed benchmark results
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "<details>" >> $GITHUB_STEP_SUMMARY
+              echo "<summary>Detailed Benchmark Results</summary>" >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+
+              for stats_file in benchmark-stats-*.json; do
+                if [ -f "$stats_file" ]; then
+                  NAME=$(jq -r '.name' "$stats_file")
+                  BENCHMARK_SUMMARY=$(jq -r '.benchmark_summary' "$stats_file")
+                  if [ -n "$BENCHMARK_SUMMARY" ] && [ "$BENCHMARK_SUMMARY" != "null" ]; then
+                    echo "#### $NAME" >> $GITHUB_STEP_SUMMARY
+                    echo "$BENCHMARK_SUMMARY" >> $GITHUB_STEP_SUMMARY
+                    echo "" >> $GITHUB_STEP_SUMMARY
+                  fi
+                fi
+              done
+
+              echo "</details>" >> $GITHUB_STEP_SUMMARY
+            fi
+
             # Process test statistics if available
-            if ls test-stats-*.json >/dev/null 2>&1; then
+            # Use a more robust file existence check
+            if compgen -G "test-stats-*.json" >/dev/null 2>&1; then
               echo "" >> $GITHUB_STEP_SUMMARY
               echo "### 🧪 Test Execution Performance" >> $GITHUB_STEP_SUMMARY
               echo "| Test Suite | Duration | Tests | Examples | Status | Race | Coverage | Fuzz |" >> $GITHUB_STEP_SUMMARY
@@ -206,6 +258,10 @@ jobs:
             echo "| 🔒 Security Scans | ${{ inputs.security-result }} | $([ "${{ inputs.security-result }}" = "success" ] && echo "✅" || echo "❌") |"
             echo "| 📊 Code Quality | ${{ inputs.code-quality-result }} | $([ "${{ inputs.code-quality-result }}" = "success" ] && echo "✅" || echo "❌") |"
             echo "| 🧪 Test Suite | ${{ inputs.test-suite-result }} | $([ "${{ inputs.test-suite-result }}" = "success" ] && echo "✅" || echo "❌") |"
+            # Only show benchmarks row if it was attempted
+            if [[ "${{ inputs.benchmarks-result }}" != "skipped" ]]; then
+              echo "| 🏃 Benchmarks | ${{ inputs.benchmarks-result }} | $([ "${{ inputs.benchmarks-result }}" = "success" ] && echo "✅" || echo "❌") |"
+            fi
             # Only show release row if it was attempted
             if [[ "${{ inputs.release-result }}" != "skipped" ]]; then
               echo "| 🚀 Release | ${{ inputs.release-result }} | $([ "${{ inputs.release-result }}" = "success" ] && echo "✅" || echo "❌") |"
@@ -254,6 +310,7 @@ jobs:
             [ "${{ inputs.security-result }}" != "success" ] && [ "${{ inputs.security-result }}" != "skipped" ] && FAILED_JOBS="${FAILED_JOBS}Security Scans, "
             [ "${{ inputs.code-quality-result }}" != "success" ] && [ "${{ inputs.code-quality-result }}" != "skipped" ] && FAILED_JOBS="${FAILED_JOBS}Code Quality, "
             [ "${{ inputs.test-suite-result }}" != "success" ] && [ "${{ inputs.test-suite-result }}" != "skipped" ] && FAILED_JOBS="${FAILED_JOBS}Test Suite, "
+            [ "${{ inputs.benchmarks-result }}" != "success" ] && [ "${{ inputs.benchmarks-result }}" != "skipped" ] && FAILED_JOBS="${FAILED_JOBS}Benchmarks, "
             [ "${{ inputs.release-result }}" != "success" ] && [ "${{ inputs.release-result }}" != "skipped" ] && FAILED_JOBS="${FAILED_JOBS}Release, "
 
             if [ -n "$FAILED_JOBS" ]; then

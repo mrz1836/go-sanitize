@@ -15,65 +15,74 @@ on:
   workflow_call:
     inputs:
       env-json:
-        description: 'JSON string of environment variables'
+        description: "JSON string of environment variables"
         required: true
         type: string
       primary-runner:
-        description: 'Primary runner OS'
+        description: "Primary runner OS"
         required: true
         type: string
     secrets:
       github-token:
-        description: 'GitHub token for API access'
+        description: "GitHub token for API access"
         required: true
     outputs:
+      benchmarks-enabled:
+        description: "Whether benchmarks are enabled"
+        value: ${{ jobs.setup-config.outputs.benchmarks-enabled }}
+      benchmark-matrix:
+        description: "Benchmark matrix JSON"
+        value: ${{ jobs.setup-config.outputs.benchmark-matrix }}
       code-coverage-enabled:
-        description: 'Whether code coverage is enabled'
+        description: "Whether code coverage is enabled"
         value: ${{ jobs.setup-config.outputs.code-coverage-enabled }}
       fuzz-testing-enabled:
-        description: 'Whether fuzz testing is enabled'
+        description: "Whether fuzz testing is enabled"
         value: ${{ jobs.setup-config.outputs.fuzz-testing-enabled }}
       go-primary-version:
-        description: 'Primary Go version'
+        description: "Primary Go version"
         value: ${{ jobs.setup-config.outputs.go-primary-version }}
       go-secondary-version:
-        description: 'Secondary Go version'
+        description: "Secondary Go version"
         value: ${{ jobs.setup-config.outputs.go-secondary-version }}
       go-versions:
-        description: 'Unique Go versions array'
+        description: "Unique Go versions array"
         value: ${{ jobs.setup-config.outputs.go-versions }}
-      lint-enabled:
-        description: 'Whether linting is enabled'
-        value: ${{ jobs.setup-config.outputs.lint-enabled }}
+      go-lint-enabled:
+        description: "Whether Go linting is enabled"
+        value: ${{ jobs.setup-config.outputs.go-lint-enabled }}
+      yaml-lint-enabled:
+        description: "Whether YAML linting is enabled"
+        value: ${{ jobs.setup-config.outputs.yaml-lint-enabled }}
       makefile-exists:
-        description: 'Whether Makefile exists'
+        description: "Whether Makefile exists"
         value: ${{ jobs.setup-config.outputs.makefile-exists }}
       primary-runner:
-        description: 'Primary runner OS'
+        description: "Primary runner OS"
         value: ${{ jobs.setup-config.outputs.primary-runner }}
       race-detection-enabled:
-        description: 'Whether race detection is enabled'
+        description: "Whether race detection is enabled"
         value: ${{ jobs.setup-config.outputs.race-detection-enabled }}
       secondary-runner:
-        description: 'Secondary runner OS'
+        description: "Secondary runner OS"
         value: ${{ jobs.setup-config.outputs.secondary-runner }}
       security-scans-enabled:
-        description: 'Whether security scans are enabled'
+        description: "Whether security scans are enabled"
         value: ${{ jobs.setup-config.outputs.security-scans-enabled }}
       start-epoch:
-        description: 'Workflow start epoch time'
+        description: "Workflow start epoch time"
         value: ${{ jobs.setup-config.outputs.start-epoch }}
       start-time:
-        description: 'Workflow start time'
+        description: "Workflow start time"
         value: ${{ jobs.setup-config.outputs.start-time }}
       static-analysis-enabled:
-        description: 'Whether static analysis is enabled'
+        description: "Whether static analysis is enabled"
         value: ${{ jobs.setup-config.outputs.static-analysis-enabled }}
       test-matrix:
-        description: 'Test matrix JSON'
+        description: "Test matrix JSON"
         value: ${{ jobs.setup-config.outputs.test-matrix }}
       warm-cache-matrix:
-        description: 'Warm cache matrix JSON'
+        description: "Warm cache matrix JSON"
         value: ${{ jobs.setup-config.outputs.warm-cache-matrix }}
 
 permissions:
@@ -87,12 +96,15 @@ jobs:
     name: 🎯 Setup CI Config
     runs-on: ${{ inputs.primary-runner }}
     outputs:
+      benchmarks-enabled: ${{ steps.config.outputs.benchmarks-enabled }}
+      benchmark-matrix: ${{ steps.matrix.outputs.matrix }}
       code-coverage-enabled: ${{ steps.config.outputs.code-coverage-enabled }}
       fuzz-testing-enabled: ${{ steps.config.outputs.fuzz-testing-enabled }}
       go-primary-version: ${{ steps.config.outputs.go-primary-version }}
       go-secondary-version: ${{ steps.config.outputs.go-secondary-version }}
       go-versions: ${{ steps.versions.outputs.versions }}
-      lint-enabled: ${{ steps.config.outputs.lint-enabled }}
+      go-lint-enabled: ${{ steps.config.outputs.go-lint-enabled }}
+      yaml-lint-enabled: ${{ steps.config.outputs.yaml-lint-enabled }}
       makefile-exists: ${{ steps.config.outputs.makefile-exists }}
       primary-runner: ${{ steps.config.outputs.primary-runner }}
       race-detection-enabled: ${{ steps.config.outputs.race-detection-enabled }}
@@ -267,8 +279,10 @@ jobs:
           fi
 
           # Feature flags
+          echo "benchmarks-enabled=${{ env.ENABLE_BENCHMARKS }}" >> $GITHUB_OUTPUT
           echo "code-coverage-enabled=${{ env.ENABLE_CODE_COVERAGE }}" >> $GITHUB_OUTPUT
-          echo "lint-enabled=${{ env.ENABLE_LINT }}" >> $GITHUB_OUTPUT
+          echo "go-lint-enabled=${{ env.ENABLE_GO_LINT }}" >> $GITHUB_OUTPUT
+          echo "yaml-lint-enabled=${{ env.ENABLE_YAML_LINT }}" >> $GITHUB_OUTPUT
           echo "race-detection-enabled=${{ env.ENABLE_RACE_DETECTION }}" >> $GITHUB_OUTPUT
           echo "security-scans-enabled=${{ env.ENABLE_SECURITY_SCANS }}" >> $GITHUB_OUTPUT
           echo "static-analysis-enabled=${{ env.ENABLE_STATIC_ANALYSIS }}" >> $GITHUB_OUTPUT
@@ -333,9 +347,11 @@ jobs:
           echo "## 🚀 Feature Flags" >> $GITHUB_STEP_SUMMARY
           echo "| Feature | Status | Impact |" >> $GITHUB_STEP_SUMMARY
           echo "|---------|--------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| **Benchmarks** | $([ "${{ env.ENABLE_BENCHMARKS }}" == "true" ] && echo "✅ Enabled" || echo "❌ Disabled") | Performance benchmarks will $([ "${{ env.ENABLE_BENCHMARKS }}" == "true" ] && echo "run and collect metrics" || echo "be skipped") |" >> $GITHUB_STEP_SUMMARY
           echo "| **Code Coverage** | $([ "${{ env.ENABLE_CODE_COVERAGE }}" == "true" ] && echo "✅ Enabled" || echo "❌ Disabled") | Code coverage reports will $([ "${{ env.ENABLE_CODE_COVERAGE }}" == "true" ] && echo "be generated and uploaded to Codecov" || echo "not be generated") |" >> $GITHUB_STEP_SUMMARY
           echo "| **Fuzz Testing** | $([ "${{ env.ENABLE_FUZZ_TESTING }}" == "true" ] && echo "✅ Enabled" || echo "❌ Disabled") | Fuzz tests will $([ "${{ env.ENABLE_FUZZ_TESTING }}" == "true" ] && echo "run on Linux with primary Go version" || echo "be skipped") |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Linting** | $([ "${{ env.ENABLE_LINT }}" == "true" ] && echo "✅ Enabled" || echo "❌ Disabled") | golangci-lint will $([ "${{ env.ENABLE_LINT }}" == "true" ] && echo "analyze code quality" || echo "be skipped") |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Go Linting** | $([ "${{ env.ENABLE_GO_LINT }}" == "true" ] && echo "✅ Enabled" || echo "❌ Disabled") | golangci-lint will $([ "${{ env.ENABLE_GO_LINT }}" == "true" ] && echo "analyze code quality" || echo "be skipped") |" >> $GITHUB_STEP_SUMMARY
+          echo "| **YAML Linting** | $([ "${{ env.ENABLE_YAML_LINT }}" == "true" ] && echo "✅ Enabled" || echo "❌ Disabled") | prettier will $([ "${{ env.ENABLE_YAML_LINT }}" == "true" ] && echo "validate YAML formatting" || echo "be skipped") |" >> $GITHUB_STEP_SUMMARY
           echo "| **Race Detection** | $([ "${{ env.ENABLE_RACE_DETECTION }}" == "true" ] && echo "✅ Enabled" || echo "❌ Disabled") | Tests will $([ "${{ env.ENABLE_RACE_DETECTION }}" == "true" ] && echo "run with -race flag" || echo "run without race detection") |" >> $GITHUB_STEP_SUMMARY
           echo "| **Security Scans** | $([ "${{ env.ENABLE_SECURITY_SCANS }}" == "true" ] && echo "✅ Enabled" || echo "❌ Disabled") | Security tools will $([ "${{ env.ENABLE_SECURITY_SCANS }}" == "true" ] && echo "scan for vulnerabilities" || echo "be skipped") |" >> $GITHUB_STEP_SUMMARY
           echo "| **Static Analysis** | $([ "${{ env.ENABLE_STATIC_ANALYSIS }}" == "true" ] && echo "✅ Enabled" || echo "❌ Disabled") | Static analysis will $([ "${{ env.ENABLE_STATIC_ANALYSIS }}" == "true" ] && echo "check for code issues" || echo "be skipped") |" >> $GITHUB_STEP_SUMMARY

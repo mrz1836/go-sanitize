@@ -14,23 +14,23 @@ on:
   workflow_call:
     inputs:
       env-json:
-        description: 'JSON string of environment variables'
+        description: "JSON string of environment variables"
         required: true
         type: string
       primary-runner:
-        description: 'Primary runner OS'
+        description: "Primary runner OS"
         required: true
         type: string
       go-primary-version:
-        description: 'Primary Go version'
+        description: "Primary Go version"
         required: true
         type: string
     secrets:
       github-token:
-        description: 'GitHub token for API access'
+        description: "GitHub token for API access"
         required: true
       gitleaks-license:
-        description: 'Gitleaks license key'
+        description: "Gitleaks license key"
         required: false
 
 permissions:
@@ -95,7 +95,7 @@ jobs:
         uses: sonatype-nexus-community/nancy-github-action@726e338312e68ecdd4b4195765f174d3b3ce1533 # v1.0.3
         continue-on-error: false
         with:
-          githubToken: ${{ secrets.github-token }}  # ← prevents rate-limit 403
+          githubToken: ${{ secrets.github-token }} # ← prevents rate-limit 403
           nancyVersion: ${{ env.NANCY_VERSION }}
           nancyCommand: sleuth --loud --exclude-vulnerability ${{ env.NANCY_EXCLUDES }}
 
@@ -248,7 +248,7 @@ jobs:
       - name: 📥 Checkout code
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
-          fetch-depth: 0  # Fetch all history so Gitleaks can scan commits
+          fetch-depth: 0 # Fetch all history so Gitleaks can scan commits
 
       - name: 🔍 Run gitleaks scan
         uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7 # v8.27.2
@@ -256,9 +256,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.github-token }}
           GITLEAKS_LICENSE: ${{ secrets.gitleaks-license }}
           GITLEAKS_NOTIFY_USER_LIST: ${{ env.GITLEAKS_NOTIFY_USER_LIST }}
-          GITLEAKS_ENABLE_COMMENTS: 'true'
-          GITLEAKS_ENABLE_UPLOAD_ARTIFACT: 'true'
-          GITLEAKS_ENABLE_SUMMARY: 'true'
+          GITLEAKS_ENABLE_COMMENTS: "true"
+          GITLEAKS_ENABLE_UPLOAD_ARTIFACT: "true"
+          GITLEAKS_ENABLE_SUMMARY: "true"
           GITLEAKS_VERSION: ${{ env.GITLEAKS_VERSION }}
 
       - name: 📊 Job Summary

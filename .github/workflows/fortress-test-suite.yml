@@ -14,43 +14,43 @@ on:
   workflow_call:
     inputs:
       env-json:
-        description: 'JSON string of environment variables'
+        description: "JSON string of environment variables"
         required: true
         type: string
       test-matrix:
-        description: 'Test matrix JSON'
+        description: "Test matrix JSON"
         required: true
         type: string
       primary-runner:
-        description: 'Primary runner OS'
+        description: "Primary runner OS"
         required: true
         type: string
       go-primary-version:
-        description: 'Primary Go version'
+        description: "Primary Go version"
         required: true
         type: string
       go-secondary-version:
-        description: 'Secondary Go version'
+        description: "Secondary Go version"
         required: true
         type: string
       code-coverage-enabled:
-        description: 'Whether code coverage is enabled'
+        description: "Whether code coverage is enabled"
         required: true
         type: string
       race-detection-enabled:
-        description: 'Whether race detection is enabled'
+        description: "Whether race detection is enabled"
         required: true
         type: string
       fuzz-testing-enabled:
-        description: 'Whether fuzz testing is enabled'
+        description: "Whether fuzz testing is enabled"
         required: true
         type: string
     secrets:
       github-token:
-        description: 'GitHub token for API access'
+        description: "GitHub token for API access"
         required: true
       codecov-token:
-        description: 'Codecov token for coverage uploads'
+        description: "Codecov token for coverage uploads"
         required: false
 
 permissions:
@@ -62,7 +62,7 @@ jobs:
   # ----------------------------------------------------------------------------------
   test-go:
     name: 🧪 Test (${{ matrix.name }})
-    timeout-minutes: 30  # Prevent hung tests
+    timeout-minutes: 30 # Prevent hung tests
     strategy:
       fail-fast: true
       matrix: ${{ fromJson(inputs.test-matrix) }}

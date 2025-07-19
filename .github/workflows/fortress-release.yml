@@ -17,27 +17,27 @@ on:
   workflow_call:
     inputs:
       env-json:
-        description: 'Environment configuration in JSON format'
+        description: "Environment configuration in JSON format"
         required: true
         type: string
       primary-runner:
-        description: 'Primary runner OS to use'
+        description: "Primary runner OS to use"
         required: true
         type: string
       go-primary-version:
-        description: 'Primary Go version'
+        description: "Primary Go version"
         required: true
         type: string
       golangci-lint-version:
-        description: 'Version of golangci-lint to use'
+        description: "Version of golangci-lint to use"
         required: true
         type: string
     secrets:
       github-token:
-        description: 'GitHub token for authentication'
+        description: "GitHub token for authentication"
         required: true
       slack-webhook:
-        description: 'Slack webhook URL for notifications'
+        description: "Slack webhook URL for notifications"
         required: true
 
 # ————————————————————————————————————————————————————————————————
@@ -54,7 +54,7 @@ jobs:
     name: 🚀 Build and Release
     runs-on: ${{ inputs.primary-runner }}
     permissions:
-      contents: write  # Required to create releases
+      contents: write # Required to create releases
     steps:
       # ————————————————————————————————————————————————————————————————
       # Checkout code and set up Go environment
@@ -62,7 +62,7 @@ jobs:
       - name: 📥 Checkout code
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
-          fetch-depth: 0  # Required for changelog generation
+          fetch-depth: 0 # Required for changelog generation
           token: ${{ secrets.github-token }}
 
       - name: 🔧 Set Go cache paths (cross-platform)
@@ -170,7 +170,7 @@ jobs:
           args: check --verbose
         env:
           GITHUB_TOKEN: ${{ secrets.github-token }}
-          SLACK_WEBHOOK: ${{ secrets.slack-webhook }}   # used only if referenced in .goreleaser.yml
+          SLACK_WEBHOOK: ${{ secrets.slack-webhook }} # used only if referenced in .goreleaser.yml
 
       # ————————————————————————————————————————————————————————————————
       # Extract changelog information
@@ -204,7 +204,7 @@ jobs:
           args: release --clean --verbose
         env:
           GITHUB_TOKEN: ${{ secrets.github-token }}
-          SLACK_WEBHOOK: ${{ secrets.slack-webhook }}   # used only if referenced in .goreleaser.yml
+          SLACK_WEBHOOK: ${{ secrets.slack-webhook }} # used only if referenced in .goreleaser.yml
 
       # ————————————————————————————————————————————————————————————————
       # Generate release summary
