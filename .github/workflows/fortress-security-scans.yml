@@ -229,6 +229,7 @@ jobs:
   gitleaks:
     name: 🕵️ Run Gitleaks (Secret Scan)
     runs-on: ${{ inputs.primary-runner }}
+    if: github.event.pull_request.head.repo.full_name == github.repository
     steps:
       # ————————————————————————————————————————————————————————————————
       # Parse environment variables

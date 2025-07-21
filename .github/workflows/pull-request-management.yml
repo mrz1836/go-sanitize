@@ -640,7 +640,8 @@ jobs:
       contents: write
     if: |
       github.event.action == 'closed' &&
-      github.event.pull_request.merged == true
+      github.event.pull_request.merged == true &&
+      github.event.pull_request.head.repo.full_name == github.repository
     outputs:
       branch-deleted: ${{ steps.delete.outputs.branch-deleted }}
 
@@ -755,6 +756,7 @@ jobs:
           echo "**📋 PR:** #$PR_NUMBER - $PR_TITLE" >> $GITHUB_STEP_SUMMARY
           echo "**🎬 Action:** $PR_ACTION" >> $GITHUB_STEP_SUMMARY
           echo "**👤 Author:** @$PR_AUTHOR" >> $GITHUB_STEP_SUMMARY
+          echo "**🔗 Source:** ${{ github.event.pull_request.head.repo.full_name == github.repository && 'Internal' || 'Fork' }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
 
           # Show results based on action type

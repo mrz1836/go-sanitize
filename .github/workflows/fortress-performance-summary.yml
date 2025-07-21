@@ -128,6 +128,7 @@ jobs:
             echo "| **Workflow** | ${{ github.workflow }} |"
             echo "| **Run Number** | ${{ github.run_number }} |"
             echo "| **Trigger** | ${{ github.event_name }} |"
+            echo "| **Source** | ${{ github.event.pull_request.head.repo.full_name == github.repository && 'Internal' || 'Fork' }} |"
             echo ""
 
             # Process cache statistics if available
