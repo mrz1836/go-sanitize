@@ -1,0 +1,40 @@
+# ------------------------------------------------------------------------------------
+#  Prettier Configuration
+#
+#  Purpose: Ensures consistent YAML formatting across all tools (Prettier, IDEs)
+#  Location: .github directory (preferred for project-specific configs)
+#
+#  Maintainer: @mrz1836
+#
+# ------------------------------------------------------------------------------------
+
+# Print width (line length limit)
+printWidth: 80
+
+# Indentation
+tabWidth: 2
+useTabs: false
+
+# Quotes
+singleQuote: false # Use double quotes for consistency
+
+# Brackets and spacing (applies to JS/JSON objects, not YAML arrays)
+bracketSpacing: false # Keep consistent with YAML array formatting
+bracketSameLine: false
+
+# Array and object formatting
+trailingComma: "none" # No trailing commas in YAML
+
+# Line endings (should match .editorconfig)
+endOfLine: "lf"
+
+# Prose formatting (for Markdown in YAML)
+proseWrap: "preserve"
+
+# YAML-specific settings
+overrides:
+  - files: "*.{yml,yaml}"
+    options:
+      printWidth: 120 # Allow longer lines for YAML workflow files
+      bracketSpacing: false
+      singleQuote: false

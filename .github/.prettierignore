@@ -1,0 +1,73 @@
+# Directories managed by package managers or VCS
+node_modules/
+vendor/
+.git/
+
+# Build outputs
+dist/
+build/
+
+# Coverage artifacts
+coverage/
+*.cover
+*.cov
+coverage.txt
+coverage.html
+
+# Minified assets
+*.min.js
+*.min.css
+
+# Generated source code
+*.generated.*
+**gen.go
+mock**.go
+*.pb.go
+*.pb.gw.go
+**/packaged.yaml
+
+# Compiled binaries
+*.exe
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Temporary / swap files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# IDE metadata
+.idea/
+.vscode/
+*.iml
+
+# Dependency locks
+go.sum
+package-lock.json
+yarn.lock
+
+# Data exports
+*.json
+*.csv
+*.tsv
+*.sql
+
+# Documentation & licenses
+*.md
+LICENSE
+CHANGELOG
+CITATION.cff
+
+# Build & lint configs
+**/.golangci.json
+**/.golangci.yml
+**/.golangci.yaml
+**/.env.shared
+**/Makefile
+**/makefile
+**/*.mk
