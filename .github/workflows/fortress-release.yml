@@ -38,7 +38,7 @@ on:
         required: true
       slack-webhook:
         description: "Slack webhook URL for notifications"
-        required: true
+        required: false
 
 # ————————————————————————————————————————————————————————————————
 # Permissions

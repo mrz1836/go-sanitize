@@ -51,7 +51,7 @@ permissions:
 # ————————————————————————————————————————————————————————————————
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
 
 jobs:
   # ----------------------------------------------------------------------------------
@@ -111,7 +111,7 @@ jobs:
     needs: [load-env, setup, test-makefile]
     strategy:
       fail-fast: true
-      matrix: ${{ fromJson(needs.setup.outputs.warm-cache-matrix) }}
+      matrix: ${{ fromJSON(needs.setup.outputs.warm-cache-matrix) }}
     runs-on: ${{ matrix.os }}
     steps:
       # ————————————————————————————————————————————————————————————————
@@ -155,6 +155,9 @@ jobs:
     uses: ./.github/workflows/fortress-security-scans.yml
     with:
       env-json: ${{ needs.load-env.outputs.env-json }}
+      enable-nancy: ${{ needs.setup.outputs.nancy-enabled == 'true' }}
+      enable-govulncheck: ${{ needs.setup.outputs.govulncheck-enabled == 'true' }}
+      enable-gitleaks: ${{ needs.setup.outputs.gitleaks-enabled == 'true' }}
       go-primary-version: ${{ needs.setup.outputs.go-primary-version }}
       primary-runner: ${{ needs.setup.outputs.primary-runner }}
     secrets:
@@ -295,9 +298,9 @@ jobs:
   # ----------------------------------------------------------------------------------
   release:
     name: 🚀 Release Version
-    needs: [load-env, setup, status-check]
+    needs: [load-env, setup, test-suite, security, code-quality]
     # Only run on successful tag pushes
-    if: startsWith(github.ref, 'refs/tags/v') && needs.status-check.result == 'success'
+    if: startsWith(github.ref, 'refs/tags/v')
     uses: ./.github/workflows/fortress-release.yml
     with:
       env-json: ${{ needs.load-env.outputs.env-json }}
@@ -315,7 +318,7 @@ jobs:
   performance-summary:
     name: 📊 Performance Summary
     if: always()
-    needs: [load-env, setup, test-makefile, security, code-quality, test-suite, benchmarks, release]
+    needs: [load-env, setup, test-makefile, security, code-quality, test-suite, benchmarks, release, status-check]
     uses: ./.github/workflows/fortress-performance-summary.yml
     with:
       benchmarks-result: ${{ needs.benchmarks.result }}
@@ -327,6 +330,7 @@ jobs:
       setup-result: ${{ needs.setup.result }}
       start-epoch: ${{ needs.setup.outputs.start-epoch }}
       start-time: ${{ needs.setup.outputs.start-time }}
+      status-check-result: ${{ needs.status-check.result }}
       test-makefile-result: ${{ needs.test-makefile.result }}
       test-matrix: ${{ needs.setup.outputs.test-matrix }}
       test-suite-result: ${{ needs.test-suite.result }}

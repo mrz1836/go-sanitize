@@ -69,6 +69,18 @@ on:
       security-scans-enabled:
         description: "Whether security scans are enabled"
         value: ${{ jobs.setup-config.outputs.security-scans-enabled }}
+      nancy-enabled:
+        description: "Whether Nancy dependency checks are enabled"
+        value: ${{ jobs.setup-config.outputs.nancy-enabled }}
+      govulncheck-enabled:
+        description: "Whether govulncheck vulnerability scanning is enabled"
+        value: ${{ jobs.setup-config.outputs.govulncheck-enabled }}
+      gitleaks-enabled:
+        description: "Whether Gitleaks secret scanning is enabled"
+        value: ${{ jobs.setup-config.outputs.gitleaks-enabled }}
+      is-release-run:
+        description: "Whether this is a release-eligible run (tag starting with v)"
+        value: ${{ jobs.setup-config.outputs.is-release-run }}
       start-epoch:
         description: "Workflow start epoch time"
         value: ${{ jobs.setup-config.outputs.start-epoch }}
@@ -110,6 +122,10 @@ jobs:
       race-detection-enabled: ${{ steps.config.outputs.race-detection-enabled }}
       secondary-runner: ${{ steps.config.outputs.secondary-runner }}
       security-scans-enabled: ${{ steps.config.outputs.security-scans-enabled }}
+      nancy-enabled: ${{ steps.config.outputs.nancy-enabled }}
+      govulncheck-enabled: ${{ steps.config.outputs.govulncheck-enabled }}
+      gitleaks-enabled: ${{ steps.config.outputs.gitleaks-enabled }}
+      is-release-run: ${{ steps.config.outputs.is-release-run }}
       start-epoch: ${{ steps.timer.outputs.start-epoch }}
       start-time: ${{ steps.timer.outputs.start-time }}
       static-analysis-enabled: ${{ steps.config.outputs.static-analysis-enabled }}
@@ -284,9 +300,25 @@ jobs:
           echo "go-lint-enabled=${{ env.ENABLE_GO_LINT }}" >> $GITHUB_OUTPUT
           echo "yaml-lint-enabled=${{ env.ENABLE_YAML_LINT }}" >> $GITHUB_OUTPUT
           echo "race-detection-enabled=${{ env.ENABLE_RACE_DETECTION }}" >> $GITHUB_OUTPUT
-          echo "security-scans-enabled=${{ env.ENABLE_SECURITY_SCANS }}" >> $GITHUB_OUTPUT
+          # Security scans - enable if any individual tool is enabled
+          if [[ "${{ env.ENABLE_SECURITY_SCAN_NANCY }}" == "true" || "${{ env.ENABLE_SECURITY_SCAN_GOVULNCHECK }}" == "true" || "${{ env.ENABLE_SECURITY_SCAN_GITLEAKS }}" == "true" ]]; then
+            echo "security-scans-enabled=true" >> $GITHUB_OUTPUT
+          else
+            echo "security-scans-enabled=false" >> $GITHUB_OUTPUT
+          fi
+          echo "nancy-enabled=${{ env.ENABLE_SECURITY_SCAN_NANCY }}" >> $GITHUB_OUTPUT
+          echo "govulncheck-enabled=${{ env.ENABLE_SECURITY_SCAN_GOVULNCHECK }}" >> $GITHUB_OUTPUT
+          echo "gitleaks-enabled=${{ env.ENABLE_SECURITY_SCAN_GITLEAKS }}" >> $GITHUB_OUTPUT
           echo "static-analysis-enabled=${{ env.ENABLE_STATIC_ANALYSIS }}" >> $GITHUB_OUTPUT
           echo "fuzz-testing-enabled=${{ env.ENABLE_FUZZ_TESTING }}" >> $GITHUB_OUTPUT
+
+          # Detect if this is a release run
+          if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+            echo "is-release-run=true" >> $GITHUB_OUTPUT
+            echo "🚀 Release detected: Tag ${{ github.ref_name }}"
+          else
+            echo "is-release-run=false" >> $GITHUB_OUTPUT
+          fi
 
       # ————————————————————————————————————————————————————————————————
       # Build the final summary of the configuration
@@ -310,26 +342,30 @@ jobs:
           echo "_Generated at: ${SUMMARY_TIME}_" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
 
-          # Environment Overview
-          echo "## 📊 Environment Overview" >> $GITHUB_STEP_SUMMARY
-          echo "- **Total Environment Variables Loaded**: $ENV_COUNT" >> $GITHUB_STEP_SUMMARY
-          echo "- **Configuration Source**: \`.github/.env.shared\`" >> $GITHUB_STEP_SUMMARY
-          echo "- **Workflow Start Time**: ${{ steps.timer.outputs.start-time }}" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-
-          # All Environment Variables
-          echo "## 🔍 Loaded Environment Variables" >> $GITHUB_STEP_SUMMARY
-          echo "<details>" >> $GITHUB_STEP_SUMMARY
-          echo "<summary>Click to expand all $ENV_COUNT environment variables</summary>" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Variable | Value |" >> $GITHUB_STEP_SUMMARY
+          # Workflow Trigger Information
+          echo "## 🎯 Workflow Trigger" >> $GITHUB_STEP_SUMMARY
+          echo "| Property | Value |" >> $GITHUB_STEP_SUMMARY
           echo "|----------|-------|" >> $GITHUB_STEP_SUMMARY
-
-          # Sort and display all env vars
-          echo "$ENV_JSON" | jq -r 'to_entries | sort_by(.key) | .[] | "| **\(.key)** | `\(.value)` |"' >> $GITHUB_STEP_SUMMARY
-
+          echo "| **Trigger Type** | \`${{ github.event_name }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Reference** | \`${{ github.ref }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Branch/Tag** | \`${{ github.ref_name }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Is Tag Push** | $([ "${{ startsWith(github.ref, 'refs/tags/') }}" == "true" ] && echo "✅ Yes" || echo "❌ No") |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Is Release Eligible** | $([ "${{ startsWith(github.ref, 'refs/tags/v') }}" == "true" ] && echo "🚀 **Yes - Release will run if tests pass**" || echo "❌ No") |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "</details>" >> $GITHUB_STEP_SUMMARY
+
+          # Configuration Statistics (moved up for overview)
+          echo "## 📈 Configuration Overview" >> $GITHUB_STEP_SUMMARY
+          ENABLED_FEATURES=$(echo "$ENV_JSON" | jq -r '[to_entries | .[] | select(.key | startswith("ENABLE_")) | select(.value == "true")] | length')
+          DISABLED_FEATURES=$(echo "$ENV_JSON" | jq -r '[to_entries | .[] | select(.key | startswith("ENABLE_")) | select(.value == "false")] | length')
+          MATRIX_COUNT=$(echo "$MATRIX_JSON" | jq '.include | length')
+
+          echo "- **Workflow Start Time**: ${{ steps.timer.outputs.start-time }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Total Environment Variables**: $ENV_COUNT (from \`.github/.env.shared\`)" >> $GITHUB_STEP_SUMMARY
+          echo "- **Enabled Features**: $ENABLED_FEATURES" >> $GITHUB_STEP_SUMMARY
+          echo "- **Disabled Features**: $DISABLED_FEATURES" >> $GITHUB_STEP_SUMMARY
+          echo "- **Test Matrix Combinations**: $MATRIX_COUNT" >> $GITHUB_STEP_SUMMARY
+          echo "- **Unique Go Versions**: $(echo "$UNIQUE_GO_VERSIONS" | jq 'length')" >> $GITHUB_STEP_SUMMARY
+          echo "- **Runner Operating Systems**: $([ "${{ env.PRIMARY_RUNNER }}" == "${{ env.SECONDARY_RUNNER }}" ] && echo "1" || echo "2")" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
 
           # Core Configuration
@@ -343,6 +379,17 @@ jobs:
           echo "| **Unique Go Versions** | $UNIQUE_GO_VERSIONS | Deduplicated list of Go versions |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
 
+          # Test Matrix
+          echo "## 🧪 Generated Test Matrix" >> $GITHUB_STEP_SUMMARY
+          echo "**Total test configurations**: $MATRIX_COUNT" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| # | OS | Go Version | Configuration Name | Fuzz Testing |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|----|-----------|--------------------|--------------|" >> $GITHUB_STEP_SUMMARY
+
+          echo "$MATRIX_JSON" | jq -r '.include | to_entries | .[] | "| \(.key + 1) | \(.value.os) | \(.value["go-version"]) | \(.value.name) | \(if .value["run-fuzz"] then "✅ Yes" else "❌ No" end) |"' >> $GITHUB_STEP_SUMMARY
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+
           # Feature Flags
           echo "## 🚀 Feature Flags" >> $GITHUB_STEP_SUMMARY
           echo "| Feature | Status | Impact |" >> $GITHUB_STEP_SUMMARY
@@ -353,7 +400,9 @@ jobs:
           echo "| **Go Linting** | $([ "${{ env.ENABLE_GO_LINT }}" == "true" ] && echo "✅ Enabled" || echo "❌ Disabled") | golangci-lint will $([ "${{ env.ENABLE_GO_LINT }}" == "true" ] && echo "analyze code quality" || echo "be skipped") |" >> $GITHUB_STEP_SUMMARY
           echo "| **YAML Linting** | $([ "${{ env.ENABLE_YAML_LINT }}" == "true" ] && echo "✅ Enabled" || echo "❌ Disabled") | prettier will $([ "${{ env.ENABLE_YAML_LINT }}" == "true" ] && echo "validate YAML formatting" || echo "be skipped") |" >> $GITHUB_STEP_SUMMARY
           echo "| **Race Detection** | $([ "${{ env.ENABLE_RACE_DETECTION }}" == "true" ] && echo "✅ Enabled" || echo "❌ Disabled") | Tests will $([ "${{ env.ENABLE_RACE_DETECTION }}" == "true" ] && echo "run with -race flag" || echo "run without race detection") |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Security Scans** | $([ "${{ env.ENABLE_SECURITY_SCANS }}" == "true" ] && echo "✅ Enabled" || echo "❌ Disabled") | Security tools will $([ "${{ env.ENABLE_SECURITY_SCANS }}" == "true" ] && echo "scan for vulnerabilities" || echo "be skipped") |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Nancy (Dependency Checks)** | $([ "${{ env.ENABLE_SECURITY_SCAN_NANCY }}" == "true" ] && echo "✅ Enabled" || echo "❌ Disabled") | Nancy will $([ "${{ env.ENABLE_SECURITY_SCAN_NANCY }}" == "true" ] && echo "scan dependencies for vulnerabilities" || echo "be skipped") |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Govulncheck (Go Vuln Scan)** | $([ "${{ env.ENABLE_SECURITY_SCAN_GOVULNCHECK }}" == "true" ] && echo "✅ Enabled" || echo "❌ Disabled") | govulncheck will $([ "${{ env.ENABLE_SECURITY_SCAN_GOVULNCHECK }}" == "true" ] && echo "scan for Go vulnerabilities" || echo "be skipped") |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Gitleaks (Secret Scan)** | $([ "${{ env.ENABLE_SECURITY_SCAN_GITLEAKS }}" == "true" ] && echo "✅ Enabled" || echo "❌ Disabled") | Gitleaks will $([ "${{ env.ENABLE_SECURITY_SCAN_GITLEAKS }}" == "true" ] && echo "scan for leaked secrets" || echo "be skipped") |" >> $GITHUB_STEP_SUMMARY
           echo "| **Static Analysis** | $([ "${{ env.ENABLE_STATIC_ANALYSIS }}" == "true" ] && echo "✅ Enabled" || echo "❌ Disabled") | Static analysis will $([ "${{ env.ENABLE_STATIC_ANALYSIS }}" == "true" ] && echo "check for code issues" || echo "be skipped") |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
 
@@ -363,6 +412,23 @@ jobs:
           echo "|-------------|--------|---------|" >> $GITHUB_STEP_SUMMARY
           echo "| **Makefile** | $([ "${{ steps.config.outputs.makefile-exists }}" == "true" ] && echo "✅ Found" || echo "⚠️ Not Found") | Required: $([ "${{ env.MAKEFILE_REQUIRED }}" == "true" ] && echo "Yes" || echo "No") |" >> $GITHUB_STEP_SUMMARY
           echo "| **Verbose Output** | $([ "${{ env.ENABLE_VERBOSE_TEST_OUTPUT }}" == "true" ] && echo "✅ Enabled" || echo "❌ Disabled") | Test output verbosity |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Security Tools Configuration
+          echo "## 🔒 Security Tools Configuration" >> $GITHUB_STEP_SUMMARY
+          echo "| Tool | Version | Configuration |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|---------|---------------|" >> $GITHUB_STEP_SUMMARY
+          echo "| **Gitleaks** | \`${{ env.GITLEAKS_VERSION }}\` | Notify: \`${{ env.GITLEAKS_NOTIFY_USER_LIST }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Govulncheck** | \`${{ env.GOVULNCHECK_VERSION }}\` | Go vulnerability scanner |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Nancy** | \`${{ env.NANCY_VERSION }}\` | Excludes: \`${{ env.NANCY_EXCLUDES }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # GitHub Token Configuration
+          echo "## 🔑 Authentication" >> $GITHUB_STEP_SUMMARY
+          echo "| Setting | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|---------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| **Preferred Token** | \`${{ env.PREFERRED_GITHUB_TOKEN }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Token Type** | $([ "${{ env.PREFERRED_GITHUB_TOKEN }}" == "GH_PAT_TOKEN" ] && echo "Personal Access Token (5000 req/hour)" || echo "Default GITHUB_TOKEN (1000 req/hour)") |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
 
           # Custom Project Variables
@@ -379,45 +445,19 @@ jobs:
           fi
           echo "" >> $GITHUB_STEP_SUMMARY
 
-          # Security Tools Configuration
-          echo "## 🔒 Security Tools Configuration" >> $GITHUB_STEP_SUMMARY
-          echo "| Tool | Version | Configuration |" >> $GITHUB_STEP_SUMMARY
-          echo "|------|---------|---------------|" >> $GITHUB_STEP_SUMMARY
-          echo "| **Gitleaks** | \`${{ env.GITLEAKS_VERSION }}\` | Notify: \`${{ env.GITLEAKS_NOTIFY_USER_LIST }}\` |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Govulncheck** | \`${{ env.GOVULNCHECK_VERSION }}\` | Go vulnerability scanner |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Nancy** | \`${{ env.NANCY_VERSION }}\` | Excludes: \`${{ env.NANCY_EXCLUDES }}\` |" >> $GITHUB_STEP_SUMMARY
+          # All Environment Variables (moved to end as reference)
+          echo "## 🔍 All Environment Variables" >> $GITHUB_STEP_SUMMARY
+          echo "<details>" >> $GITHUB_STEP_SUMMARY
+          echo "<summary>Click to expand all $ENV_COUNT environment variables</summary>" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Variable | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|-------|" >> $GITHUB_STEP_SUMMARY
 
-          # Test Matrix
-          echo "## 🧪 Generated Test Matrix" >> $GITHUB_STEP_SUMMARY
-          MATRIX_COUNT=$(echo "$MATRIX_JSON" | jq '.include | length')
-          echo "**Total test configurations**: $MATRIX_COUNT" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| # | OS | Go Version | Configuration Name | Fuzz Testing |" >> $GITHUB_STEP_SUMMARY
-          echo "|---|----|-----------|--------------------|--------------|" >> $GITHUB_STEP_SUMMARY
-
-          echo "$MATRIX_JSON" | jq -r '.include | to_entries | .[] | "| \(.key + 1) | \(.value.os) | \(.value["go-version"]) | \(.value.name) | \(if .value["run-fuzz"] then "✅ Yes" else "❌ No" end) |"' >> $GITHUB_STEP_SUMMARY
+          # Sort and display all env vars
+          echo "$ENV_JSON" | jq -r 'to_entries | sort_by(.key) | .[] | "| **\(.key)** | `\(.value)` |"' >> $GITHUB_STEP_SUMMARY
 
           echo "" >> $GITHUB_STEP_SUMMARY
-
-          # GitHub Token Configuration
-          echo "## 🔑 Authentication" >> $GITHUB_STEP_SUMMARY
-          echo "| Setting | Value |" >> $GITHUB_STEP_SUMMARY
-          echo "|---------|-------|" >> $GITHUB_STEP_SUMMARY
-          echo "| **Preferred Token** | \`${{ env.PREFERRED_GITHUB_TOKEN }}\` |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Token Type** | $([ "${{ env.PREFERRED_GITHUB_TOKEN }}" == "GH_PAT_TOKEN" ] && echo "Personal Access Token (5000 req/hour)" || echo "Default GITHUB_TOKEN (1000 req/hour)") |" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-
-          # Summary Statistics
-          echo "## 📈 Configuration Statistics" >> $GITHUB_STEP_SUMMARY
-          ENABLED_FEATURES=$(echo "$ENV_JSON" | jq -r '[to_entries | .[] | select(.key | startswith("ENABLE_")) | select(.value == "true")] | length')
-          DISABLED_FEATURES=$(echo "$ENV_JSON" | jq -r '[to_entries | .[] | select(.key | startswith("ENABLE_")) | select(.value == "false")] | length')
-
-          echo "- **Enabled Features**: $ENABLED_FEATURES" >> $GITHUB_STEP_SUMMARY
-          echo "- **Disabled Features**: $DISABLED_FEATURES" >> $GITHUB_STEP_SUMMARY
-          echo "- **Test Matrix Combinations**: $MATRIX_COUNT" >> $GITHUB_STEP_SUMMARY
-          echo "- **Unique Go Versions**: $(echo "$UNIQUE_GO_VERSIONS" | jq 'length')" >> $GITHUB_STEP_SUMMARY
-          echo "- **Runner Operating Systems**: $([ "${{ env.PRIMARY_RUNNER }}" == "${{ env.SECONDARY_RUNNER }}" ] && echo "1" || echo "2")" >> $GITHUB_STEP_SUMMARY
+          echo "</details>" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
 
           # Footer

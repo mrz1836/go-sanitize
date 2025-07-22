@@ -50,7 +50,7 @@ jobs:
     timeout-minutes: 30 # Prevent hung benchmarks
     strategy:
       fail-fast: false # Continue running other benchmarks if one fails
-      matrix: ${{ fromJson(inputs.benchmark-matrix) }}
+      matrix: ${{ fromJSON(inputs.benchmark-matrix) }}
     runs-on: ${{ matrix.os }}
 
     steps:

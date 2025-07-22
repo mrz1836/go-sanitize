@@ -65,7 +65,7 @@ jobs:
     timeout-minutes: 30 # Prevent hung tests
     strategy:
       fail-fast: true
-      matrix: ${{ fromJson(inputs.test-matrix) }}
+      matrix: ${{ fromJSON(inputs.test-matrix) }}
     runs-on: ${{ matrix.os }}
 
     steps:

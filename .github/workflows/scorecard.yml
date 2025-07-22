@@ -10,16 +10,18 @@ on:
   # To guarantee Maintained check is occasionally updated. See
   # https://github.com/ossf/scorecard/blob/main/docs/checks.md#maintained
   schedule:
-    - cron: '0 8 * * 1' # Every Monday at 08:00 UTC
+    - cron: "0 8 * * 1" # Every Monday at 08:00 UTC
   push:
-    branches: [ "master" ]
+    branches: ["master"]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 # Declare default permissions as read-only.
-permissions: read-all
+permissions:
+  contents: read
+  security-events: read # For scorecard analysis
 
 jobs:
   analysis:

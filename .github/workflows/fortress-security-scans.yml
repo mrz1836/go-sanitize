@@ -17,6 +17,21 @@ on:
         description: "JSON string of environment variables"
         required: true
         type: string
+      enable-nancy:
+        description: "Enable Nancy security scan"
+        required: false
+        type: boolean
+        default: true
+      enable-govulncheck:
+        description: "Enable govulncheck security scan"
+        required: false
+        type: boolean
+        default: true
+      enable-gitleaks:
+        description: "Enable Gitleaks security scan"
+        required: false
+        type: boolean
+        default: true
       primary-runner:
         description: "Primary runner OS"
         required: true
@@ -43,6 +58,7 @@ jobs:
   ask-nancy:
     name: 🛡️ Ask Nancy (Dependency Checks)
     runs-on: ${{ inputs.primary-runner }}
+    if: ${{ inputs.enable-nancy }}
     steps:
       # ————————————————————————————————————————————————————————————————
       # Parse environment variables
@@ -124,6 +140,7 @@ jobs:
   govulncheck:
     name: 🔐 Run govulncheck (Vulnerability Scan)
     runs-on: ${{ inputs.primary-runner }}
+    if: ${{ inputs.enable-govulncheck }}
     steps:
       # ————————————————————————————————————————————————————————————————
       # Parse environment variables
@@ -229,7 +246,7 @@ jobs:
   gitleaks:
     name: 🕵️ Run Gitleaks (Secret Scan)
     runs-on: ${{ inputs.primary-runner }}
-    if: github.event.pull_request.head.repo.full_name == github.repository
+    if: ${{ inputs.enable-gitleaks }}
     steps:
       # ————————————————————————————————————————————————————————————————
       # Parse environment variables
@@ -244,6 +261,38 @@ jobs:
           done
 
       # ————————————————————————————————————————————————————————————————
+      # Check repository security conditions
+      # ————————————————————————————————————————————————————————————————
+      - name: 🔍 Check repository security conditions
+        id: repo-check
+        env:
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_HEAD_REF: ${{ github.head_ref }}
+          PR_HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+        run: |
+          echo "🔍 Checking repository security conditions..."
+          echo "Event Name: $GITHUB_EVENT_NAME"
+          echo "Actor: $GITHUB_ACTOR"
+          echo "Repository: $GITHUB_REPOSITORY"
+          echo "Head Ref: $GITHUB_HEAD_REF"
+
+          # For workflow_call, we typically trust the calling workflow from the same repo
+          # For pull_request events, check if head repo matches base repo
+          if [[ "$GITHUB_EVENT_NAME" == "workflow_call" ]]; then
+            echo "✅ Workflow call from same repository - security scans allowed"
+            echo "is_same_repo=true" >> $GITHUB_OUTPUT
+          elif [[ "$PR_HEAD_REPO" == "$GITHUB_REPOSITORY" ]] || [[ -z "$PR_HEAD_REPO" ]]; then
+            echo "✅ Same repository or push event - security scans allowed"
+            echo "is_same_repo=true" >> $GITHUB_OUTPUT
+          else
+            echo "⚠️  Fork detected - skipping secret-sensitive scans for security"
+            echo "PR Head Repo: $PR_HEAD_REPO"
+            echo "is_same_repo=false" >> $GITHUB_OUTPUT
+          fi
+
+      # ————————————————————————————————————————————————————————————————
       # Checkout code and set up Go environment
       # ————————————————————————————————————————————————————————————————
       - name: 📥 Checkout code
@@ -252,6 +301,7 @@ jobs:
           fetch-depth: 0 # Fetch all history so Gitleaks can scan commits
 
       - name: 🔍 Run gitleaks scan
+        if: steps.repo-check.outputs.is_same_repo == 'true'
         uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7 # v8.27.2
         env:
           GITHUB_TOKEN: ${{ secrets.github-token }}
@@ -263,6 +313,7 @@ jobs:
           GITLEAKS_VERSION: ${{ env.GITLEAKS_VERSION }}
 
       - name: 📊 Job Summary
+        if: steps.repo-check.outputs.is_same_repo == 'true'
         run: |
           echo "## 🕵️ Gitleaks Secret Scan Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
@@ -274,3 +325,17 @@ jobs:
           echo "| **Result** | ✅ No secrets detected (see logs for details) |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "🎯 **Secret scan completed successfully.**" >> $GITHUB_STEP_SUMMARY
+
+      - name: 📊 Fork Security Notice
+        if: steps.repo-check.outputs.is_same_repo == 'false'
+        run: |
+          echo "## 🕵️ Gitleaks Secret Scan Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| 🔒 Security Details | ⚠️  Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| **Tool** | Gitleaks |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Fork Detected** | ${{ github.event.pull_request.head.repo.full_name || 'N/A (not a PR event)' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Base Repository** | ${{ github.repository }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Result** | ⚠️  Skipped for security (fork cannot access secrets) |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "🔒 **Secret scanning was skipped because this PR comes from a fork. This is a security feature to prevent secret exposure.**" >> $GITHUB_STEP_SUMMARY

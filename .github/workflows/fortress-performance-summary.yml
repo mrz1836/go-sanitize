@@ -51,6 +51,11 @@ on:
         required: false
         type: string
         default: "skipped"
+      status-check-result:
+        description: "Result of the status-check job"
+        required: false
+        type: string
+        default: "skipped"
       test-matrix:
         description: "Test matrix JSON"
         required: true
@@ -263,6 +268,8 @@ jobs:
             if [[ "${{ inputs.benchmarks-result }}" != "skipped" ]]; then
               echo "| 🏃 Benchmarks | ${{ inputs.benchmarks-result }} | $([ "${{ inputs.benchmarks-result }}" = "success" ] && echo "✅" || echo "❌") |"
             fi
+            # Always show status-check result
+            echo "| 🎯 All Tests Passed | ${{ inputs.status-check-result }} | $([ "${{ inputs.status-check-result }}" = "success" ] && echo "✅" || echo "❌") |"
             # Only show release row if it was attempted
             if [[ "${{ inputs.release-result }}" != "skipped" ]]; then
               echo "| 🚀 Release | ${{ inputs.release-result }} | $([ "${{ inputs.release-result }}" = "success" ] && echo "✅" || echo "❌") |"
@@ -312,6 +319,7 @@ jobs:
             [ "${{ inputs.code-quality-result }}" != "success" ] && [ "${{ inputs.code-quality-result }}" != "skipped" ] && FAILED_JOBS="${FAILED_JOBS}Code Quality, "
             [ "${{ inputs.test-suite-result }}" != "success" ] && [ "${{ inputs.test-suite-result }}" != "skipped" ] && FAILED_JOBS="${FAILED_JOBS}Test Suite, "
             [ "${{ inputs.benchmarks-result }}" != "success" ] && [ "${{ inputs.benchmarks-result }}" != "skipped" ] && FAILED_JOBS="${FAILED_JOBS}Benchmarks, "
+            [ "${{ inputs.status-check-result }}" != "success" ] && [ "${{ inputs.status-check-result }}" != "skipped" ] && FAILED_JOBS="${FAILED_JOBS}Status Check, "
             [ "${{ inputs.release-result }}" != "success" ] && [ "${{ inputs.release-result }}" != "skipped" ] && FAILED_JOBS="${FAILED_JOBS}Release, "
 
             if [ -n "$FAILED_JOBS" ]; then
