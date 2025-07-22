@@ -28,7 +28,7 @@ GOMODCACHE ?= $(HOME)/go/pkg/mod
 PARALLEL := $(shell getconf _NPROCESSORS_ONLN 2>/dev/null || echo 4)
 
 # Tool version pins
-GOLANGCI_LINT_VERSION := v2.2.2
+GOLANGCI_LINT_VERSION := v2.3.0
 export GOLANGCI_LINT_VERSION
 
 .PHONY: bench
