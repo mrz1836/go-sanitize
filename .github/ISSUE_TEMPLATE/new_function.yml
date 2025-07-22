@@ -1,7 +1,7 @@
 name: New Function Request
 description: Request the addition of a new Go function with full test, benchmark, and documentation coverage.
 title: "[Function] Add <FunctionName>"
-labels: [ "feature", "test", "documentation" ]
+labels: ["feature", "test", "documentation"]
 assignees:
   - mrz1836
 body:

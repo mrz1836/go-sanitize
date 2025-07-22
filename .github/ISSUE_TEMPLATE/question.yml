@@ -1,7 +1,7 @@
 name: Question
 description: General template for asking a question related to this project
 title: "[Question] <your topic here>"
-labels: [ "question" ]
+labels: ["question"]
 assignees:
   - mrz1836
 body:

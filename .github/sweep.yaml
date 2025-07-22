@@ -1,6 +1,6 @@
 gha_enabled: true
 branch: master
-blocked_dirs: [ ]
+blocked_dirs: []
 draft: false
 description: |
   Sweep AI must follow the repository guidelines in .github/AGENTS.md.

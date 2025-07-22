@@ -24,8 +24,8 @@ name: Stale Check
 on:
   schedule:
     # ┌─ min  ─┬─ hour ─┬─ dom ─┬─ mon ─┬─ dow ─┐
-    - cron: '0 12 * * 1-5'  # 7:00 AM EST (12:00 UTC)
-  workflow_dispatch:        # Allow manual triggering
+    - cron: "0 12 * * 1-5" # 7:00 AM EST (12:00 UTC)
+  workflow_dispatch: # Allow manual triggering
 
 # ————————————————————————————————————————————————————————————————
 # Permissions
@@ -75,8 +75,8 @@ jobs:
     needs: [load-env]
     runs-on: ubuntu-latest
     permissions:
-      issues: write                       # Required to add labels and comments
-      pull-requests: write                # Required to add labels and comments on PRs
+      issues: write # Required to add labels and comments
+      pull-requests: write # Required to add labels and comments on PRs
 
     steps:
       # ————————————————————————————————————————————————————————————————

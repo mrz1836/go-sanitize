@@ -47,10 +47,10 @@ updates:
           - "*auth*"
           - "*jwt*"
           - "*oauth*"
-        update-types: [ "minor", "patch" ]
+        update-types: ["minor", "patch"]
     open-pull-requests-limit: 10
-    assignees: [ "mrz1836" ]
-    labels: [ "chore", "dependencies", "gomod" ]
+    assignees: ["mrz1836"]
+    labels: ["chore", "dependencies", "gomod"]
     commit-message:
       prefix: "chore"
       include: "scope"
@@ -70,10 +70,10 @@ updates:
       - dependency-type: "direct"
     groups:
       ghactions-all:
-        patterns: [ "*" ]
+        patterns: ["*"]
     open-pull-requests-limit: 10
-    assignees: [ "mrz1836" ]
-    labels: [ "chore", "dependencies", "github-actions" ]
+    assignees: ["mrz1836"]
+    labels: ["chore", "dependencies", "github-actions"]
     commit-message:
       prefix: "chore"
       include: "scope"
@@ -93,10 +93,10 @@ updates:
       - dependency-type: "direct"
     groups:
       devcontainer-all:
-        patterns: [ "*" ]
+        patterns: ["*"]
     open-pull-requests-limit: 5
-    assignees: [ "mrz1836" ]
-    labels: [ "chore", "dependencies", "devcontainer" ]
+    assignees: ["mrz1836"]
+    labels: ["chore", "dependencies", "devcontainer"]
     commit-message:
       prefix: "chore"
       include: "scope"

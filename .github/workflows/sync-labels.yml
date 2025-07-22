@@ -20,13 +20,13 @@ name: Sync Labels
 # ————————————————————————————————————————————————————————————————
 on:
   push:
-    branches: [ master ]
+    branches: [master]
     paths:
-      - .github/labels.yml  # Runs *only* when this file changes
-  workflow_dispatch:        # Allow manual triggering
+      - .github/labels.yml # Runs *only* when this file changes
+  workflow_dispatch: # Allow manual triggering
     inputs:
       dry_run:
-        description: 'Dry run mode (show changes without applying them)'
+        description: "Dry run mode (show changes without applying them)"
         type: boolean
         default: false
         required: false
@@ -102,7 +102,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      issues: write    # Required for label management
+      issues: write # Required for label management
 
     steps:
       # ————————————————————————————————————————————————————————————————

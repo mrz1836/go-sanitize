@@ -15,15 +15,15 @@
 #
 # ------------------------------------------------------------------------------------
 
-name: 'Load Environment Variables'
-description: 'Loads environment variables from .github/.env.shared and outputs as JSON'
+name: "Load Environment Variables"
+description: "Loads environment variables from .github/.env.shared and outputs as JSON"
 
 outputs:
   env-json:
-    description: 'JSON object containing all environment variables'
+    description: "JSON object containing all environment variables"
     value: ${{ steps.load-env.outputs.env-json }}
   primary-runner:
-    description: 'Primary runner OS extracted from environment variables'
+    description: "Primary runner OS extracted from environment variables"
     value: ${{ steps.load-env.outputs.primary-runner }}
 
 runs:

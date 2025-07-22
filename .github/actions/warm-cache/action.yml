@@ -8,32 +8,32 @@
 #
 # ------------------------------------------------------------------------------------
 
-name: 'Warm Go Caches'
-description: 'Warm Go module and build caches for the specified Go version and OS'
+name: "Warm Go Caches"
+description: "Warm Go module and build caches for the specified Go version and OS"
 
 inputs:
   go-version:
-    description: 'Go version to use'
+    description: "Go version to use"
     required: true
   matrix-os:
-    description: 'Operating system for the runner'
+    description: "Operating system for the runner"
     required: true
   matrix-name:
-    description: 'Display name for the matrix configuration'
+    description: "Display name for the matrix configuration"
     required: true
   enable-verbose:
-    description: 'Enable verbose output'
+    description: "Enable verbose output"
     required: false
-    default: 'false'
+    default: "false"
   go-primary-version:
-    description: 'Primary Go version for comparison'
+    description: "Primary Go version for comparison"
     required: true
   go-secondary-version:
-    description: 'Secondary Go version for comparison'
+    description: "Secondary Go version for comparison"
     required: true
 
 runs:
-  using: 'composite'
+  using: "composite"
   steps:
     # ————————————————————————————————————————————————————————————————
     # Checkout code, set up Go, and cache dependencies
@@ -59,7 +59,7 @@ runs:
     # ────────────────────────────────────────────────────────────────────────────
     - name: 💾 Restore Go module cache (shared)
       id: gomod-cache
-      uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684     # v4.2.3
+      uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
       with:
         path: |
           ~/go/pkg/mod
@@ -133,7 +133,7 @@ runs:
     # ────────────────────────────────────────────────────────────────────────────
     - name: 💾 Restore Go build cache (per-version)
       id: gobuild-cache
-      uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684     # v4.2.3
+      uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
       with:
         path: |
           ~/.cache/go-build

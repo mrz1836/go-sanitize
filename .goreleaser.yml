@@ -11,9 +11,9 @@ changelog:
   sort: asc
   filters:
     exclude:
-      - '^.github:'
-      - '^.vscode:'
-      - '^test:'
+      - "^.github:"
+      - "^.vscode:"
+      - "^test:"
 
 # ---------------------------
 # Builder
@@ -38,12 +38,11 @@ release:
 # Announce
 # ---------------------------
 announce:
-
   # See more at: https://goreleaser.com/customization/announce/#slack
   slack:
     enabled: false
-    message_template: '{{ .ProjectName }} {{ .Tag }} is out! Changelog: https://github.com/mrz1836/{{ .ProjectName }}/releases/tag/{{ .Tag }}'
-    channel: '#test_slack'
+    message_template: "{{ .ProjectName }} {{ .Tag }} is out! Changelog: https://github.com/mrz1836/{{ .ProjectName }}/releases/tag/{{ .Tag }}"
+    channel: "#test_slack"
     # username: ''
     # icon_emoji: ''
     # icon_url: ''
@@ -51,18 +50,18 @@ announce:
   # See more at: https://goreleaser.com/customization/announce/#twitter
   twitter:
     enabled: false
-    message_template: '{{ .ProjectName }} {{ .Tag }} is out!'
+    message_template: "{{ .ProjectName }} {{ .Tag }} is out!"
 
   # See more at: https://goreleaser.com/customization/announce/#discord
   discord:
     enabled: false
-    message_template: '{{ .ProjectName }} {{ .Tag }} is out!'
+    message_template: "{{ .ProjectName }} {{ .Tag }} is out!"
     # Defaults to `GoReleaser`
-    author: ''
+    author: ""
     # Defaults to `3888754` - the grey-ish from goreleaser
-    color: ''
+    color: ""
     # Defaults to `https://goreleaser.com/static/avatar.png`
-    icon_url: ''
+    icon_url: ""
 
   # See more at: https://goreleaser.com/customization/announce/#reddit
   reddit:
@@ -74,4 +73,4 @@ announce:
     # Defaults to `{{ .GitURL }}/releases/tag/{{ .Tag }}`
     # url_template: 'https://github.com/mrz1836/{{ .ProjectName }}/releases/tag/{{ .Tag }}'
     # Defaults to `{{ .ProjectName }} {{ .Tag }} is out!`
-    title_template: '{{ .ProjectName }} {{ .Tag }} is out!'
+    title_template: "{{ .ProjectName }} {{ .Tag }} is out!"
