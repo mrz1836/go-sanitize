@@ -14,4 +14,26 @@ trim_trailing_whitespace = false
 
 [*.{yml,yaml}]
 indent_style = space
-indent_size  = 2      # or 4-spaces if you prefer
+indent_size  = 2
+
+[*.{json,prettierrc}]
+indent_style = space
+indent_size  = 2
+
+[*.{js,mjs,cjs,ts}]
+indent_style = space
+indent_size  = 2
+
+[*.py]
+indent_style = space
+indent_size  = 4
+
+[{Makefile,*.mk}]
+indent_style = tab
+
+[*.{xml,cff}]
+indent_style = space
+indent_size  = 2
+
+[{LICENSE,Dockerfile,.gitignore,.dockerignore,.prettierignore}]
+insert_final_newline = true
