@@ -364,8 +364,16 @@ jobs:
 
             # Process both test failures and build failures
 
-            # First handle regular test failures
-            if grep -oE 'FAIL:.*\(([^)]+)\)' test-failures.txt 2>/dev/null | sed -E 's/.*\(([^):]+)[^)]*\).*/\1/' | sort -u > "$TEMP_PACKAGES"; then
+            # Extract package names from test failures using a named regex and
+            # intermediate steps
+            FAIL_REGEX='FAIL:.*\(([^)]+)\)'
+            PACKAGE_LINE_REGEX='.*\(([^):]+)[^)]*\).*'
+
+            grep -oE "$FAIL_REGEX" test-failures.txt 2>/dev/null > temp-fail-lines.txt
+            sed -E "s/$PACKAGE_LINE_REGEX/\1/" temp-fail-lines.txt | sort -u > "$TEMP_PACKAGES"
+            rm temp-fail-lines.txt
+
+            if [[ -s "$TEMP_PACKAGES" ]]; then
               echo "📦 Found packages with test failures:"
               cat "$TEMP_PACKAGES"
 
