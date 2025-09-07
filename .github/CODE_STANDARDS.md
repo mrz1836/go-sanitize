@@ -1,6 +1,6 @@
 # ✅ Code Standards
 
-Welcome to a modern Go codebase. 
+Welcome to a modern Go codebase.
 
 This library follows best-in-class practices for clarity, performance, and maintainability.
 
@@ -8,7 +8,7 @@ This library follows best-in-class practices for clarity, performance, and maint
 
 ## 🎓 Effective Go
 
-We adhere to the patterns and philosophy in [Effective Go](https://golang.org/doc/effective_go.html). 
+We adhere to the patterns and philosophy in [Effective Go](https://golang.org/doc/effective_go.html).
 
 Stick to idiomatic code. Avoid cleverness when clarity wins.
 

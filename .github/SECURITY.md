@@ -35,7 +35,7 @@ We welcome responsible disclosures from researchers, vendors, users, and curious
 * 📢 **Status updates** every 5 business days
 * ✅ **Resolution target** of 30 days (for confirmed vulnerabilities)
 
-Prefer encrypted comms? Let us know in your initial email—we’ll reply with our PGP public key. 
+Prefer encrypted comms? Let us know in your initial email—we’ll reply with our PGP public key.
 All official security responses are signed with it.
 
 <br/>
