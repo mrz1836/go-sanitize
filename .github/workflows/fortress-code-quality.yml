@@ -49,6 +49,7 @@ on:
         description: "GitHub token for API access"
         required: true
 
+# Security: Restrictive default permissions with job-level overrides for least privilege access
 permissions:
   contents: read
 
@@ -62,65 +63,39 @@ jobs:
     runs-on: ${{ inputs.primary-runner }}
     steps:
       # ————————————————————————————————————————————————————————————————
-      # Parse environment variables
-      # ————————————————————————————————————————————————————————————————
-      - name: 🔧 Parse environment variables
-        env:
-          ENV_JSON: ${{ inputs.env-json }}
-        run: |
-          echo "📋 Setting environment variables..."
-          echo "$ENV_JSON" | jq -r 'to_entries | .[] | "\(.key)=\(.value)"' | while IFS='=' read -r key value; do
-            echo "$key=$value" >> $GITHUB_ENV
-          done
-
-      # ————————————————————————————————————————————————————————————————
-      # Checkout code and set up Go environment
+      # Checkout code (required for local actions)
       # ————————————————————————————————————————————————————————————————
       - name: 📥 Checkout code
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
-      - name: 🔧 Set Go cache paths (cross-platform)
-        run: |
-          echo "🔧 Setting up Go cache paths..."
-          echo "GOCACHE=$HOME/.cache/go-build"        >> $GITHUB_ENV
-          echo "GOMODCACHE=$HOME/go/pkg/mod"          >> $GITHUB_ENV
-          echo "GOLANGCI_LINT_CACHE=$HOME/.cache/golangci-lint" >> $GITHUB_ENV
-
       # ————————————————————————————————————————————————————————————————
-      # Restore Go module and build caches
+      # Parse environment variables
       # ————————————————————————————————————————————————————————————————
-      - name: 💾 Restore Go module cache
-        id: restore-gomod
-        uses: actions/cache/restore@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
+      - name: 🔧 Parse environment variables
+        uses: ./.github/actions/parse-env
         with:
-          path: ~/go/pkg/mod
-          key: ${{ inputs.primary-runner }}-gomod-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ inputs.primary-runner }}-gomod-
+          env-json: ${{ inputs.env-json }}
 
       # ————————————————————————————————————————————————————————————————
-      # # Restore the build cache and test cache
+      # Setup Go with caching and version management
       # ————————————————————————————————————————————————————————————————
-      - name: 💾 Restore Go build cache
-        id: restore-gobuild
-        uses: actions/cache/restore@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
-        with:
-          path: |
-            ~/.cache/go-build
-            ~/.cache/go-build/test
-          key: ${{ inputs.primary-runner }}-gobuild-${{ inputs.go-primary-version }}-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ inputs.primary-runner }}-gobuild-${{ inputs.go-primary-version }}-
-
-      # ————————————————————————————————————————————————————————————————
-      # Set up Go environment
-      # ————————————————————————————————————————————————————————————————
-      - name: 🏗️ Set up Go
+      - name: 🏗️ Setup Go with Cache
         id: setup-go-vet
-        uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
+        uses: ./.github/actions/setup-go-with-cache
         with:
           go-version: ${{ inputs.go-primary-version }}
-          cache: false # we handle caches ourselves
+          matrix-os: ${{ inputs.primary-runner }}
+          go-primary-version: ${{ inputs.go-primary-version }}
+          go-secondary-version: ${{ inputs.go-primary-version }}
+
+      # ————————————————————————————————————————————————————————————————
+      # Setup MAGE-X (required for magex lint command)
+      # ————————————————————————————————————————————————————————————————
+      - name: 🔧 Setup MAGE-X
+        uses: ./.github/actions/setup-magex
+        with:
+          magex-version: ${{ env.MAGE_X_VERSION }}
+          runner-os: ${{ inputs.primary-runner }}
 
       # ————————————————————————————————————————————————————————————————
       # Run go vet with parallel execution
@@ -128,7 +103,7 @@ jobs:
       - name: 🔍 Go vet (parallel)
         run: |
           echo "🚀 Running static analysis with go vet (parallel mode)..."
-          make vet-parallel
+          magex vet
           echo "✅ Static analysis completed successfully"
 
       # ————————————————————————————————————————————————————————————————
@@ -138,14 +113,41 @@ jobs:
         run: |
           echo "## 📊 Go Vet Static Analysis Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| 🔍 Analysis Details | ✅ Status |" >> $GITHUB_STEP_SUMMARY
+          echo "| Analysis Details | Status |" >> $GITHUB_STEP_SUMMARY
           echo "|---|---|" >> $GITHUB_STEP_SUMMARY
           echo "| **Tool** | go vet (Official Go Static Analyzer) |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Execution** | 🚀 Project packages only |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Execution** | Project packages only |" >> $GITHUB_STEP_SUMMARY
           echo "| **Scope** | ./... (excludes dependencies) |" >> $GITHUB_STEP_SUMMARY
           echo "| **Result** | ✅ No issues found |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "🎯 **All packages passed static analysis checks.**" >> $GITHUB_STEP_SUMMARY
+
+      # ————————————————————————————————————————————————————————————————
+      # Collect cache statistics
+      # ————————————————————————————————————————————————————————————————
+      - name: 📊 Collect cache statistics
+        id: cache-stats-govet
+        if: always()
+        uses: ./.github/actions/collect-cache-stats
+        with:
+          workflow-name: govet
+          job-name: govet
+          os: ${{ inputs.primary-runner }}
+          go-version: ${{ inputs.go-primary-version }}
+          cache-prefix: cache-stats
+          gomod-cache-hit: ${{ steps.setup-go-vet.outputs.module-cache-hit }}
+          gobuild-cache-hit: ${{ steps.setup-go-vet.outputs.build-cache-hit }}
+
+      # ————————————————————————————————————————————————————————————————
+      # Upload infrastructure cache statistics
+      # ————————————————————————————————————————————————————————————————
+      - name: 📤 Upload infrastructure cache statistics
+        if: always()
+        uses: ./.github/actions/upload-statistics
+        with:
+          artifact-name: cache-stats-govet
+          artifact-path: cache-stats-govet.json
+          retention-days: 1
 
   # ----------------------------------------------------------------------------------
   # Lint (Code Linting)
@@ -158,22 +160,18 @@ jobs:
       golangci-lint-version: ${{ steps.golangci-lint-version.outputs.version }}
     steps:
       # ————————————————————————————————————————————————————————————————
-      # Parse environment variables
-      # ————————————————————————————————————————————————————————————————
-      - name: 🔧 Parse environment variables
-        env:
-          ENV_JSON: ${{ inputs.env-json }}
-        run: |
-          echo "📋 Setting environment variables..."
-          echo "$ENV_JSON" | jq -r 'to_entries | .[] | "\(.key)=\(.value)"' | while IFS='=' read -r key value; do
-            echo "$key=$value" >> $GITHUB_ENV
-          done
-
-      # ————————————————————————————————————————————————————————————————
-      # Checkout code and set up Go environment
+      # Checkout code (required for local actions)
       # ————————————————————————————————————————————————————————————————
       - name: 📥 Checkout code
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+      # ————————————————————————————————————————————————————————————————
+      # Parse environment variables
+      # ————————————————————————————————————————————————————————————————
+      - name: 🔧 Parse environment variables
+        uses: ./.github/actions/parse-env
+        with:
+          env-json: ${{ inputs.env-json }}
 
       - name: 🔧 Set Go cache paths (cross-platform)
         run: |
@@ -183,54 +181,35 @@ jobs:
           echo "GOLANGCI_LINT_CACHE=$HOME/.cache/golangci-lint" >> $GITHUB_ENV
 
       # ————————————————————————————————————————————————————————————————
-      # Extract golangci-lint version from Makefile
+      # Extract golangci-lint version (MAGE-X managed)
       # ————————————————————————————————————————————————————————————————
-      - name: 🔍 Extract golangci-lint version from Makefile
+      - name: 🔍 Use MAGE-X managed golangci-lint version
         id: golangci-lint-version
         run: |
-          VERSION=$(make lint-version)
-          if [ -z "$VERSION" ]; then
-            echo "❌ GOLANGCI_LINT_VERSION is not set in the Makefile"
-            exit 1
-          fi
-          echo "✅ Found golangci-lint version: $VERSION"
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          # MAGE-X handles golangci-lint version automatically
+          echo "✅ Using MAGE-X managed golangci-lint version"
+          echo "version=${{ env.MAGE_X_GOLANGCI_LINT_VERSION }}" >> $GITHUB_OUTPUT
 
       # ————————————————————————————————————————————————————————————————
-      # Restore Go module and build caches
+      # Setup Go with caching and version management
       # ————————————————————————————————————————————————————————————————
-      - name: 💾 Restore Go module cache
-        id: restore-gomod
-        uses: actions/cache/restore@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
-        with:
-          path: ~/go/pkg/mod
-          key: ${{ inputs.primary-runner }}-gomod-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ inputs.primary-runner }}-gomod-
-
-      # ————————————————————————————————————————————————————————————————
-      # Restore the build cache and test cache
-      # ————————————————————————————————————————————————————————————————
-      - name: 💾 Restore Go build cache
-        id: restore-gobuild
-        uses: actions/cache/restore@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
-        with:
-          path: |
-            ~/.cache/go-build
-            ~/.cache/go-build/test
-          key: ${{ inputs.primary-runner }}-gobuild-${{ inputs.go-primary-version }}-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ inputs.primary-runner }}-gobuild-${{ inputs.go-primary-version }}-
-
-      # ————————————————————————————————————————————————————————————————
-      # Set up Go environment
-      # ————————————————————————————————————————————————————————————————
-      - name: 🏗️ Set up Go
+      - name: 🏗️ Setup Go with Cache
         id: setup-go-lint
-        uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
+        uses: ./.github/actions/setup-go-with-cache
         with:
           go-version: ${{ inputs.go-primary-version }}
-          cache: false
+          matrix-os: ${{ inputs.primary-runner }}
+          go-primary-version: ${{ inputs.go-primary-version }}
+          go-secondary-version: ${{ inputs.go-primary-version }}
+
+      # ————————————————————————————————————————————————————————————————
+      # Setup MAGE-X (required for magex lint command)
+      # ————————————————————————————————————————————————————————————————
+      - name: 🔧 Setup MAGE-X
+        uses: ./.github/actions/setup-magex
+        with:
+          magex-version: ${{ env.MAGE_X_VERSION }}
+          runner-os: ${{ inputs.primary-runner }}
 
       # ————————————————————————————————————————————————————————————————
       # Restore Cache golangci-lint
@@ -241,9 +220,6 @@ jobs:
         with:
           path: ${{ env.GOLANGCI_LINT_CACHE }}
           key: ${{ inputs.primary-runner }}-golangci-lint-analysis-${{ hashFiles('.golangci.json', '**/go.sum') }}-${{ steps.golangci-lint-version.outputs.version }}
-          restore-keys: |
-            ${{ inputs.primary-runner }}-golangci-lint-analysis-${{ hashFiles('.golangci.json', '**/go.sum') }}
-            ${{ inputs.primary-runner }}-golangci-lint-analysis-
 
       - name: 🔍 Debug cache usage
         run: |
@@ -264,11 +240,8 @@ jobs:
           # Export the cache directory for golangci-lint
           export GOLANGCI_LINT_CACHE=$GOLANGCI_LINT_CACHE
 
-          # Running lint with version from Makefile
-          echo "🔧 Using golangci-lint version: ${{ steps.golangci-lint-version.outputs.version }}"
-
-          # Run with your makefile
-          make lint
+          # Run with MAGE-X
+          magex lint
 
           echo "✅ Code linting completed successfully"
 
@@ -279,7 +252,7 @@ jobs:
         run: |
           echo "## ✨ Code Linting Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| 🧹 Linting Details | ✅ Status |" >> $GITHUB_STEP_SUMMARY
+          echo "| Linting Details | Status |" >> $GITHUB_STEP_SUMMARY
           echo "|---|---|" >> $GITHUB_STEP_SUMMARY
           echo "| **Configuration** | Custom ruleset via .golangci.json |" >> $GITHUB_STEP_SUMMARY
           echo "| **Version** | ${{ steps.golangci-lint-version.outputs.version }} |" >> $GITHUB_STEP_SUMMARY
@@ -287,6 +260,34 @@ jobs:
           echo "| **Result** | ✅ All checks passed |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "🎯 **Code quality standards met - no linting issues found.**" >> $GITHUB_STEP_SUMMARY
+
+      # ————————————————————————————————————————————————————————————————
+      # Collect cache statistics
+      # ————————————————————————————————————————————————————————————————
+      - name: 📊 Collect cache statistics
+        id: cache-stats-lint
+        if: always()
+        uses: ./.github/actions/collect-cache-stats
+        with:
+          workflow-name: lint
+          job-name: lint
+          os: ${{ inputs.primary-runner }}
+          go-version: ${{ inputs.go-primary-version }}
+          cache-prefix: cache-stats
+          gomod-cache-hit: ${{ steps.setup-go-lint.outputs.module-cache-hit }}
+          gobuild-cache-hit: ${{ steps.setup-go-lint.outputs.build-cache-hit }}
+          include-golangci: true
+
+      # ————————————————————————————————————————————————————————————————
+      # Upload infrastructure cache statistics
+      # ————————————————————————————————————————————————————————————————
+      - name: 📤 Upload infrastructure cache statistics
+        if: always()
+        uses: ./.github/actions/upload-statistics
+        with:
+          artifact-name: cache-stats-lint
+          artifact-path: cache-stats-lint.json
+          retention-days: 1
 
   # ----------------------------------------------------------------------------------
   # YAML Validation (Linting)
@@ -299,24 +300,20 @@ jobs:
       prettier-version: ${{ steps.prettier-version.outputs.version }}
     steps:
       # ————————————————————————————————————————————————————————————————
-      # Parse environment variables
-      # ————————————————————————————————————————————————————————————————
-      - name: 🔧 Parse environment variables
-        env:
-          ENV_JSON: ${{ inputs.env-json }}
-        run: |
-          echo "📋 Setting environment variables..."
-          echo "$ENV_JSON" | jq -r 'to_entries | .[] | "\(.key)=\(.value)"' | while IFS='=' read -r key value; do
-            echo "$key=$value" >> $GITHUB_ENV
-          done
-
-      # ————————————————————————————————————————————————————————————————
-      # Checkout code with full history for proper ignore file handling
+      # Checkout code (required for local actions)
       # ————————————————————————————————————————————————————————————————
       - name: 📥 Checkout repository
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
           fetch-depth: 0 # Full history for prettier ignores files
+
+      # ————————————————————————————————————————————————————————————————
+      # Parse environment variables
+      # ————————————————————————————————————————————————————————————————
+      - name: 🔧 Parse environment variables
+        uses: ./.github/actions/parse-env
+        with:
+          env-json: ${{ inputs.env-json }}
 
       # ————————————————————————————————————————————————————————————————
       # Check for required .prettierignore file
@@ -500,7 +497,7 @@ jobs:
         run: |
           echo "## 📐 YAML Validation Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| 🔍 Validation Details | ✅ Status |" >> $GITHUB_STEP_SUMMARY
+          echo "| Validation Details | Status |" >> $GITHUB_STEP_SUMMARY
           echo "|---|---|" >> $GITHUB_STEP_SUMMARY
           echo "| **Tool** | Prettier (EditorConfig-aware) |" >> $GITHUB_STEP_SUMMARY
           echo "| **Version** | ${{ steps.prettier-version.outputs.version }} |" >> $GITHUB_STEP_SUMMARY
@@ -508,13 +505,13 @@ jobs:
           echo "| **Scope** | All .yml and .yaml files |" >> $GITHUB_STEP_SUMMARY
           echo "| **Result** | ✅ All files properly formatted |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### 📊 File Processing Statistics" >> $GITHUB_STEP_SUMMARY
+          echo "### File Processing Statistics" >> $GITHUB_STEP_SUMMARY
           echo "- **Total YAML files found**: ${{ env.TOTAL_YAML }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Files processed by prettier**: ${{ env.PROCESSED_YAML }}" >> $GITHUB_STEP_SUMMARY  
+          echo "- **Files processed by prettier**: ${{ env.PROCESSED_YAML }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Files needing formatting**: ${{ env.CHECKED_YAML }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Files ignored by prettier**: $((${{ env.TOTAL_YAML }} - ${{ env.PROCESSED_YAML }}))" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### 📋 EditorConfig YAML Rules Applied" >> $GITHUB_STEP_SUMMARY
+          echo "### EditorConfig YAML Rules Applied" >> $GITHUB_STEP_SUMMARY
           echo "- **Indent Style**: Spaces" >> $GITHUB_STEP_SUMMARY
           echo "- **Indent Size**: 2" >> $GITHUB_STEP_SUMMARY
           echo "- **Line Endings**: LF" >> $GITHUB_STEP_SUMMARY

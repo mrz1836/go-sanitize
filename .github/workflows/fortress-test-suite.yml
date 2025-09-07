@@ -1,8 +1,14 @@
 # ------------------------------------------------------------------------------------
-#  Test Suite (Reusable Workflow) (GoFortress)
+#  Test Suite (Orchestrator Workflow) (GoFortress)
 #
-#  Purpose: Run the main Go test suite across multiple Go versions and operating
-#  systems, including unit tests, race detection, coverage, and fuzz tests.
+#  Purpose: Orchestrate the complete Go test suite across multiple workflows,
+#  including matrix testing, fuzz testing, validation, and coverage processing.
+#
+#  This workflow coordinates sub-workflows for improved maintainability:
+#    - fortress-test-matrix.yml: Multi-platform test execution
+#    - fortress-test-fuzz.yml: Fuzz testing execution
+#    - fortress-test-validation.yml: Test result validation
+#    - fortress-coverage.yml: Coverage processing (existing)
 #
 #  Maintainer: @mrz1836
 #
@@ -37,6 +43,11 @@ on:
         description: "Whether code coverage is enabled"
         required: true
         type: string
+      coverage-provider:
+        description: "Coverage service provider (internal or codecov)"
+        required: false
+        type: string
+        default: "internal"
       race-detection-enabled:
         description: "Whether race detection is enabled"
         required: true
@@ -49,261 +60,78 @@ on:
       github-token:
         description: "GitHub token for API access"
         required: true
-      codecov-token:
-        description: "Codecov token for coverage uploads"
+      CODECOV_TOKEN:
+        description: "Codecov token for uploading coverage (required when coverage-provider is codecov)"
         required: false
 
+# Security: Restrictive default permissions with job-level overrides for least privilege access
 permissions:
-  contents: read
+  contents: read # Default read-only access to repository contents
 
 jobs:
   # ----------------------------------------------------------------------------------
-  # Testing Matrix for Go (Parallel)
+  # Test Matrix Execution (Multi-platform, Multi-version)
   # ----------------------------------------------------------------------------------
-  test-go:
-    name: 🧪 Test (${{ matrix.name }})
-    timeout-minutes: 30 # Prevent hung tests
-    strategy:
-      fail-fast: true
-      matrix: ${{ fromJSON(inputs.test-matrix) }}
-    runs-on: ${{ matrix.os }}
+  execute-test-matrix:
+    name: 🧪 Execute Test Matrix
+    uses: ./.github/workflows/fortress-test-matrix.yml
+    with:
+      env-json: ${{ inputs.env-json }}
+      test-matrix: ${{ inputs.test-matrix }}
+      primary-runner: ${{ inputs.primary-runner }}
+      go-primary-version: ${{ inputs.go-primary-version }}
+      go-secondary-version: ${{ inputs.go-secondary-version }}
+      code-coverage-enabled: ${{ inputs.code-coverage-enabled }}
+      race-detection-enabled: ${{ inputs.race-detection-enabled }}
 
-    steps:
-      # ————————————————————————————————————————————————————————————————
-      # Parse environment variables
-      # ————————————————————————————————————————————————————————————————
-      - name: 🔧 Parse environment variables
-        env:
-          ENV_JSON: ${{ inputs.env-json }}
-        run: |
-          echo "📋 Setting environment variables..."
-          echo "$ENV_JSON" | jq -r 'to_entries | .[] | "\(.key)=\(.value)"' | while IFS='=' read -r key value; do
-            echo "$key=$value" >> $GITHUB_ENV
-          done
+  # ----------------------------------------------------------------------------------
+  # Fuzz Testing Execution (Primary platform only)
+  # ----------------------------------------------------------------------------------
+  execute-fuzz-tests:
+    name: 🎯 Execute Fuzz Tests
+    uses: ./.github/workflows/fortress-test-fuzz.yml
+    with:
+      env-json: ${{ inputs.env-json }}
+      primary-runner: ${{ inputs.primary-runner }}
+      go-primary-version: ${{ inputs.go-primary-version }}
+      go-secondary-version: ${{ inputs.go-secondary-version }}
+      fuzz-testing-enabled: ${{ inputs.fuzz-testing-enabled }}
 
-      # ————————————————————————————————————————————————————————————————
-      # Checkout code and set up Go environment
-      # ————————————————————————————————————————————————————————————————
-      - name: 📥 Checkout code
-        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+  # ----------------------------------------------------------------------------------
+  # Test Results Validation (Aggregate all test results)
+  # ----------------------------------------------------------------------------------
+  validate-test-results:
+    name: 🔍 Validate Test Results
+    needs: [execute-test-matrix, execute-fuzz-tests]
+    if: always() # Always run to validate results even if tests failed
+    uses: ./.github/workflows/fortress-test-validation.yml
+    with:
+      env-json: ${{ inputs.env-json }}
+      primary-runner: ${{ inputs.primary-runner }}
+      fuzz-testing-enabled: ${{ inputs.fuzz-testing-enabled }}
 
-      - name: 🔧 Set Go cache paths (cross-platform)
-        run: |
-          echo "🔧 Setting up Go cache paths..."
-          echo "GOCACHE=$HOME/.cache/go-build"        >> $GITHUB_ENV
-          echo "GOMODCACHE=$HOME/go/pkg/mod"          >> $GITHUB_ENV
-          echo "GOLANGCI_LINT_CACHE=$HOME/.cache/golangci-lint" >> $GITHUB_ENV
-
-      # ————————————————————————————————————————————————————————————————
-      # Restore Go module and build caches
-      # ————————————————————————————————————————————————————————————————
-      - name: 💾 Restore Go module cache
-        id: restore-gomod
-        uses: actions/cache/restore@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
-        with:
-          path: ~/go/pkg/mod
-          key: ${{ matrix.os }}-gomod-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ matrix.os }}-gomod-
-
-      # ————————————————————————————————————————————————————————————————
-      # Restore the build cache and test cache
-      # ————————————————————————————————————————————————————————————————
-      - name: 💾 Restore Go build cache
-        id: restore-gobuild
-        uses: actions/cache/restore@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
-        with:
-          path: |
-            ~/.cache/go-build
-            ~/.cache/go-build/test
-          key: ${{ matrix.os }}-gobuild-${{ matrix.go-version }}-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ matrix.os }}-gobuild-${{ matrix.go-version }}-
-
-      # ————————————————————————————————————————————————————————————————
-      # Check go.mod required version before setting up Go
-      # ————————————————————————————————————————————————————————————————
-      - name: 🔍 Check Go version requirement
-        id: check-go-version
-        shell: bash
-        run: |
-          if [ -f go.mod ]; then
-            REQUIRED_VERSION=$(grep -E '^go\s+[0-9]+\.[0-9]+' go.mod | awk '{print $2}')
-            if [ -n "$REQUIRED_VERSION" ]; then
-              echo "📋 go.mod requires Go version: $REQUIRED_VERSION"
-              echo "required_version=$REQUIRED_VERSION" >> $GITHUB_OUTPUT
-
-              # Extract major.minor from matrix.go-version (handle formats like 1.23.x, 1.23, 1.23.4)
-              REQUESTED_VERSION="${{ matrix.go-version }}"
-              REQUESTED_MAJOR_MINOR=$(echo "$REQUESTED_VERSION" | grep -oE '^[0-9]+\.[0-9]+')
-
-              # Compare versions
-              if [ -n "$REQUESTED_MAJOR_MINOR" ]; then
-                # Convert to comparable format (e.g., 1.23 -> 123, 1.9 -> 109)
-                REQ_COMPARABLE=$(echo "$REQUIRED_VERSION" | awk -F. '{printf "%d%02d", $1, $2}')
-                REQUESTED_COMPARABLE=$(echo "$REQUESTED_MAJOR_MINOR" | awk -F. '{printf "%d%02d", $1, $2}')
-
-                if [ "$REQUESTED_COMPARABLE" -lt "$REQ_COMPARABLE" ]; then
-                  echo "⚠️ WARNING: Requested Go version (${{ matrix.go-version }}) is older than required ($REQUIRED_VERSION)"
-                  echo "version_mismatch=true" >> $GITHUB_OUTPUT
-                else
-                  echo "✅ Requested Go version (${{ matrix.go-version }}) meets requirement ($REQUIRED_VERSION)"
-                  echo "version_mismatch=false" >> $GITHUB_OUTPUT
-                fi
-              fi
-            fi
-          fi
-
-      # ————————————————————————————————————————————————————————————————
-      # Determine Go Toolchain Mode and set up Go
-      # ————————————————————————————————————————————————————————————————
-      # Issue with installing 1.23 and then it auto-upgrading to 1.24
-      - name: 🧮 Determine Go Toolchain Mode
-        id: toolchain-mode
-        shell: bash
-        run: |
-          # If there's a version mismatch, allow toolchain to auto-upgrade
-          if [[ "${{ steps.check-go-version.outputs.version_mismatch }}" == "true" ]]; then
-            echo "⚠️ Version mismatch detected - allowing Go toolchain to auto-upgrade"
-            echo "Not setting GOTOOLCHAIN (using default auto behavior)"
-          elif [[ "${{ matrix.go-version }}" == "${{ inputs.go-secondary-version }}" && \
-                "${{ matrix.go-version }}" != "${{ inputs.go-primary-version }}" ]]; then
-            echo "Setting GOTOOLCHAIN=local"
-            echo "GOTOOLCHAIN=local" >> $GITHUB_ENV
-          else
-            echo "Not setting GOTOOLCHAIN (using default)"
-          fi
-
-      - name: 🏗️ Set up Go
-        id: setup-go-test
-        uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
-        with:
-          go-version: ${{ matrix.go-version }}
-          cache: false # we handle caches ourselves
-
-      # ————————————————————————————————————————————————————————————————
-      # Start test timer
-      # ————————————————————————————————————————————————————————————————
-      - name: ⏱️ Start test timer
-        id: test-timer
-        run: |
-          echo "test-start=$(date +%s)" >> $GITHUB_OUTPUT
-
-      # ————————————————————————————————————————————————————————————————
-      # Run tests and coverage
-      # ————————————————————————————————————————————————————————————————
-      - name: 🧪 Run tests
-        run: |
-          # Safely assign values to shell vars
-          RACE="${{ inputs.race-detection-enabled }}"
-          COVER="${{ inputs.code-coverage-enabled }}"
-
-          echo "🔍 Race Detection Enabled: $RACE"
-          echo "🔍 Code Coverage Enabled: $COVER"
-
-          if [[ "$RACE" == "true" && "$COVER" == "true" ]]; then
-            echo "🏁 Running tests with race detection and coverage analysis..."
-            make test-cover-race VERBOSE=${{ env.ENABLE_VERBOSE_TEST_OUTPUT }}
-          elif [[ "$RACE" != "true" && "$COVER" == "true" ]]; then
-            echo "🏁 Running tests with coverage analysis..."
-            make test-cover VERBOSE=${{ env.ENABLE_VERBOSE_TEST_OUTPUT }}
-          elif [[ "$RACE" == "true" && "$COVER" != "true" ]]; then
-            echo "🏁 Running tests with race detection..."
-            make test-race VERBOSE=${{ env.ENABLE_VERBOSE_TEST_OUTPUT }}
-          else
-            echo "🏁 Running tests without coverage or race detection..."
-            make test VERBOSE=${{ env.ENABLE_VERBOSE_TEST_OUTPUT }}
-          fi
-
-          echo "✅ Tests completed successfully"
-
-      # ————————————————————————————————————————————————————————————————
-      # Fuzz tests (only on Linux)
-      # ————————————————————————————————————————————————————————————————
-      - name: 🎯 Run fuzz tests
-        if: matrix.run-fuzz
-        run: |
-          echo "🎯 Running fuzz tests..."
-          make test-fuzz VERBOSE=${{ env.ENABLE_VERBOSE_TEST_OUTPUT }}
-          echo "✅ Fuzz tests completed successfully"
-
-      # ————————————————————————————————————————————————————————————————
-      # All test results are always captured
-      # ————————————————————————————————————————————————————————————————
-      - name: 📊 Calculate test statistics
-        id: test-summary
-        if: always()
-        run: |
-          TEST_END=$(date +%s)
-          TEST_DURATION=$((TEST_END - ${{ steps.test-timer.outputs.test-start }}))
-          TEST_COUNT=0
-          EXAMPLE_COUNT=0
-          BENCHMARK_COUNT=0
-
-          # Count tests if possible
-          TEST_COUNT=$(find . -type f -name '*_test.go' \
-            -not -path './vendor/*' \
-            -not -path './third_party/*' \
-            -not -path './testdata/*' \
-            -exec grep -hE '^\s*func (\([^)]+\) )?Test[A-Z0-9_]' {} + | wc -l)
-
-          # Count examples if possible
-          EXAMPLE_COUNT=$(find . -type f -name '*_test.go' \
-            -not -path './vendor/*' \
-            -not -path './third_party/*' \
-            -exec grep -h '^func Example' {} + | wc -l)
-
-          # Count benchmarks if possible
-          BENCHMARK_COUNT=$(find . -type f -name '*_test.go' \
-            -not -path './vendor/*' \
-            -not -path './third_party/*' \
-            -exec grep -h '^func Benchmark' {} + | wc -l)
-
-          STATS_FILE="test-stats-${{ matrix.os }}-${{ matrix.go-version }}.json"
-
-          # Capture the output of "make loc" and store the markdown summary
-          LOC_OUTPUT_JSON=$(make loc | jq -Rsa .)
-
-          cat > "$STATS_FILE" << EOF
-          {
-            "name": "${{ matrix.name }}",
-            "os": "${{ matrix.os }}",
-            "go_version": "${{ matrix.go-version }}",
-            "duration_seconds": $TEST_DURATION,
-            "test_count": $TEST_COUNT,
-            "example_count": $EXAMPLE_COUNT,
-            "benchmark_count": $BENCHMARK_COUNT,
-            "status": "${{ job.status }}",
-            "race_enabled": ${{ inputs.race-detection-enabled }},
-            "coverage_enabled": ${{ inputs.code-coverage-enabled }},
-            "fuzz_run": ${{ matrix.run-fuzz && 'true' || 'false' }},
-            "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-            "loc_summary": $LOC_OUTPUT_JSON
-          }
-          EOF
-
-          echo "📊 Test statistics:"
-          jq . "$STATS_FILE"
-
-      # ————————————————————————————————————————————————————————————————
-      # Upload test statistics
-      # ————————————————————————————————————————————————————————————————
-      - name: 📤 Upload test statistics
-        if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
-        with:
-          name: test-stats-${{ matrix.os }}-${{ matrix.go-version }}
-          path: test-stats-*.json
-          retention-days: 1
-
-      # ————————————————————————————————————————————————————————————————
-      # Upload coverage only for race-cover tests
-      # ————————————————————————————————————————————————————————————————
-      - name: 📈 Upload coverage
-        if: inputs.code-coverage-enabled == 'true'
-        uses: codecov/codecov-action@fdcc8476540edceab3de004e990f80d881c6cc00 # v5.5.0
-        with:
-          fail_ci_if_error: true
-          flags: unittests
-          token: ${{ secrets.codecov-token }}
-          verbose: true
+  # ----------------------------------------------------------------------------------
+  # Coverage Processing (Existing workflow integration)
+  # ----------------------------------------------------------------------------------
+  process-coverage:
+    name: 📊 Process Coverage
+    needs: [execute-test-matrix, validate-test-results]
+    if: inputs.code-coverage-enabled == 'true' && !startsWith(github.ref, 'refs/tags/')
+    permissions:
+      contents: write # Write repository content and push to gh-pages branch for coverage processing
+      pull-requests: write # Required: Coverage workflow needs to create PR comments
+      pages: write # Required: Coverage workflow needs to deploy to GitHub Pages
+      id-token: write # Required: Coverage workflow needs GitHub Pages authentication
+      statuses: write # Required: Coverage workflow needs to create commit status checks
+    uses: ./.github/workflows/fortress-coverage.yml
+    with:
+      coverage-file: coverage.txt
+      branch-name: ${{ github.head_ref || github.ref_name }}
+      commit-sha: ${{ github.sha }}
+      env-json: ${{ inputs.env-json }}
+      primary-runner: ${{ inputs.primary-runner }}
+      event-name: ${{ github.event_name }}
+      pr-number: ${{ github.event.pull_request.number }}
+    secrets:
+      github-token: ${{ secrets.GH_PAT_TOKEN != '' && secrets.GH_PAT_TOKEN || secrets.GITHUB_TOKEN }}
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

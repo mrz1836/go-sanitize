@@ -1,0 +1,331 @@
+# ------------------------------------------------------------------------------------
+#  Fuzz Testing (Reusable Workflow) (GoFortress)
+#
+#  Purpose: Execute Go fuzz tests to detect edge cases and potential security
+#  vulnerabilities through automated input generation and testing.
+#
+#  This workflow handles:
+#    - Fuzz test execution on primary runner with primary Go version
+#    - Panic and error detection from fuzz test output
+#    - Failure analysis and structured reporting
+#    - Statistics collection and artifact uploading
+#    - Cache performance tracking
+#
+#  Maintainer: @mrz1836
+#
+# ------------------------------------------------------------------------------------
+
+name: GoFortress (Fuzz Tests)
+
+on:
+  workflow_call:
+    inputs:
+      env-json:
+        description: "JSON string of environment variables"
+        required: true
+        type: string
+      primary-runner:
+        description: "Primary runner OS"
+        required: true
+        type: string
+      go-primary-version:
+        description: "Primary Go version"
+        required: true
+        type: string
+      go-secondary-version:
+        description: "Secondary Go version"
+        required: true
+        type: string
+      fuzz-testing-enabled:
+        description: "Whether fuzz testing is enabled"
+        required: true
+        type: string
+
+# Security: Restrictive default permissions with job-level overrides for least privilege access
+permissions:
+  contents: read
+
+jobs:
+  # ----------------------------------------------------------------------------------
+  # Fuzz Testing
+  # ----------------------------------------------------------------------------------
+  fuzz-tests:
+    name: 🎯 Fuzz Tests
+    if: inputs.fuzz-testing-enabled == 'true'
+    timeout-minutes: 15 # Fuzz tests have shorter timeout
+    permissions:
+      contents: read # Read repository content for testing
+    runs-on: ${{ inputs.primary-runner }}
+
+    steps:
+      # ————————————————————————————————————————————————————————————————
+      # Checkout code (required for local actions)
+      # ————————————————————————————————————————————————————————————————
+      - name: 📥 Checkout code
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+      # ————————————————————————————————————————————————————————————————
+      # Parse environment variables
+      # ————————————————————————————————————————————————————————————————
+      - name: 🔧 Parse environment variables
+        uses: ./.github/actions/parse-env
+        with:
+          env-json: ${{ inputs.env-json }}
+
+      # ————————————————————————————————————————————————————————————————
+      # Setup Go with caching and version management (primary version only)
+      # ————————————————————————————————————————————————————————————————
+      - name: 🏗️ Setup Go with Cache
+        id: setup-go-fuzz
+        uses: ./.github/actions/setup-go-with-cache
+        with:
+          go-version: ${{ inputs.go-primary-version }}
+          matrix-os: ${{ inputs.primary-runner }}
+          go-primary-version: ${{ inputs.go-primary-version }}
+          go-secondary-version: ${{ inputs.go-secondary-version }}
+
+      # ————————————————————————————————————————————————————————————————
+      # Setup MAGE-X (required for magex test commands)
+      # ————————————————————————————————————————————————————————————————
+      - name: 🔧 Setup MAGE-X
+        uses: ./.github/actions/setup-magex
+        with:
+          magex-version: ${{ env.MAGE_X_VERSION }}
+          runner-os: ${{ inputs.primary-runner }}
+
+      # ————————————————————————————————————————————————————————————————
+      # Start fuzz test timer
+      # ————————————————————————————————————————————————————————————————
+      - name: ⏱️ Start fuzz test timer
+        id: fuzz-timer
+        run: |
+          echo "fuzz-start=$(date +%s)" >> $GITHUB_OUTPUT
+          echo "🕒 Fuzz test timer started at: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+
+      # ————————————————————————————————————————————————————————————————
+      # Setup fuzz test failure detection functions
+      # ————————————————————————————————————————————————————————————————
+      - name: 🔧 Setup failure detection for fuzz tests
+        uses: ./.github/actions/test-failure-detection
+        with:
+          output-file: "fuzz-output.log"
+          mode: "text"
+
+      # ————————————————————————————————————————————————————————————————
+      # Run fuzz tests
+      # ————————————————————————————————————————————————————————————————
+      - name: 🎯 Run fuzz tests
+        id: run-fuzz-tests
+        continue-on-error: true
+        run: |
+          echo "🎯 Running fuzz tests in parallel..."
+          FUZZ_TIMEOUT="${TEST_TIMEOUT_FUZZ:-5m}"
+          magex test:fuzz time=5s -timeout $FUZZ_TIMEOUT 2>&1 | tee fuzz-output.log
+          FUZZ_EXIT_CODE=${PIPESTATUS[0]}
+          echo "🔧 Fuzz tests completed with timeout: $FUZZ_TIMEOUT"
+
+          # Store the exit code for later steps
+          echo "FUZZ_EXIT_CODE=$FUZZ_EXIT_CODE" >> $GITHUB_ENV
+          echo "fuzz-exit-code=$FUZZ_EXIT_CODE" >> $GITHUB_OUTPUT
+
+          if [[ $FUZZ_EXIT_CODE -eq 0 ]]; then
+            echo "✅ Fuzz tests completed successfully"
+          else
+            echo "❌ Fuzz tests failed with exit code $FUZZ_EXIT_CODE"
+          fi
+
+      # ————————————————————————————————————————————————————————————————
+      # Analyze fuzz test failures using detection functions
+      # ————————————————————————————————————————————————————————————————
+      - name: 🔍 Analyze fuzz test failures
+        if: always() && steps.run-fuzz-tests.outputs.fuzz-exit-code != '0'
+        uses: ./.github/actions/test-failure-detection
+        with:
+          output-file: "fuzz-output.log"
+          exit-code: ${{ steps.run-fuzz-tests.outputs.fuzz-exit-code }}
+          mode: "text"
+          failures-file: "fuzz-failures.txt"
+
+      # ————————————————————————————————————————————————————————————————
+      # Fuzz test failure analysis and reporting
+      # ————————————————————————————————————————————————————————————————
+      - name: 🚨 Create Fuzz Test Failure Summary
+        if: failure()
+        run: |
+          echo "## 🚨 Fuzz Test Failures" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **OS**: ${{ inputs.primary-runner }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Go Version**: ${{ inputs.go-primary-version }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ -f fuzz-output.log ]; then
+            # Use robust failure detection for fuzz tests
+            if command -v detect_failures_from_text >/dev/null 2>&1; then
+              # Use robust detection if functions are available
+              detect_failures_from_text "fuzz-output.log" "fuzz-failures.txt" || true
+              FAIL_COUNT=$(wc -l < fuzz-failures.txt 2>/dev/null || echo "0")
+              echo "🔍 Using robust fuzz failure detection: $FAIL_COUNT"
+            else
+              # Fallback: use enhanced patterns with numeric validation
+              FAIL_COUNT=$(grep -c -E "^(FAIL|---[[:space:]]*FAIL|--[[:space:]]*FAIL|\[?FAIL\]?)[[:space:]:.]" fuzz-output.log 2>/dev/null || echo "0")
+              FAIL_COUNT=$(echo "$FAIL_COUNT" | tr -d '\n\r' | xargs)
+              [[ "$FAIL_COUNT" =~ ^[0-9]+$ ]] || FAIL_COUNT=0
+              echo "⚠️ Using enhanced patterns for fuzz failure detection: $FAIL_COUNT"
+            fi
+
+            # Enhanced panic detection with numeric validation
+            PANIC_COUNT=$(grep -c -E "panic:|fatal error:|runtime error:" fuzz-output.log 2>/dev/null || echo "0")
+            PANIC_COUNT=$(echo "$PANIC_COUNT" | tr -d '\n\r' | xargs)
+            [[ "$PANIC_COUNT" =~ ^[0-9]+$ ]] || PANIC_COUNT=0
+
+            echo "- **Failed Fuzz Tests**: $FAIL_COUNT" >> $GITHUB_STEP_SUMMARY
+            echo "- **Panics**: $PANIC_COUNT" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+
+            if [ "$FAIL_COUNT" -gt 0 ]; then
+              echo "### 🔍 Failed Fuzz Test Summary (First 5)" >> $GITHUB_STEP_SUMMARY
+              echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+              if [[ -f fuzz-failures.txt ]] && [[ -s fuzz-failures.txt ]]; then
+                head -5 fuzz-failures.txt >> $GITHUB_STEP_SUMMARY
+              else
+                # Fallback: use enhanced patterns
+                grep -E "^(FAIL|---[[:space:]]*FAIL|--[[:space:]]*FAIL|\[?FAIL\]?)[[:space:]:.]" fuzz-output.log | head -5 >> $GITHUB_STEP_SUMMARY
+              fi
+              echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+            fi
+
+            if [ "$PANIC_COUNT" -gt 0 ]; then
+              echo "### 🚨 Fuzz Test Panic/Error Summary" >> $GITHUB_STEP_SUMMARY
+              echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+              # Enhanced panic/error detection patterns
+              grep -A 2 -B 1 -E "panic:|fatal error:|runtime error:" fuzz-output.log | head -20 >> $GITHUB_STEP_SUMMARY
+              echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            fi
+          else
+            echo "⚠️ Fuzz test output log not found" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      # ————————————————————————————————————————————————————————————————
+      # Create GitHub annotations for fuzz test failures
+      # ————————————————————————————————————————————————————————————————
+      - name: 📋 Annotate Key Fuzz Test Failures
+        if: failure()
+        run: |
+          if [ -f fuzz-output.log ]; then
+            echo "::group::📋 Fuzz Test Failure Analysis (Enhanced)"
+
+            # Count and report overall statistics using robust detection
+            if [[ -f fuzz-failures.txt ]] && [[ -s fuzz-failures.txt ]]; then
+              FAIL_COUNT=$(wc -l < fuzz-failures.txt 2>/dev/null || echo "0")
+              echo "🔍 Using robust fuzz failure count for annotation: $FAIL_COUNT"
+            else
+              # Fallback: use enhanced patterns with numeric validation
+              FAIL_COUNT=$(grep -c -E "^(FAIL|---[[:space:]]*FAIL|--[[:space:]]*FAIL|\[?FAIL\]?)[[:space:]:.]" fuzz-output.log 2>/dev/null || echo "0")
+              FAIL_COUNT=$(echo "$FAIL_COUNT" | tr -d '\n\r' | xargs)
+              [[ "$FAIL_COUNT" =~ ^[0-9]+$ ]] || FAIL_COUNT=0
+              echo "⚠️ Using enhanced patterns for fuzz annotation: $FAIL_COUNT"
+            fi
+
+            # Enhanced panic detection with numeric validation
+            PANIC_COUNT=$(grep -c -E "panic:|fatal error:|runtime error:" fuzz-output.log 2>/dev/null || echo "0")
+            PANIC_COUNT=$(echo "$PANIC_COUNT" | tr -d '\n\r' | xargs)
+            [[ "$PANIC_COUNT" =~ ^[0-9]+$ ]] || PANIC_COUNT=0
+
+            echo "::error title=Fuzz Test Suite Failed::$FAIL_COUNT fuzz tests failed, $PANIC_COUNT panics/errors detected on ${{ inputs.primary-runner }} Go ${{ inputs.go-primary-version }}"
+
+            # Annotate first 3 failed fuzz tests using robust detection
+            if [[ "$FAIL_COUNT" -gt 0 ]]; then
+              if [[ -f fuzz-failures.txt ]] && [[ -s fuzz-failures.txt ]]; then
+                head -3 fuzz-failures.txt | while IFS= read -r line; do
+                  echo "::error title=Failed Fuzz Test::$line"
+                done
+              else
+                # Fallback: use enhanced patterns
+                grep -E "^(FAIL|---[[:space:]]*FAIL|--[[:space:]]*FAIL|\[?FAIL\]?)[[:space:]:.]" fuzz-output.log | head -3 | while IFS= read -r line; do
+                  echo "::error title=Failed Fuzz Test::$line"
+                done
+              fi
+            fi
+
+            # Annotate panics/errors with enhanced patterns
+            if [ "$PANIC_COUNT" -gt 0 ]; then
+              grep -B 1 -E "panic:|fatal error:|runtime error:" fuzz-output.log | head -2 | while IFS= read -r line; do
+                echo "::error title=Fuzz Test Panic/Error::$line"
+              done
+            fi
+
+            echo "::endgroup::"
+          fi
+
+      # ————————————————————————————————————————————————————————————————
+      # Generate fuzz test statistics using composite action
+      # ————————————————————————————————————————————————————————————————
+      - name: 📊 Calculate fuzz test statistics
+        id: fuzz-summary
+        if: always()
+        uses: ./.github/actions/test-statistics
+        with:
+          matrix-name: "Fuzz Tests (${{ inputs.primary-runner }})"
+          matrix-os: ${{ inputs.primary-runner }}
+          matrix-go-version: ${{ inputs.go-primary-version }}
+          test-exit-code: ${{ steps.run-fuzz-tests.outputs.fuzz-exit-code || '0' }}
+          output-mode: "FULL"
+          job-status: ${{ job.status }}
+          test-start-time: ${{ steps.fuzz-timer.outputs.fuzz-start || '0' }}
+          race-detection-enabled: "false"
+          code-coverage-enabled: "false"
+          fuzz-run: "true"
+          failures-file: "fuzz-failures.txt"
+          output-file: "fuzz-output.log"
+
+      # ————————————————————————————————————————————————————————————————
+      # Collect performance cache statistics
+      # ————————————————————————————————————————————————————————————————
+      - name: 📊 Collect performance cache statistics
+        uses: ./.github/actions/collect-cache-stats
+        with:
+          workflow-name: fuzz
+          job-name: fuzz-tests
+          os: ${{ inputs.primary-runner }}
+          go-version: ${{ inputs.go-primary-version }}
+          cache-prefix: cache-stats
+          gomod-cache-hit: ${{ steps.setup-go-fuzz.outputs.module-cache-hit }}
+          gobuild-cache-hit: ${{ steps.setup-go-fuzz.outputs.build-cache-hit }}
+
+      # ————————————————————————————————————————————————————————————————
+      # Upload performance cache statistics for completion report
+      # ————————————————————————————————————————————————————————————————
+      - name: 📤 Upload performance cache statistics
+        if: always()
+        uses: ./.github/actions/upload-statistics
+        with:
+          artifact-name: cache-stats-fuzz
+          artifact-path: cache-stats-fuzz.json
+          retention-days: "1"
+
+      # ————————————————————————————————————————————————————————————————
+      # Upload fuzz test outputs and failures for validation
+      # ————————————————————————————————————————————————————————————————
+      - name: 📤 Upload fuzz test outputs
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: test-results-fuzz-${{ inputs.primary-runner }}-${{ inputs.go-primary-version }}
+          path: |
+            fuzz-output.log
+            fuzz-failures.txt
+            fuzz-failures-detailed.txt
+          retention-days: 1
+          if-no-files-found: ignore
+
+      # ————————————————————————————————————————————————————————————————
+      # Upload fuzz test statistics for completion report
+      # ————————————————————————————————————————————————————————————————
+      - name: 📤 Upload fuzz test statistics
+        if: always()
+        uses: ./.github/actions/upload-statistics
+        with:
+          artifact-name: test-stats-fuzz-${{ inputs.primary-runner }}-${{ inputs.go-primary-version }}
+          artifact-path: ${{ steps.fuzz-summary.outputs.statistics-file }}
+          retention-days: "1"
