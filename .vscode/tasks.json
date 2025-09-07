@@ -1,17 +1,15 @@
 {
-	"version": "2.0.0",
-	"tasks": [
-		{
-			"label": "make",
-			"type": "shell",
-			"command": "make",
-			"problemMatcher": [
-				"$go"
-			],
-			"group": {
-				"kind": "build",
-				"isDefault": true
-			}
-		}
-	]
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "magex",
+            "type": "shell",
+            "command": "magex",
+            "problemMatcher": ["$go"],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
 }

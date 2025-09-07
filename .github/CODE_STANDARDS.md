@@ -27,7 +27,7 @@ Here’s a quick overview of what you'll find:
 - Commit and branch naming conventions
 - Pull request conventions and required sections
 - Labeling conventions for GitHub issues/PRs
-- Makefile and build system overview
+- Build system and tooling overview
 - And more!
 
 This is intended for AI agents like [GPT](https://chatgpt.com/) and [Claude](https://claude.ai), but also for us human developers too!

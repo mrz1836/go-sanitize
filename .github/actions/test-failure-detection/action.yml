@@ -119,36 +119,54 @@ runs:
           # Initialize JSON array for structured failures with signatures
           echo '[]' > "$signatures_file"
 
-          # Fast single-pass JSON extraction for test failures with line numbers (< 1s for 10K lines)
+          # Fast single-pass JSON extraction for test failures (< 1s for 10K lines)
           # Filter JSON lines and parse in one pass - eliminates 2-minute hang
-          # Extract line numbers from Output field when available
+          # Note: Line numbers aren't available in Go test JSON output
           grep '^{' "$json_file" 2>/dev/null | \
             jq -r 'select(.Action == "fail") |
-              if (.Output and .Output != null and .Output != "") then
-                # Try to extract file:line from Output field
-                (.Output | match("([^:]+\\.go):(\\d+):"; "g") |
-                  "--- FAIL: \(if (.Test and .Test != null and .Test != "null") then .Test else "unknown" end) (\(.Package):\(.captures[1].string))")
-                // "--- FAIL: \(if (.Test and .Test != null and .Test != "null") then .Test else "unknown" end) (\(.Package))"
-              else
-                "--- FAIL: \(if (.Test and .Test != null and .Test != "null") then .Test else "unknown" end) (\(.Package))"
-              end' \
+              "--- FAIL: \(if (.Test and .Test != null and .Test != "null") then .Test else "unknown" end) (\(.Package))"' \
             2>/dev/null > "$failures_file"
 
           # Create structured test failure entries with unique signatures
           if grep '^{' "$json_file" 2>/dev/null | jq -r 'select(.Action == "fail")' 2>/dev/null | head -1 | grep -q .; then
-            echo "📝 Creating structured test failure entries..."
+            echo "📝 Creating structured test failure entries with enhanced output..."
+
+            # First pass: Extract test failure basic info from Action == "fail" entries
+            local temp_failures
+            temp_failures=$(mktemp)
             grep '^{' "$json_file" 2>/dev/null | \
               jq -r 'select(.Action == "fail") | {
                 type: "test",
                 package: .Package,
                 test: (if (.Test and .Test != null and .Test != "null") then .Test else "unknown" end),
-                output: .Output // "",
-                line_number: (if (.Output and .Output != null and .Output != "") then (.Output | match("([^:]+\\.go):(\\d+):"; "g") | .captures[1].string) // null else null end),
                 signature: (.Package + ":" + (if (.Test and .Test != null and .Test != "null") then .Test else "unknown" end)),
                 unique_id: (.Package + ":" + (if (.Test and .Test != null and .Test != "null") then .Test else "unknown" end) | gsub("[^a-zA-Z0-9_/.-]"; "_"))
-              }' 2>/dev/null | \
-              jq -s '.' >> "$signatures_file.tmp" 2>/dev/null && \
+              }' 2>/dev/null | jq -s '.' > "$temp_failures"
+
+            # Second pass: Extract failure output from Action == "output" entries containing "--- FAIL:"
+            local temp_outputs
+            temp_outputs=$(mktemp)
+            grep '^{' "$json_file" 2>/dev/null | \
+              jq -r 'select(.Action == "output" and (.Output // "") | contains("--- FAIL:")) | {
+                package: .Package,
+                test: (if (.Test and .Test != null and .Test != "null") then .Test else "unknown" end),
+                output: (.Output // ""),
+                signature: (.Package + ":" + (if (.Test and .Test != null and .Test != "null") then .Test else "unknown" end))
+              }' 2>/dev/null | jq -s '.' > "$temp_outputs"
+
+            # Third pass: Merge failure info with outputs using signature as key
+            jq -n --slurpfile failures "$temp_failures" --slurpfile outputs "$temp_outputs" '
+              ($failures[0] // []) as $fail_list |
+              ($outputs[0] // []) as $output_list |
+              ($output_list | group_by(.signature) | map({key: .[0].signature, value: (map(.output) | join("\n"))})) as $output_map |
+              $fail_list | map(. + {
+                output: (($output_map | map(select(.key == .signature)) | .[0].value) // ""),
+                line_number: null
+              })' > "$signatures_file.tmp" 2>/dev/null && \
               mv "$signatures_file.tmp" "$signatures_file" || echo '[]' > "$signatures_file"
+
+            # Cleanup temp files
+            rm -f "$temp_failures" "$temp_outputs"
           fi
 
           # Also check for build failures which have FailedBuild field but no Test field
@@ -162,14 +180,19 @@ runs:
             # Create temporary array for build failures
             echo '[]' > "${signatures_file}.build"
 
+            # Extract all build-output entries once before the loop for better performance
+            local all_build_outputs
+            all_build_outputs=$(grep '^{' "$json_file" 2>/dev/null | \
+              jq -r 'select(.Action == "build-output" and .ImportPath) |
+                     (.ImportPath | split(" ")[0]) + "\t" + .Output' 2>/dev/null)
+
             while IFS= read -r pkg; do
               if [[ -n "$pkg" ]]; then
                 echo "--- BUILD FAILED: $pkg" >> "$failures_file"
 
-                # Extract build error messages for this package
+                # Extract build error messages for this package from pre-extracted data
                 local build_errors
-                build_errors=$(grep '^{' "$json_file" 2>/dev/null | \
-                  jq -r --arg pkg "$pkg" 'select(.ImportPath and (.ImportPath | startswith($pkg + " ")) and .Action == "build-output") | .Output' 2>/dev/null | \
+                build_errors=$(echo "$all_build_outputs" | grep "^$pkg	" | cut -f2 | \
                   grep -E "^[^[:space:]]" | head -10)  # Limit to first 10 error lines
 
                 local error_output=""
@@ -329,13 +352,10 @@ runs:
             while IFS= read -r failure_line; do
               if [[ -n "$failure_line" && "$failure_line" != *"Generic test failure"* ]]; then
                 # Extract package and test info from failure line
-                # Pattern: --- FAIL: TestName (package.name) or --- FAIL: TestName (package.name:123)
+                # Pattern: --- FAIL: TestName (package.name)
                 if [[ "$failure_line" =~ "FAIL:" ]]; then
                   local test_name=$(echo "$failure_line" | sed -E 's/^.*FAIL: ([^ ]+).*$/\1/' | head -c 200)
                   local package_name=$(echo "$failure_line" | sed -E 's/^.*\(([^):]+)[^)]*\).*$/\1/' | head -c 200)
-                  local line_number=$(echo "$failure_line" | sed -E 's/^.*\([^:]+:([0-9]+)\).*$/\1/' | head -c 10)
-                  # If line_number extraction didn't work, it will be same as input - set to empty
-                  [[ "$line_number" == "$failure_line" ]] && line_number=""
 
                   # Handle build failures
                   if [[ "$failure_line" =~ "BUILD FAILED:" ]]; then
@@ -354,12 +374,12 @@ runs:
                   else
                     # Regular test failure
                     if [[ -n "$test_name" && -n "$package_name" && "$test_name" != "$package_name" ]]; then
-                      jq -n --arg pkg "$package_name" --arg test "$test_name" --arg output "$failure_line" --arg line "$line_number" '{
+                      jq -n --arg pkg "$package_name" --arg test "$test_name" --arg output "$failure_line" '{
                         type: "test",
                         package: $pkg,
                         test: $test,
                         output: $output,
-                        line_number: (if ($line != "") then ($line | tonumber) else null end),
+                        line_number: null,
                         signature: ($pkg + ":" + $test),
                         unique_id: (($pkg + ":" + $test) | gsub("[^a-zA-Z0-9_/.-]"; "_"))
                       }' >> "$temp_signatures.items"

@@ -7,7 +7,11 @@
 
 # GitHub Actions workflows
 .github/workflows/* @mrz1836
-.github/.env.shared @mrz1836
+.github/.env.base @mrz1836
+.github/.env.custom @mrz1836
+
+# MAGE-X
+.mage.yaml @mrz1836
 
 # Documentation files
 *.md @mrz1836
@@ -22,11 +26,22 @@ Makefile @mrz1836
 go.mod @mrz1836
 go.sum @mrz1836
 
+# Code Coverage
+codecov.yml @mrz1836
+
+# Linter configuration
+.golangci.json @mrz1836
+.golangci.yml @mrz1836
+
 # AI Config Files
 .github/AGENTS.md @mrz1836
 .cursorrules @mrz1836
 .github/CLAUDE.md @mrz1836
 sweep.yml @mrz1836
+
+# Security and configuration files
+.github/SECURITY.md @mrz1836
+.github/.gitleaks.toml @mrz1836
 
 # Repository configuration
 .github/labels.yml @mrz1836

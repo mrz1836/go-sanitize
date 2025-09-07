@@ -319,13 +319,22 @@ jobs:
             echo "🏷️ Adding matrix job information to failure signatures..."
             MATRIX_JOB_ID="${{ matrix.name }}"
 
+            # Debug: Show signature file before processing
+            echo "🔍 Signature file before adding matrix info:"
+            echo "  • File size: $(wc -c < test-failures-signatures.json) bytes"
+            echo "  • Entry count: $(jq 'length' test-failures-signatures.json 2>/dev/null || echo 'invalid')"
+            if [[ -s test-failures-signatures.json ]]; then
+              echo "  • First entry:"
+              jq '.[0]' test-failures-signatures.json 2>/dev/null | head -5 | sed 's/^/    /' || echo "    (invalid JSON)"
+            fi
+
             # Add matrix_job field to each signature entry
             jq --arg matrix_job "$MATRIX_JOB_ID" 'map(. + {matrix_job: $matrix_job})' test-failures-signatures.json > test-failures-signatures.tmp && \
               mv test-failures-signatures.tmp test-failures-signatures.json
 
             echo "✅ Added matrix job info ($MATRIX_JOB_ID) to $(jq 'length' test-failures-signatures.json 2>/dev/null || echo '0') signatures"
           else
-            echo "ℹ️ No signatures file found - creating empty file"
+            echo "ℹ️ No signatures file found - creating empty file for matrix job ${{ matrix.name }}"
             echo '[]' > test-failures-signatures.json
           fi
 
@@ -356,7 +365,7 @@ jobs:
             # Process both test failures and build failures
 
             # First handle regular test failures
-            if grep -oE '\([^)]+\)' test-failures.txt 2>/dev/null | sed 's/[()]//g' | sort -u > "$TEMP_PACKAGES"; then
+            if grep -oE 'FAIL:.*\(([^)]+)\)' test-failures.txt 2>/dev/null | sed -E 's/.*\(([^):]+)[^)]*\).*/\1/' | sort -u > "$TEMP_PACKAGES"; then
               echo "📦 Found packages with test failures:"
               cat "$TEMP_PACKAGES"
 

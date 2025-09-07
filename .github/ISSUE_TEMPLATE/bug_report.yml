@@ -10,7 +10,7 @@ body:
     attributes:
       label: Describe the bug
       description: Provide a clear and concise summary of the problem or unexpected behavior.
-      placeholder: The sanitize.PhoneNumber function strips the plus sign from international numbers...
+      placeholder: The custom function strips the plus sign from numbers...
     validations:
       required: true
 
@@ -20,8 +20,8 @@ body:
       label: Steps to reproduce
       description: Provide minimal steps or code snippets to reproduce the issue.
       placeholder: |
-        1. Call sanitize.PhoneNumber("+1-800-555-1234")
-        2. Observe that the result is "18005551234" (missing '+')
+        1. Call package.Func("input")
+        2. Observe that the result is "input" (missing 'symbol')
     validations:
       required: true
 
@@ -30,7 +30,7 @@ body:
     attributes:
       label: Expected behavior
       description: Describe what you expected to happen instead.
-      placeholder: I expected the result to be "+18005551234" since the plus sign is allowed.
+      placeholder: I expected the result to be "symbol+input" since the plus sign is allowed.
     validations:
       required: true
 
@@ -40,7 +40,7 @@ body:
       label: Environment details
       description: Provide version information and your Go setup to help debug.
       placeholder: |
-        - Go version: go1.22.2
+        - Go version: go1.24.3
         - OS: macOS 14.5 (arm64)
         - Library version/commit: v1.3.4 or commit 88aef9c
     validations:
