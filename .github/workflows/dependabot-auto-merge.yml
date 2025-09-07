@@ -5,12 +5,12 @@
 #           for different update types (patch, minor, major) and dependency types
 #           (development, production). Security updates get special handling.
 #
-#  Configuration: All settings are loaded from .github/.env.shared for centralized
-#  management across all workflows.
+#  Configuration: All settings are loaded from .env.base and .env.custom files for
+#  centralized management across all workflows.
 #
 #  Triggers: Pull request events for immediate response to Dependabot PRs
 #
-#  Auto-merge Rules (configurable via .env.shared):
+#  Auto-merge Rules (configurable via .env.base/.env.custom):
 #  - Patch updates: Auto-merge by default
 #  - Minor dev dependencies: Auto-merge by default
 #  - Minor prod dependencies: Manual review by default
@@ -30,12 +30,9 @@ on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
 
-# ————————————————————————————————————————————————————————————————
-# Permissions
-# ————————————————————————————————————————————————————————————————
+# Security: Restrictive default permissions with job-level overrides for least privilege access
 permissions:
   contents: read
-  pull-requests: read
 
 # ————————————————————————————————————————————————————————————————
 # Concurrency Control
@@ -47,11 +44,11 @@ concurrency:
 # ————————————————————————————————————————————————————————————————
 # Environment Variables
 # ————————————————————————————————————————————————————————————————
-# Note: Configuration variables are loaded from .github/.env.shared
+# Note: Configuration variables are loaded from .env.base and .env.custom files
 
 jobs:
   # ----------------------------------------------------------------------------------
-  # Load Environment Variables from .env.shared
+  # Load Environment Variables
   # ----------------------------------------------------------------------------------
   load-env:
     name: 🌍 Load Environment Variables
@@ -68,7 +65,8 @@ jobs:
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
           sparse-checkout: |
-            .github/.env.shared
+            .github/.env.base
+            .github/.env.custom
             .github/actions/load-env
 
       # ————————————————————————————————————————————————————————————————
@@ -86,9 +84,9 @@ jobs:
     needs: [load-env]
     runs-on: ubuntu-latest
     permissions:
-      pull-requests: write
-      contents: write
-      issues: write
+      pull-requests: write # Required: Update and merge Dependabot PRs
+      issues: write # Required: Comment on related dependency issues
+      # Note: contents write not needed - gh CLI uses token directly
     outputs:
       dependency-names: ${{ steps.metadata.outputs.dependency-names }}
       update-type: ${{ steps.metadata.outputs.update-type }}
@@ -120,7 +118,7 @@ jobs:
 
           # Validate required configuration
           if [[ -z "$MAINTAINER" ]] || [[ "$MAINTAINER" == "null" ]]; then
-            echo "❌ ERROR: DEPENDABOT_MAINTAINER_USERNAME not set in .env.shared" >&2
+            echo "❌ ERROR: DEPENDABOT_MAINTAINER_USERNAME not set in configuration" >&2
             exit 1
           fi
 

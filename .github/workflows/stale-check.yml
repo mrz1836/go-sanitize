@@ -5,8 +5,8 @@
 #  This workflow identifies stale items, marks them with a label, and eventually closes
 #  them if no activity occurs within the configured timeframe.
 #
-#  Configuration: All settings are loaded from .github/.env.shared for centralized
-#  management across all workflows.
+#  Configuration: All settings are loaded from .env.base and .env.custom files for
+#  centralized management across all workflows.
 #
 #  Triggers:
 #  - Scheduled: Monday-Friday at 08:32 UTC
@@ -27,9 +27,7 @@ on:
     - cron: "0 12 * * 1-5" # 7:00 AM EST (12:00 UTC)
   workflow_dispatch: # Allow manual triggering
 
-# ————————————————————————————————————————————————————————————————
-# Permissions
-# ————————————————————————————————————————————————————————————————
+# Security: Restrictive default permissions with job-level overrides for least privilege access
 permissions:
   contents: read
 
@@ -42,7 +40,7 @@ concurrency:
 
 jobs:
   # ----------------------------------------------------------------------------------
-  # Load Environment Variables from .env.shared
+  # Load Environment Variables
   # ----------------------------------------------------------------------------------
   load-env:
     name: 🌍 Load Environment Variables
@@ -57,7 +55,8 @@ jobs:
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
           sparse-checkout: |
-            .github/.env.shared
+            .github/.env.base
+            .github/.env.custom
             .github/actions/load-env
 
       # ————————————————————————————————————————————————————————————————

@@ -5,14 +5,14 @@
 #           and readiness conditions are met. GitHub handles the actual merge
 #           when all status checks pass.
 #
-#  Configuration: All settings are loaded from .github/.env.shared for centralized
-#  management across all workflows.
+#  Configuration: All settings are loaded from .env.base and .env.custom files for
+#  centralized management across all workflows.
 #
 #  Triggers:
 #  - Pull request reviews (submitted)
 #  - Pull request state changes (ready_for_review, review_request_removed)
 #
-#  Auto-merge Rules (configurable via .env.shared):
+#  Auto-merge Rules (configurable via .env.base/.env.custom):
 #  - Minimum number of approvals
 #  - No requested reviewers remaining (if configured)
 #  - No "Changes Requested" reviews
@@ -34,12 +34,10 @@ on:
   pull_request:
     types: [ready_for_review, review_request_removed]
 
-# ————————————————————————————————————————————————————————————————
-# Permissions
-# ————————————————————————————————————————————————————————————————
+# Security: Restrictive default permissions with job-level overrides for least privilege access
 permissions:
-  contents: read
-  pull-requests: read
+  contents: read # Default read-only access to repository contents
+  pull-requests: read # Default read access to pull requests
 
 # ————————————————————————————————————————————————————————————————
 # Concurrency Control
@@ -51,11 +49,11 @@ concurrency:
 # ————————————————————————————————————————————————————————————————
 # Environment Variables
 # ————————————————————————————————————————————————————————————————
-# Note: Configuration variables are loaded from .github/.env.shared
+# Note: Configuration variables are loaded from .env.base and .env.custom files
 
 jobs:
   # ----------------------------------------------------------------------------------
-  # Load Environment Variables from .env.shared
+  # Load Environment Variables
   # ----------------------------------------------------------------------------------
   load-env:
     name: 🌍 Load Environment Variables
@@ -70,7 +68,8 @@ jobs:
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
           sparse-checkout: |
-            .github/.env.shared
+            .github/.env.base
+            .github/.env.custom
             .github/actions/load-env
 
       # ————————————————————————————————————————————————————————————————
@@ -88,8 +87,7 @@ jobs:
     needs: [load-env]
     runs-on: ubuntu-latest
     permissions:
-      contents: write
-      pull-requests: write
+      pull-requests: write # Required: Update PR status and enable auto-merge
     outputs:
       action-taken: ${{ steps.process.outputs.action }}
       pr-number: ${{ github.event.pull_request.number }}

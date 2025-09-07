@@ -206,6 +206,7 @@
 		"allow-parallel-runners": true,
 		"concurrency": 8,
 		"issues-exit-code": 1,
+		"build-tags": ["mage"],
 		"tests": true
 	},
 	"output": {

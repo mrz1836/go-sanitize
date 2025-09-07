@@ -197,12 +197,6 @@ To generate a snapshot (non-versioned) release for testing purposes, run:
 make release-snap
 ```
 
-Before tagging a new version, update the release metadata in the `CITATION.cff` file:
-
-```bash
-make citation version=0.2.1
-```
-
 Then create and push a new Git tag using:
 
 ```bash
@@ -229,7 +223,6 @@ List of all current commands:
 ```text
 bench                 ## Run all benchmarks in the Go application
 build-go              ## Build the Go application (locally)
-citation              ## Update version in CITATION.cff (use version=X.Y.Z)
 clean-mods            ## Remove all the Go mod cache
 coverage              ## Show test coverage
 diff                  ## Show git diff and fail if uncommitted changes exist
