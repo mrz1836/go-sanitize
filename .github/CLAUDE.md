@@ -19,7 +19,6 @@ This repository uses **`AGENTS.md`** as the single source of truth for:
 2. **Follow branch‑prefix and commit‑message standards**
    They drive Mergify auto‑labeling and CI gates.
 3. **Never tag releases**
-   Only repository code‑owners run `make tag` / `make release`.
 4. **Pass CI**
    Run `go fmt`, `goimports`, `go vet`, `staticcheck`, and `golangci‑lint` locally before opening a PR.
 

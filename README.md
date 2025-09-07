@@ -180,6 +180,19 @@ extra baggage.
 ### Additional Documentation & Repository Management
 
 <details>
+<summary><strong><code>Development Setup (Getting Started)</code></strong></summary>
+<br/>
+
+Install [MAGE-X](https://github.com/mrz1836/mage-x) build tool for development:
+
+```bash
+# Install MAGE-X for development and building
+go install github.com/mrz1836/mage-x/cmd/magex@latest
+magex update:install
+```
+</details>
+
+<details>
 <summary><strong><code>Library Deployment</code></strong></summary>
 <br/>
 
