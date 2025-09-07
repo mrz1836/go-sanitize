@@ -30,7 +30,7 @@ builds:
 # Archives
 # ---------------------------
 archives:
-  - id: go-template
+  - id: go-sanitize
     name_template: >-
       {{- .ProjectName }}_
       {{- .Version }}_
