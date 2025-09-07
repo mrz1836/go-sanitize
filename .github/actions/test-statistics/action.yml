@@ -92,7 +92,10 @@ runs:
       id: generate-stats
       shell: bash
       run: |
-        # Get basic values
+        # Enable error handling but don't exit on first error to allow cleanup
+        set +e
+
+        # Get basic values with safe defaults
         TEST_EXIT_CODE="${{ inputs.test-exit-code }}"
         OUTPUT_MODE="${{ inputs.output-mode }}"
         TEST_END=$(date +%s)
@@ -234,7 +237,9 @@ runs:
           FUZZ_TEST_COUNT=$TEST_COUNT
         fi
 
-        jq -n \
+        # Create JSON with error handling
+        JSON_CREATE_SUCCESS=false
+        if jq -n \
           --arg name "${{ inputs.matrix-name }}" \
           --arg os "${{ inputs.matrix-os }}" \
           --arg version "${{ inputs.matrix-go-version }}" \
@@ -282,24 +287,69 @@ runs:
             loc_go_files: $loc_go_files,
             loc_total: $loc_total,
             loc_date: $loc_date
-          }' > "$STATS_FILE"
+          }' > "$STATS_FILE" 2>/dev/null; then
+          JSON_CREATE_SUCCESS=true
+          echo "📊 Test statistics generated successfully:"
+        else
+          echo "⚠️ JSON creation failed, creating minimal statistics file"
+          # Create minimal fallback JSON
+          printf '%s\n' \
+            '{' \
+            '  "name": "'"${{ inputs.matrix-name }}"'",' \
+            '  "os": "'"${{ inputs.matrix-os }}"'",' \
+            '  "go_version": "'"${{ inputs.matrix-go-version }}"'",' \
+            '  "test_mode": "'"$OUTPUT_MODE"'",' \
+            '  "duration_seconds": '"$TEST_DURATION"',' \
+            '  "test_count": '"${TEST_COUNT:-0}"',' \
+            '  "benchmark_count": '"${BENCHMARK_COUNT:-0}"',' \
+            '  "status": "'"${{ inputs.job-status }}"'",' \
+            '  "test_exit_code": '"${TEST_EXIT_CODE:-0}"',' \
+            '  "test_passed": '"$TEST_PASSED"',' \
+            '  "total_failures": '"${TOTAL_FAILURES:-0}"',' \
+            '  "affected_packages": '"${AFFECTED_PACKAGES:-0}"',' \
+            '  "failure_details": [],' \
+            '  "output_size_bytes": '"${OUTPUT_SIZE:-0}"',' \
+            '  "race_enabled": '"$RACE_ENABLED"',' \
+            '  "coverage_enabled": '"$COVERAGE_ENABLED"',' \
+            '  "fuzz_run": '"$FUZZ_RUN"',' \
+            '  "fuzz_test_count": '"${FUZZ_TEST_COUNT:-0}"',' \
+            '  "timestamp": "'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'",' \
+            '  "loc_test_files": "'"$LOC_TEST_FILES"'",' \
+            '  "loc_go_files": "'"$LOC_GO_FILES"'",' \
+            '  "loc_total": "'"$LOC_TOTAL"'",' \
+            '  "loc_date": "'"$LOC_DATE"'"' \
+            '}' > "$STATS_FILE"
+          JSON_CREATE_SUCCESS=true
+          echo "📊 Minimal test statistics generated successfully:"
+        fi
 
-        echo "📊 Test statistics generated successfully:"
-        jq . "$STATS_FILE"
+        # Display the JSON file if it was created successfully
+        if [[ "$JSON_CREATE_SUCCESS" == "true" ]] && [[ -f "$STATS_FILE" ]]; then
+          jq . "$STATS_FILE" 2>/dev/null || cat "$STATS_FILE"
+        else
+          echo "❌ Failed to create statistics file"
+        fi
 
-        # Set outputs for other steps/workflows
-        echo "statistics-file=$STATS_FILE" >> $GITHUB_OUTPUT
-        echo "test-count=$TEST_COUNT" >> $GITHUB_OUTPUT
-        echo "benchmark-count=$BENCHMARK_COUNT" >> $GITHUB_OUTPUT
-        echo "total-failures=$TOTAL_FAILURES" >> $GITHUB_OUTPUT
-        echo "test-passed=$TEST_PASSED" >> $GITHUB_OUTPUT
-        echo "duration-seconds=$TEST_DURATION" >> $GITHUB_OUTPUT
-        echo "loc-total=$LOC_TOTAL" >> $GITHUB_OUTPUT
+        # Always set outputs for other steps/workflows (with safe defaults)
+        if [[ "$JSON_CREATE_SUCCESS" == "true" ]] && [[ -f "$STATS_FILE" ]]; then
+          echo "statistics-file=$STATS_FILE" >> $GITHUB_OUTPUT
+        else
+          echo "statistics-file=" >> $GITHUB_OUTPUT
+        fi
+        echo "test-count=${TEST_COUNT:-0}" >> $GITHUB_OUTPUT
+        echo "benchmark-count=${BENCHMARK_COUNT:-0}" >> $GITHUB_OUTPUT
+        echo "total-failures=${TOTAL_FAILURES:-0}" >> $GITHUB_OUTPUT
+        echo "test-passed=${TEST_PASSED:-false}" >> $GITHUB_OUTPUT
+        echo "duration-seconds=${TEST_DURATION:-0}" >> $GITHUB_OUTPUT
+        echo "loc-total=${LOC_TOTAL:-}" >> $GITHUB_OUTPUT
 
         echo "📊 Statistics collection completed:"
-        echo "   • Tests: $TEST_COUNT"
-        echo "   • Benchmarks: $BENCHMARK_COUNT"
-        echo "   • Failures: $TOTAL_FAILURES"
-        echo "   • Passed: $TEST_PASSED"
-        echo "   • Duration: ${TEST_DURATION}s"
-        echo "   • LOC Total: $LOC_TOTAL"
+        echo "   • Tests: ${TEST_COUNT:-0}"
+        echo "   • Benchmarks: ${BENCHMARK_COUNT:-0}"
+        echo "   • Failures: ${TOTAL_FAILURES:-0}"
+        echo "   • Passed: ${TEST_PASSED:-false}"
+        echo "   • Duration: ${TEST_DURATION:-0}s"
+        echo "   • LOC Total: ${LOC_TOTAL:-N/A}"
+
+        # Always exit successfully to prevent cascading failures
+        exit 0

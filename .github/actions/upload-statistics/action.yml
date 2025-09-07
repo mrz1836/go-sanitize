@@ -40,7 +40,7 @@ inputs:
   if-no-files-found:
     description: "Behavior when no files match the path (warn, error, ignore)"
     required: false
-    default: "warn"
+    default: "ignore"
   compression-level:
     description: "Compression level for the artifact (0-9, 6 is default)"
     required: false
