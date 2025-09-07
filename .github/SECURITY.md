@@ -51,7 +51,7 @@ We regularly scan for known vulnerabilities using:
 Want to run these yourself?
 
 ```sh
-make govulncheck
+magex deps:audit
 # or run nancy via the CI workflow
 ```
 

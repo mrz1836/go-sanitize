@@ -13,13 +13,24 @@ coverage:
   round: down # up, down, or nearest
   precision: 2 # Number of decimal places, between 0 and 5
 
+# Flag Management - Simple carryforward for everything
+# ----------------------
+flag_management:
+  default_rules:
+    carryforward: true # This keeps coverage from previous uploads
+    statuses:
+      - type: project
+        target: auto
+        threshold: 2%
+
 # Ignoring Paths
 # --------------
 # which folders/files to ignore
 ignore:
   - ".github/**"
-  - ".make/**"
+  - ".mage-cache/**"
   - ".vscode/**"
+  - "bin/**"
   - "examples/**"
 
 # Parsers

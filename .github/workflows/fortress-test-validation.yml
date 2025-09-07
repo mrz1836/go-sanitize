@@ -113,14 +113,20 @@ jobs:
             echo "📋 Directory structure before flattening:"
             find test-results/ -name "*.json" -type f | head -10 | sed 's/^/  • /' || echo "  No JSON files found"
 
+            # Process all JSON files including signatures
             find test-results/ -name "*.json" -type f | while read -r file; do
               filename=$(basename "$file")
               echo "Moving $file to test-results/$filename"
               cp "$file" "test-results/$filename"
             done
 
-            echo "📋 Available statistics files after flattening:"
-            ls -la test-results/*-stats-*.json 2>/dev/null || echo "  No statistics files found"
+            echo "📋 Available files after flattening:"
+            echo "  • Statistics files:"
+            ls -la test-results/*-stats-*.json 2>/dev/null || echo "    No statistics files found"
+            echo "  • Signature files:"
+            ls -la test-results/*test-failures-signatures.json 2>/dev/null || echo "    No signature files found"
+            echo "  • Summary files:"
+            ls -la test-results/*test-failures-summary.json 2>/dev/null || echo "    No summary files found"
           else
             echo "⚠️ No test-results directory found"
           fi
@@ -143,6 +149,17 @@ jobs:
             echo "📋 Found failure signature files:"
             ls -la test-results/*test-failures-signatures.json 2>/dev/null || echo "No signature files found"
 
+            # Debug: Show content of signature files
+            echo "🔍 Debugging signature file contents:"
+            for sig_file in test-results/*test-failures-signatures.json; do
+              if [[ -f "$sig_file" ]]; then
+                echo "📄 File: $sig_file"
+                echo "  • File size: $(wc -c < "$sig_file") bytes"
+                echo "  • First few lines:"
+                head -5 "$sig_file" | sed 's/^/    /' || echo "    (empty or invalid)"
+              fi
+            done
+
             # Merge all signature files and deduplicate by signature
             for sig_file in test-results/*test-failures-signatures.json; do
               if [[ -s "$sig_file" ]]; then
@@ -150,6 +167,8 @@ jobs:
                 RAW_COUNT=$(jq 'length' "$sig_file" 2>/dev/null || echo "0")
                 TOTAL_RAW_FAILURES=$((TOTAL_RAW_FAILURES + RAW_COUNT))
                 echo "  • Raw failures in this file: $RAW_COUNT"
+              else
+                echo "📄 Skipping empty file: $sig_file"
               fi
             done
 
@@ -354,24 +373,28 @@ jobs:
                 echo "------------------"
                 echo "$BUILD_FAILURES"
 
-                # Show detailed build errors
+                # Show detailed build errors with output
                 jq -r '.[] | select(.type == "build") |
                   "📦 " + (.package | split("/") | .[-1] // .[-2] // .) + " (detected in " + (.occurrences | tostring) + " matrix jobs):" +
-                  "\n" + .output' deduplicated-failures.json 2>/dev/null | sed 's/^/  /' | head -c 2000
+                  "\n" + (.output // "No detailed error available")' deduplicated-failures.json 2>/dev/null | sed 's/^/  /' | head -c 2000
               fi
 
-              # Show test failures with line numbers when available
+              # Show test failures with enhanced details
               TEST_FAILURES=$(jq -r '.[] | select(.type == "test") |
-                if (.line_number and .line_number != null) then
-                  "  📦 " + (.package | split("/") | .[-1] // .[-2] // .) + ": " + .test + ":" + (.line_number | tostring) + " (" + (.occurrences | tostring) + " matrix jobs)"
-                else
-                  "  📦 " + (.package | split("/") | .[-1] // .[-2] // .) + ": " + .test + " (" + (.occurrences | tostring) + " matrix jobs)"
-                end' deduplicated-failures.json 2>/dev/null)
+                "  📦 " + (.package | split("/") | .[-1] // .[-2] // .) + ": " + .test + " (" + (.occurrences | tostring) + " matrix jobs)"' deduplicated-failures.json 2>/dev/null)
               if [[ -n "$TEST_FAILURES" ]]; then
                 echo ""
                 echo "🧪 Test Failures:"
                 echo "-----------------"
                 echo "$TEST_FAILURES"
+
+                # Show detailed test outputs
+                echo ""
+                echo "📝 Test Error Details:"
+                echo "---------------------"
+                jq -r '.[] | select(.type == "test") |
+                  "❌ " + .test + " (" + (.package | split("/") | .[-1] // .[-2] // .) + "):" +
+                  "\n" + (.output // "No error output available")' deduplicated-failures.json 2>/dev/null | head -c 3000
               fi
 
             # Fallback to old structured failure details

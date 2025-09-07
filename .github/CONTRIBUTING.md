@@ -8,11 +8,7 @@ Thanks for taking the time to contribute! This project thrives on clear, well-te
 
 1. Fork the repo.
 2. Create a new branch.
-3. Install the pre-commit hooks:
-   ```bash
-   pip install pre-commit
-   pre-commit install
-   ```
+3. Install the [pre-commit hooks](https://github.com/mrz1836/go-pre-commit).
 4. Commit *one feature per commit*.
 5. Write tests.
 6. Open a pull request with a clear list of changes.
@@ -34,8 +30,6 @@ Tests should be:
 * Easy to understand
 * Focused on one behavior
 * Fast
-
-Use `require` over `assert` where possible (we lint for this).
 
 This project aims for >= **90% code coverage**. Every code path must be tested to
 keep the Codecov badge green and CI passing.

@@ -4,9 +4,9 @@
 All contributors must read `.github/AGENTS.md` for complete guidelines. If any rule here conflicts with that file, **AGENTS.md** takes precedence.
 
 ## Coding Standards
-- Format with `go fmt ./...` and `goimports -w .`.
-- Lint with `golangci-lint run` and vet with `go vet ./...`.
-- Run `go test ./...` before committing.
+- Format with `magex format:fix`.
+- Lint with `magex lint` and vet with `magex vet`.
+- Run `magex test` before committing.
 - Follow Go naming and commenting conventions described in AGENTS.md.
 
 ## Commit Messages
@@ -22,8 +22,7 @@ All contributors must read `.github/AGENTS.md` for complete guidelines. If any r
   4. **Impact / Risk**
 
 ## Dependency Management
-- Manage modules with `go mod tidy` after import changes.
-- Run `make govulncheck` to check for vulnerabilities when dependencies change.
+- Manage modules with `magex tidy` after import changes.
 
 ## Security Reporting
 - Do not open public issues for vulnerabilities.
