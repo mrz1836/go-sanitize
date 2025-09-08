@@ -208,7 +208,7 @@ jobs:
       # Sync labels using native GitHub API
       # ————————————————————————————————————————————————————————————————
       - name: 🏷️ Sync labels from manifest
-        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
         env:
           ENV_JSON: ${{ needs.load-env.outputs.env-json }}
         with:
@@ -426,7 +426,7 @@ jobs:
       # ————————————————————————————————————————————————————————————————
       - name: 🔍 Verify sync results
         if: github.event.inputs.dry_run != 'true'
-        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
         with:
           github-token: ${{ secrets.GH_PAT_TOKEN != '' && secrets.GH_PAT_TOKEN || secrets.GITHUB_TOKEN }}
           script: |
