@@ -297,8 +297,8 @@ jobs:
                   # Count test failures - handle both regular test format and fuzz test format
                   LEGACY_TEST_COUNT=$(jq '[.[] | select(.failures) | .failures[]] | length' "$summary_file" 2>/dev/null || echo "0")
 
-                  # Also count entries that are fuzz tests (Type == "test" and no .failures field)
-                  FUZZ_TEST_COUNT=$(jq '[.[] | select(.Type == "test" and (.failures | length) > 0)] | length' "$summary_file" 2>/dev/null || echo "0")
+                  # Also count entries that are fuzz tests (Type == "test" and has .failures field with content)
+                  FUZZ_TEST_COUNT=$(jq '[.[] | select(.Type == "test" and (.failures // [] | length > 0))] | length' "$summary_file" 2>/dev/null || echo "0")
 
                   # Count build failures
                   BUILD_COUNT=$(jq '[.[] | select(.Type == "build")] | length' "$summary_file" 2>/dev/null || echo "0")
@@ -370,7 +370,7 @@ jobs:
 
                   # Count all failure types
                   RECOUNT_TEST=$(jq '[.[] | select(.failures) | .failures[]] | length' "$summary_file" 2>/dev/null || echo "0")
-                  RECOUNT_FUZZ=$(jq '[.[] | select(.Type == "test" and (.failures | length) > 0)] | length' "$summary_file" 2>/dev/null || echo "0")
+                  RECOUNT_FUZZ=$(jq '[.[] | select(.Type == "test" and (.failures // [] | length > 0))] | length' "$summary_file" 2>/dev/null || echo "0")
                   RECOUNT_BUILD=$(jq '[.[] | select(.Type == "build")] | length' "$summary_file" 2>/dev/null || echo "0")
 
                   FILE_FAILURES=$((RECOUNT_TEST + RECOUNT_FUZZ + RECOUNT_BUILD))

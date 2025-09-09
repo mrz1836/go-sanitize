@@ -122,20 +122,21 @@ runs:
           # Fast single-pass JSON extraction for test failures (< 1s for 10K lines)
           # Filter JSON lines and parse in one pass - eliminates 2-minute hang
           # Note: Line numbers aren't available in Go test JSON output
+          # IMPORTANT: Only detect actual test function failures, not package/suite completion events
           grep '^{' "$json_file" 2>/dev/null | \
-            jq -r 'select(.Action == "fail") |
-              "--- FAIL: \(if (.Test and .Test != null and .Test != "null") then .Test else "unknown" end) (\(.Package))"' \
+            jq -r 'select(.Action == "fail" and .Test != null and .Test != "" and .Test != "null" and (.Test | test("^Test[A-Za-z]"))) |
+              "--- FAIL: \(.Test) (\(.Package))"' \
             2>/dev/null > "$failures_file"
 
           # Create structured test failure entries with unique signatures
-          if grep '^{' "$json_file" 2>/dev/null | jq -r 'select(.Action == "fail")' 2>/dev/null | head -1 | grep -q .; then
+          if grep '^{' "$json_file" 2>/dev/null | jq -r 'select(.Action == "fail" and .Test != null and .Test != "" and .Test != "null" and (.Test | test("^Test[A-Za-z]")))' 2>/dev/null | head -1 | grep -q .; then
             echo "📝 Creating structured test failure entries with enhanced output..."
 
             # First pass: Extract test failure basic info from Action == "fail" entries
             local temp_failures
             temp_failures=$(mktemp)
             grep '^{' "$json_file" 2>/dev/null | \
-              jq -r 'select(.Action == "fail") | {
+              jq -r 'select(.Action == "fail" and .Test != null and .Test != "" and .Test != "null" and (.Test | test("^Test[A-Za-z]"))) | {
                 type: "test",
                 package: .Package,
                 test: (if (.Test and .Test != null and .Test != "null") then .Test else "unknown" end),
