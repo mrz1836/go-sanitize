@@ -148,6 +148,179 @@ jobs:
           failures-file: "fuzz-failures.txt"
 
       # ————————————————————————————————————————————————————————————————
+      # Create structured fuzz test failure summary for validation workflow
+      # ————————————————————————————————————————————————————————————————
+      - name: 📋 Create structured fuzz test failure summary
+        if: always() && steps.run-fuzz-tests.outputs.fuzz-exit-code != '0'
+        continue-on-error: true
+        run: |
+          echo "📋 Creating structured fuzz test failure summary..."
+
+          # Initialize the JSON structure
+          echo '[]' > test-failures-summary.json
+
+          if [ -f fuzz-output.log ]; then
+            echo "🔍 Processing fuzz test output for structured failures..."
+
+            # Extract failed fuzz tests from output log
+            # Pattern: --- FAIL: FuzzTestName (0.34s)
+            grep -E "^--- FAIL: Fuzz[A-Za-z0-9_]+" fuzz-output.log | while IFS= read -r fail_line; do
+              echo "📄 Processing failure line: $fail_line"
+
+              # Extract test name from the failure line
+              # Format: --- FAIL: FuzzGetTokenFromHeader (0.34s)
+              if [[ "$fail_line" =~ ^---[[:space:]]*FAIL:[[:space:]]*([^[:space:]]+) ]]; then
+                FUZZ_TEST_NAME="${BASH_REMATCH[1]}"
+                echo "📋 Found failed fuzz test: $FUZZ_TEST_NAME"
+
+                # Extract detailed error output for this specific test
+                # Start from the failure line and capture subsequent error details
+                ERROR_OUTPUT=$(awk "
+                  BEGIN { capture = 0; found_start = 0; }
+                  /^--- FAIL: $FUZZ_TEST_NAME/ {
+                    found_start = 1;
+                    capture = 1;
+                    output = \$0;
+                    next;
+                  }
+                  found_start && /^--- FAIL:/ && !/^--- FAIL: $FUZZ_TEST_NAME/ {
+                    # Another test failure started, stop capturing
+                    exit;
+                  }
+                  found_start && /^(PASS|ok |FAIL)/ && capture {
+                    # Next test result line, stop capturing
+                    exit;
+                  }
+                  found_start && capture && /^[[:space:]]/ {
+                    # Indented lines are part of the test output
+                    if (length(output) < 2000) {
+                      output = output \"\\n\" \$0;
+                    }
+                  }
+                  found_start && capture && /^[[:space:]]*$/ {
+                    # Empty line, continue capturing briefly
+                    next;
+                  }
+                  found_start && capture && !/^[[:space:]]/ && !/^(To re-run:|Failing input)/ {
+                    # Non-indented line that's not our test, stop capturing unless it's re-run info
+                    if (\$0 !~ /^github\.com/) exit;
+                  }
+                  END {
+                    if (found_start) print output;
+                  }
+                " fuzz-output.log)
+
+                # Get package name from go.mod or use git context fallback
+                PACKAGE_NAME="${{ github.repository }}"
+                if [[ -f go.mod ]]; then
+                  PACKAGE_NAME=$(head -1 go.mod | awk '{print $2}')
+                elif [[ -n "${{ github.server_url }}" && -n "${{ github.repository }}" ]]; then
+                  # Use GitHub context as fallback
+                  PACKAGE_NAME="${{ github.server_url }}/${{ github.repository }}"
+                  PACKAGE_NAME=${PACKAGE_NAME#https://}
+                fi
+
+                # Calculate elapsed time from the failure line (extract from parentheses)
+                ELAPSED="unknown"
+                if [[ "$fail_line" =~ \(([0-9.]+[a-z]*)\) ]]; then
+                  ELAPSED="${BASH_REMATCH[1]}"
+                fi
+
+                # Create JSON entry for this failed fuzz test
+                FUZZ_JSON=$(jq -n \
+                  --arg pkg "$PACKAGE_NAME" \
+                  --arg test "$FUZZ_TEST_NAME" \
+                  --arg output "$ERROR_OUTPUT" \
+                  --arg elapsed "$ELAPSED" \
+                  '{
+                    Package: $pkg,
+                    Type: "test",
+                    failures: [{
+                      Test: $test,
+                      Elapsed: $elapsed,
+                      Output: $output
+                    }]
+                  }')
+
+                echo "📝 Adding fuzz test failure to summary:"
+                echo "$FUZZ_JSON" | jq '.'
+
+                # Add to summary file
+                jq --argjson new_entry "$FUZZ_JSON" '. += [$new_entry]' test-failures-summary.json > test-failures-summary.json.tmp
+                mv test-failures-summary.json.tmp test-failures-summary.json
+              fi
+            done
+
+            # Also update the signatures file if it exists but is empty
+            if [[ -f fuzz-failures-signatures.json ]] && [[ $(jq 'length' fuzz-failures-signatures.json 2>/dev/null || echo "0") -eq 0 ]]; then
+              echo "📝 Updating empty signatures file with fuzz test failures..."
+
+              # Get package name from go.mod or use git context fallback
+              PACKAGE_NAME="${{ github.repository }}"
+              if [[ -f go.mod ]]; then
+                PACKAGE_NAME=$(head -1 go.mod | awk '{print $2}')
+              elif [[ -n "${{ github.server_url }}" && -n "${{ github.repository }}" ]]; then
+                # Use GitHub context as fallback
+                PACKAGE_NAME="${{ github.server_url }}/${{ github.repository }}"
+                PACKAGE_NAME=${PACKAGE_NAME#https://}
+              fi
+
+              # Create signature entries from the failures
+              SIGNATURE_ENTRIES='[]'
+              if [[ -f test-failures-summary.json ]] && [[ $(jq 'length' test-failures-summary.json 2>/dev/null || echo "0") -gt 0 ]]; then
+                # Store GitHub Actions values in bash variable for proper escaping
+                MATRIX_JOB_ID="fuzz-${{ inputs.primary-runner }}-${{ inputs.go-primary-version }}"
+
+                SIGNATURE_ENTRIES=$(jq --arg matrix_job "$MATRIX_JOB_ID" '[
+                  .[] as $parent | $parent.failures[] | {
+                    type: "test",
+                    package: $parent.Package,
+                    test: .Test,
+                    output: .Output,
+                    signature: ($parent.Package + ":" + .Test),
+                    unique_id: (($parent.Package + ":" + .Test) | gsub("[^a-zA-Z0-9_/.-]"; "_")),
+                    matrix_job: $matrix_job
+                  }
+                ]' test-failures-summary.json)
+              fi
+
+              echo "$SIGNATURE_ENTRIES" > fuzz-failures-signatures.json
+              echo "✅ Updated signatures file with $(echo "$SIGNATURE_ENTRIES" | jq 'length') entries"
+            fi
+
+            echo "✅ Structured failure summary created with $(jq 'length' test-failures-summary.json 2>/dev/null || echo "0") fuzz test packages"
+
+            # Debug: Show the created summary
+            if [[ -f test-failures-summary.json ]]; then
+              echo "📊 Final fuzz failure summary:"
+              jq . test-failures-summary.json
+            fi
+          else
+            echo "⚠️ No fuzz-output.log found, creating minimal failure entry"
+
+            # Create minimal entry when output log is missing
+            # Get package name from go.mod or use git context fallback
+            PACKAGE_NAME="${{ github.repository }}"
+            if [[ -f go.mod ]]; then
+              PACKAGE_NAME=$(head -1 go.mod | awk '{print $2}')
+            elif [[ -n "${{ github.server_url }}" && -n "${{ github.repository }}" ]]; then
+              # Use GitHub context as fallback
+              PACKAGE_NAME="${{ github.server_url }}/${{ github.repository }}"
+              PACKAGE_NAME=${PACKAGE_NAME#https://}
+            fi
+
+            jq -n --arg pkg "$PACKAGE_NAME" '[{
+              Package: $pkg,
+              Type: "test",
+              failures: [{
+                Test: "unknown_fuzz_test",
+                Elapsed: "unknown",
+                Output: "Fuzz test failed but no output log available (exit code: ${{ steps.run-fuzz-tests.outputs.fuzz-exit-code }})"
+              }]
+            }]' > test-failures-summary.json
+          fi
+
+      # ————————————————————————————————————————————————————————————————
       # Fuzz test failure analysis and reporting
       # ————————————————————————————————————————————————————————————————
       - name: 🚨 Create Fuzz Test Failure Summary
@@ -317,6 +490,8 @@ jobs:
             fuzz-output.log
             fuzz-failures.txt
             fuzz-failures-detailed.txt
+            test-failures-summary.json
+            fuzz-failures-signatures.json
           retention-days: 1
           if-no-files-found: ignore
 

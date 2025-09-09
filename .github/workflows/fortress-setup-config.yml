@@ -143,7 +143,7 @@ jobs:
   # Setup the configuration for the CI environment
   # ----------------------------------------------------------------------------------
   setup-config:
-    name: 🎯 Setup CI Config
+    name: 🔧 Setup CI Config
     runs-on: ${{ inputs.primary-runner }}
     outputs:
       benchmarks-enabled: ${{ steps.config.outputs.benchmarks-enabled }}
