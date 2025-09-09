@@ -84,9 +84,9 @@ jobs:
     needs: [load-env]
     runs-on: ubuntu-latest
     permissions:
+      contents: write # Required: Enable auto-merge on PRs
       pull-requests: write # Required: Update and merge Dependabot PRs
       issues: write # Required: Comment on related dependency issues
-      # Note: contents write not needed - gh CLI uses token directly
     outputs:
       dependency-names: ${{ steps.metadata.outputs.dependency-names }}
       update-type: ${{ steps.metadata.outputs.update-type }}
@@ -387,6 +387,15 @@ jobs:
           DEPENDENCY="${{ steps.metadata.outputs.dependency-names }}"
           VERSION_CHANGE="${{ steps.metadata.outputs.previous-version }} → ${{ steps.metadata.outputs.new-version }}"
 
+          # Check token availability
+          if [[ -n "${{ secrets.GH_PAT_TOKEN }}" ]]; then
+            echo "🔑 Using Personal Access Token for enhanced permissions"
+            TOKEN_TYPE="PAT"
+          else
+            echo "⚠️ Using default GITHUB_TOKEN - auto-merge may fail for Dependabot PRs"
+            TOKEN_TYPE="GITHUB_TOKEN"
+          fi
+
           # Determine approval message based on action type
           case "$ACTION" in
             "auto-merge-patch")
@@ -407,13 +416,26 @@ jobs:
           esac
 
           # Approve the PR
-          gh pr review --approve "$PR_URL" \
-            --body "$APPROVAL_MSG: $DEPENDENCY ($VERSION_CHANGE)"
+          echo "📝 Approving PR..."
+          if ! gh pr review --approve "$PR_URL" --body "$APPROVAL_MSG: $DEPENDENCY ($VERSION_CHANGE)"; then
+            echo "❌ Failed to approve PR"
+            exit 1
+          fi
 
-          # Enable auto-merge
-          gh pr merge --auto --squash "$PR_URL"
+          # Attempt to enable auto-merge
+          echo "🚀 Attempting to enable auto-merge..."
+          if gh pr merge --auto --squash "$PR_URL"; then
+            echo "✅ Successfully enabled auto-merge for $ACTION"
+          else
+            echo "⚠️ Auto-merge failed (likely permissions issue)"
+            echo "💡 Tip: Ensure GH_PAT_TOKEN is set with repo permissions for Dependabot PRs"
 
-          echo "✅ Enabled auto-merge for $ACTION"
+            # Fallback: Set up for manual merge
+            echo "🔄 PR has been approved and is ready for manual merge"
+            echo "action_result=approved-ready-for-merge" >> $GITHUB_OUTPUT
+
+            # Don't exit with error - the PR is still approved
+          fi
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
           GH_TOKEN: ${{ secrets.GH_PAT_TOKEN || secrets.GITHUB_TOKEN }}
@@ -519,6 +541,9 @@ jobs:
             "auto-merge-security")
               ACTION_DESC="🔒 Auto-merged (security update)"
               ;;
+            "approved-ready-for-merge")
+              ACTION_DESC="✅ Approved and ready for manual merge (auto-merge failed)"
+              ;;
             "alert-major")
               ACTION_DESC="⚠️ Manual review required (major update)"
               ;;
@@ -576,6 +601,9 @@ jobs:
           case "$ACTION" in
             auto-merge-*)
               echo "✅ Action: Auto-merge enabled"
+              ;;
+            approved-ready-for-merge)
+              echo "✅ Action: Approved and ready for manual merge"
               ;;
             alert-*)
               echo "⚠️ Action: Alert sent, manual review required"
