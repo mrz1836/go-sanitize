@@ -445,10 +445,10 @@ jobs:
           SUMMARY_TIME=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
 
           # Start building the summary
-          echo "# 🏰 GoFortress CI Configuration Report" >> $GITHUB_STEP_SUMMARY
+          echo "# GoFortress CI Configuration Report" >> $GITHUB_STEP_SUMMARY
           echo "_Generated at: ${SUMMARY_TIME}_" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "## 🎯 GoFortress System Information" >> $GITHUB_STEP_SUMMARY
+          echo "## 🏰 GoFortress System Information" >> $GITHUB_STEP_SUMMARY
           echo "| Property | Value |" >> $GITHUB_STEP_SUMMARY
           echo "|----------|-------|" >> $GITHUB_STEP_SUMMARY
           echo "| **System Version** | \`${{ steps.extract-version.outputs.version }}\` |" >> $GITHUB_STEP_SUMMARY
@@ -505,7 +505,7 @@ jobs:
           echo "<br><br>" >> $GITHUB_STEP_SUMMARY
 
           # Core Configuration
-          echo "## 🎯 Core CI Configuration" >> $GITHUB_STEP_SUMMARY
+          echo "## 🛠 Core CI Configuration" >> $GITHUB_STEP_SUMMARY
           echo "| Setting | Value | Description |" >> $GITHUB_STEP_SUMMARY
           echo "|---------|-------|-------------|" >> $GITHUB_STEP_SUMMARY
           echo "| **Primary Runner** | \`${{ env.PRIMARY_RUNNER }}\` | Main OS for CI jobs |" >> $GITHUB_STEP_SUMMARY

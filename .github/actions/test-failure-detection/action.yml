@@ -507,3 +507,7 @@ runs:
         echo "   • Failure count: $FAILURE_COUNT"
         echo "   • Has failures: $HAS_FAILURES"
         echo "   • Detailed file: $DETAILED_FILE"
+
+        # Always exit with 0 to not fail the workflow step
+        # The outputs contain the failure information for downstream steps
+        exit 0
