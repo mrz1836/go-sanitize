@@ -84,7 +84,7 @@ jobs:
     needs: [load-env]
     runs-on: ubuntu-latest
     permissions:
-      contents: write # Required: Enable auto-merge on PRs
+      contents: write # Required for Dependabot PRs: Enables auto-merge (not needed for other PRs)
       pull-requests: write # Required: Update and merge Dependabot PRs
       issues: write # Required: Comment on related dependency issues
     outputs:
@@ -432,7 +432,7 @@ jobs:
 
             # Fallback: Set up for manual merge
             echo "🔄 PR has been approved and is ready for manual merge"
-            echo "action_result=approved-ready-for-merge" >> $GITHUB_OUTPUT
+            echo "action-taken=approved-ready-for-merge" >> $GITHUB_OUTPUT
 
             # Don't exit with error - the PR is still approved
           fi
