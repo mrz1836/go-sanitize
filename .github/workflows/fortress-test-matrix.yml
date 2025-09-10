@@ -264,7 +264,7 @@ jobs:
                 # Count ONLY failed test events, not package/suite failures which are expected
                 # Look for Action="fail" AND Package field AND Test field (indicating actual test failure)
                 JSON_FAILURES=$(grep '^{' test-output.log 2>/dev/null | \
-                  jq -r 'select(.Action == "fail" and .Test != null and .Test != "" and (.Package // "") != "" and (.Test | test("^Test[A-Z]"))) | .Test' 2>/dev/null | wc -l | xargs || echo "0")
+                  jq -r 'select(.Action == "fail" and .Test != null and .Test != "" and (.Package // "") != "" and (.Test | test("^Test[A-Za-z]"))) | .Test' 2>/dev/null | wc -l | xargs || echo "0")
 
                 if [[ $JSON_FAILURES -gt 0 ]]; then
                   echo "⚠️ Found $JSON_FAILURES actual failing test functions in JSON output"
