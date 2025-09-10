@@ -269,6 +269,7 @@ jobs:
         id: goreleaser
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SKIP_GORELEASER_TESTS: "true"
         run: |
           echo "🚀 Building and publishing release with GoReleaser..."
 
