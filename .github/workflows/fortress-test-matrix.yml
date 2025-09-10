@@ -5,7 +5,7 @@
 #  in a matrix strategy with comprehensive failure detection and statistics collection.
 #
 #  This workflow handles:
-#    - Multi-platform test execution (ubuntu, windows, macos)
+#    - Multi-platform test execution (ubuntu, windows, macOS)
 #    - Multiple Go version testing (primary, secondary)
 #    - Race detection and code coverage
 #    - Test failure detection and reporting
@@ -49,6 +49,41 @@ on:
         description: "Whether race detection is enabled"
         required: true
         type: string
+      redis-enabled:
+        description: "Whether Redis service is enabled"
+        required: false
+        type: string
+        default: "false"
+      redis-version:
+        description: "Redis Docker image version"
+        required: false
+        type: string
+        default: "7-alpine"
+      redis-host:
+        description: "Redis host for tests"
+        required: false
+        type: string
+        default: "localhost"
+      redis-port:
+        description: "Redis port for tests"
+        required: false
+        type: string
+        default: "6379"
+      redis-health-retries:
+        description: "Redis health check retry count"
+        required: false
+        type: string
+        default: "10"
+      redis-health-interval:
+        description: "Redis health check interval in seconds"
+        required: false
+        type: string
+        default: "10"
+      redis-health-timeout:
+        description: "Redis health check timeout in seconds"
+        required: false
+        type: string
+        default: "5"
 
 # Security: Restrictive default permissions with job-level overrides for least privilege access
 permissions:
@@ -67,6 +102,14 @@ jobs:
       fail-fast: true
       matrix: ${{ fromJSON(inputs.test-matrix) }}
     runs-on: ${{ matrix.os }}
+
+    # Redis service container (conditionally enabled)
+    services:
+      redis:
+        image: ${{ inputs.redis-enabled == 'true' && format('redis:{0}', inputs.redis-version) || 'busybox:latest' }}
+        options: ${{ inputs.redis-enabled == 'true' && format('--health-cmd "redis-cli ping" --health-interval {0}s --health-timeout {1}s --health-retries {2}', inputs.redis-health-interval, inputs.redis-health-timeout, inputs.redis-health-retries) || '--entrypoint sh' }}
+        ports:
+          - ${{ inputs.redis-enabled == 'true' && format('{0}:{0}', inputs.redis-port) || '9999:9999' }}
 
     steps:
       # ————————————————————————————————————————————————————————————————
@@ -148,6 +191,16 @@ jobs:
 
           echo "detected-mode=$DETECTED_MODE" >> $GITHUB_OUTPUT
           echo "test-count=$TEST_COUNT" >> $GITHUB_OUTPUT
+
+      # ————————————————————————————————————————————————————————————————
+      # Setup Redis service using composite action
+      # ————————————————————————————————————————————————————————————————
+      - name: 🗄️ Setup Redis Service
+        uses: ./.github/actions/setup-redis-service
+        with:
+          redis-enabled: ${{ inputs.redis-enabled }}
+          redis-host: ${{ inputs.redis-host }}
+          redis-port: ${{ inputs.redis-port }}
 
       # ————————————————————————————————————————————————————————————————
       # Setup test failure detection functions

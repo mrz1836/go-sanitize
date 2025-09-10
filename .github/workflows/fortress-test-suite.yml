@@ -56,6 +56,41 @@ on:
         description: "Whether fuzz testing is enabled"
         required: true
         type: string
+      redis-enabled:
+        description: "Whether Redis service is enabled"
+        required: false
+        type: string
+        default: "false"
+      redis-version:
+        description: "Redis Docker image version"
+        required: false
+        type: string
+        default: "7-alpine"
+      redis-host:
+        description: "Redis host for tests"
+        required: false
+        type: string
+        default: "localhost"
+      redis-port:
+        description: "Redis port for tests"
+        required: false
+        type: string
+        default: "6379"
+      redis-health-retries:
+        description: "Redis health check retry count"
+        required: false
+        type: string
+        default: "10"
+      redis-health-interval:
+        description: "Redis health check interval in seconds"
+        required: false
+        type: string
+        default: "10"
+      redis-health-timeout:
+        description: "Redis health check timeout in seconds"
+        required: false
+        type: string
+        default: "5"
     secrets:
       github-token:
         description: "GitHub token for API access"
@@ -83,6 +118,13 @@ jobs:
       go-secondary-version: ${{ inputs.go-secondary-version }}
       code-coverage-enabled: ${{ inputs.code-coverage-enabled }}
       race-detection-enabled: ${{ inputs.race-detection-enabled }}
+      redis-enabled: ${{ inputs.redis-enabled }}
+      redis-version: ${{ inputs.redis-version }}
+      redis-host: ${{ inputs.redis-host }}
+      redis-port: ${{ inputs.redis-port }}
+      redis-health-retries: ${{ inputs.redis-health-retries }}
+      redis-health-interval: ${{ inputs.redis-health-interval }}
+      redis-health-timeout: ${{ inputs.redis-health-timeout }}
 
   # ----------------------------------------------------------------------------------
   # Fuzz Testing Execution (Primary platform only)

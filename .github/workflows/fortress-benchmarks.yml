@@ -38,6 +38,41 @@ on:
         required: false
         type: number
         default: 30
+      redis-enabled:
+        description: "Whether Redis service is enabled"
+        required: false
+        type: string
+        default: "false"
+      redis-version:
+        description: "Redis Docker image version"
+        required: false
+        type: string
+        default: "7-alpine"
+      redis-host:
+        description: "Redis host for benchmarks"
+        required: false
+        type: string
+        default: "localhost"
+      redis-port:
+        description: "Redis port for benchmarks"
+        required: false
+        type: string
+        default: "6379"
+      redis-health-retries:
+        description: "Redis health check retry count"
+        required: false
+        type: string
+        default: "10"
+      redis-health-interval:
+        description: "Redis health check interval in seconds"
+        required: false
+        type: string
+        default: "10"
+      redis-health-timeout:
+        description: "Redis health check timeout in seconds"
+        required: false
+        type: string
+        default: "5"
     secrets:
       github-token:
         description: "GitHub token for API access"
@@ -58,6 +93,14 @@ jobs:
       fail-fast: false # Continue running other benchmarks if one fails
       matrix: ${{ fromJSON(inputs.benchmark-matrix) }}
     runs-on: ${{ matrix.os }}
+
+    # Redis service container (conditionally enabled)
+    services:
+      redis:
+        image: ${{ inputs.redis-enabled == 'true' && format('redis:{0}', inputs.redis-version) || 'busybox:latest' }}
+        options: ${{ inputs.redis-enabled == 'true' && format('--health-cmd "redis-cli ping" --health-interval {0}s --health-timeout {1}s --health-retries {2}', inputs.redis-health-interval, inputs.redis-health-timeout, inputs.redis-health-retries) || '--entrypoint sh' }}
+        ports:
+          - ${{ inputs.redis-enabled == 'true' && format('{0}:{0}', inputs.redis-port) || '9999:9999' }}
 
     steps:
       # ————————————————————————————————————————————————————————————————
@@ -98,6 +141,16 @@ jobs:
         with:
           magex-version: ${{ env.MAGE_X_VERSION }}
           runner-os: ${{ matrix.os }}
+
+      # ————————————————————————————————————————————————————————————————
+      # Setup Redis service using composite action
+      # ————————————————————————————————————————————————————————————————
+      - name: 🗄️ Setup Redis Service
+        uses: ./.github/actions/setup-redis-service
+        with:
+          redis-enabled: ${{ inputs.redis-enabled }}
+          redis-host: ${{ inputs.redis-host }}
+          redis-port: ${{ inputs.redis-port }}
 
       # ————————————————————————————————————————————————————————————————
       # Start benchmark timer

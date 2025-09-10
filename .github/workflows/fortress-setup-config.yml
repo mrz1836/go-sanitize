@@ -133,6 +133,27 @@ on:
       gofortress-released:
         description: "GoFortress release date"
         value: ${{ jobs.setup-config.outputs.gofortress-released }}
+      redis-enabled:
+        description: "Whether Redis service is enabled"
+        value: ${{ jobs.setup-config.outputs.redis-enabled }}
+      redis-version:
+        description: "Redis Docker image version"
+        value: ${{ jobs.setup-config.outputs.redis-version }}
+      redis-host:
+        description: "Redis host for tests"
+        value: ${{ jobs.setup-config.outputs.redis-host }}
+      redis-port:
+        description: "Redis port for tests"
+        value: ${{ jobs.setup-config.outputs.redis-port }}
+      redis-health-retries:
+        description: "Redis health check retry count"
+        value: ${{ jobs.setup-config.outputs.redis-health-retries }}
+      redis-health-interval:
+        description: "Redis health check interval in seconds"
+        value: ${{ jobs.setup-config.outputs.redis-health-interval }}
+      redis-health-timeout:
+        description: "Redis health check timeout in seconds"
+        value: ${{ jobs.setup-config.outputs.redis-health-timeout }}
 
 # Security: Restrictive default permissions with job-level overrides for least privilege access
 permissions:
@@ -173,6 +194,13 @@ jobs:
       pre-commit-enabled: ${{ steps.config.outputs.pre-commit-enabled }}
       gofortress-version: ${{ steps.extract-version.outputs.version }}
       gofortress-released: ${{ steps.extract-version.outputs.released }}
+      redis-enabled: ${{ steps.redis-config.outputs.redis-enabled }}
+      redis-version: ${{ steps.redis-config.outputs.redis-version }}
+      redis-host: ${{ steps.redis-config.outputs.redis-host }}
+      redis-port: ${{ steps.redis-config.outputs.redis-port }}
+      redis-health-retries: ${{ steps.redis-config.outputs.redis-health-retries }}
+      redis-health-interval: ${{ steps.redis-config.outputs.redis-health-interval }}
+      redis-health-timeout: ${{ steps.redis-config.outputs.redis-health-timeout }}
 
     steps:
       # ————————————————————————————————————————————————————————————————
@@ -215,6 +243,7 @@ jobs:
             go.mod
             go.sum
             .github/workflows/fortress.yml
+            .github/actions/configure-redis
 
       # ————————————————————————————————————————————————————————————————
       # Extract GoFortress version metadata from fortress.yml
@@ -428,6 +457,15 @@ jobs:
           fi
 
       # ————————————————————————————————————————————————————————————————
+      # Configure Redis service settings using composite action
+      # ————————————————————————————————————————————————————————————————
+      - name: 🗄️ Configure Redis Service
+        id: redis-config
+        uses: ./.github/actions/configure-redis
+        with:
+          env-json: ${{ inputs.env-json }}
+
+      # ————————————————————————————————————————————————————————————————
       # Build the final summary of the configuration
       # ————————————————————————————————————————————————————————————————
       - name: 📋 Build Configuration Summary
@@ -543,6 +581,7 @@ jobs:
           echo "| **Race Detection** | $([ "${{ env.ENABLE_RACE_DETECTION }}" == "true" ] && echo "✅ Enabled" || echo "❌ Disabled") | Tests will $([ "${{ env.ENABLE_RACE_DETECTION }}" == "true" ] && echo "run with -race flag" || echo "run without race detection") |" >> $GITHUB_STEP_SUMMARY
           echo "| **Static Analysis** | $([ "${{ env.ENABLE_STATIC_ANALYSIS }}" == "true" ] && echo "✅ Enabled" || echo "❌ Disabled") | Static analysis will $([ "${{ env.ENABLE_STATIC_ANALYSIS }}" == "true" ] && echo "check for code issues" || echo "be skipped") |" >> $GITHUB_STEP_SUMMARY
           echo "| **YAML Linting** | $([ "${{ env.ENABLE_YAML_LINT }}" == "true" ] && echo "✅ Enabled" || echo "❌ Disabled") | prettier will $([ "${{ env.ENABLE_YAML_LINT }}" == "true" ] && echo "validate YAML formatting" || echo "be skipped") |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Redis Service** | $([ "${{ steps.redis-config.outputs.redis-enabled }}" == "true" ] && echo "✅ Enabled" || echo "❌ Disabled") | Redis ${{ env.REDIS_VERSION }} will $([ "${{ steps.redis-config.outputs.redis-enabled }}" == "true" ] && echo "run as service container for tests" || echo "not be available") |" >> $GITHUB_STEP_SUMMARY
           echo "| **Go Docs Publishing** | $([ "${{ env.ENABLE_GODOCS_PUBLISHING }}" == "true" ] && echo "✅ Enabled" || echo "❌ Disabled") | Go documentation will $([ "${{ env.ENABLE_GODOCS_PUBLISHING }}" == "true" ] && echo "be syndicated to pkg.go.dev on releases" || echo "not be published") |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "<br><br>" >> $GITHUB_STEP_SUMMARY
@@ -583,6 +622,23 @@ jobs:
               echo "| **History Retention** | \`${{ env.GO_COVERAGE_HISTORY_RETENTION }}\` days | Coverage data retention period |" >> $GITHUB_STEP_SUMMARY
               echo "| **Exclude Paths** | \`${{ env.GO_COVERAGE_EXCLUDE_PATHS }}\` | Paths excluded from coverage |" >> $GITHUB_STEP_SUMMARY
             fi
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "<br><br>" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          # Redis Service Configuration (only show if redis is enabled)
+          if [[ "${{ steps.redis-config.outputs.redis-enabled }}" == "true" ]]; then
+            echo "## 🗄️ Redis Service Configuration" >> $GITHUB_STEP_SUMMARY
+            echo "| Setting | Value | Description |" >> $GITHUB_STEP_SUMMARY
+            echo "|---------|-------|-------------|" >> $GITHUB_STEP_SUMMARY
+            echo "| **Service Status** | \`✅ Enabled\` | Redis service container will be available for tests and benchmarks |" >> $GITHUB_STEP_SUMMARY
+            echo "| **Redis Version** | \`${{ steps.redis-config.outputs.redis-version }}\` | Docker image version used for service container |" >> $GITHUB_STEP_SUMMARY
+            echo "| **Connection Host** | \`${{ steps.redis-config.outputs.redis-host }}\` | Redis server hostname for test connections |" >> $GITHUB_STEP_SUMMARY
+            echo "| **Connection Port** | \`${{ steps.redis-config.outputs.redis-port }}\` | Redis server port for test connections |" >> $GITHUB_STEP_SUMMARY
+            echo "| **Health Check Retries** | \`${{ steps.redis-config.outputs.redis-health-retries }}\` | Number of health check retries before considering service unhealthy |" >> $GITHUB_STEP_SUMMARY
+            echo "| **Health Check Interval** | \`${{ steps.redis-config.outputs.redis-health-interval }}\` seconds | Time between health check attempts |" >> $GITHUB_STEP_SUMMARY
+            echo "| **Health Check Timeout** | \`${{ steps.redis-config.outputs.redis-health-timeout }}\` seconds | Maximum time allowed for each health check |" >> $GITHUB_STEP_SUMMARY
+            echo "| **Service Container** | Docker with native health checks | Uses GitHub Actions native service containers for reliability |" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "<br><br>" >> $GITHUB_STEP_SUMMARY
           fi

@@ -1,0 +1,204 @@
+# ------------------------------------------------------------------------------------
+#  Setup Redis Service Composite Action (GoFortress)
+#
+#  Purpose: Verify Redis service availability and configure environment variables
+#  for tests and benchmarks. Provides cross-platform Redis CLI installation and
+#  robust connection verification with retry logic.
+#
+#  Features:
+#    - Cross-platform redis-cli installation (Linux, macOS, Windows)
+#    - Configurable connection retry logic with timeout
+#    - Standard Redis environment variable setup
+#    - Redis version detection and reporting
+#    - Performance tracking outputs
+#
+#  Usage:
+#    - uses: ./.github/actions/setup-redis-service
+#      with:
+#        redis-enabled: ${{ inputs.redis-enabled }}
+#        redis-host: ${{ inputs.redis-host }}
+#        redis-port: ${{ inputs.redis-port }}
+#
+#  Maintainer: @mrz1836
+#
+# ------------------------------------------------------------------------------------
+
+name: "Setup Redis Service"
+description: "Verify Redis service availability and configure environment variables for tests/benchmarks"
+
+inputs:
+  redis-enabled:
+    description: "Whether Redis service is enabled (true/false)"
+    required: true
+  redis-host:
+    description: "Redis host address"
+    required: false
+    default: "localhost"
+  redis-port:
+    description: "Redis port number"
+    required: false
+    default: "6379"
+  max-retries:
+    description: "Maximum connection retry attempts"
+    required: false
+    default: "10"
+  retry-interval:
+    description: "Seconds between retry attempts"
+    required: false
+    default: "2"
+
+outputs:
+  redis-available:
+    description: "Whether Redis is successfully connected (true/false)"
+    value: ${{ steps.redis-verification.outputs.redis-available }}
+  redis-version:
+    description: "Detected Redis version"
+    value: ${{ steps.redis-verification.outputs.redis-version }}
+  connection-time:
+    description: "Time taken to establish connection in seconds"
+    value: ${{ steps.redis-verification.outputs.connection-time }}
+  installation-method:
+    description: "How redis-cli was obtained: pre-existing, installed, or unavailable"
+    value: ${{ steps.redis-verification.outputs.installation-method }}
+
+runs:
+  using: "composite"
+  steps:
+    # ————————————————————————————————————————————————————————————————
+    # Skip all Redis setup if disabled
+    # ————————————————————————————————————————————————————————————————
+    - name: ℹ️ Redis Service Disabled
+      if: inputs.redis-enabled != 'true'
+      shell: bash
+      run: |
+        echo "ℹ️ Redis service is disabled - skipping Redis setup"
+        echo "redis-available=false" >> $GITHUB_OUTPUT
+        echo "redis-version=n/a" >> $GITHUB_OUTPUT
+        echo "connection-time=0" >> $GITHUB_OUTPUT
+        echo "installation-method=disabled" >> $GITHUB_OUTPUT
+
+    # ————————————————————————————————————————————————————————————————
+    # Verify Redis service and configure environment
+    # ————————————————————————————————————————————————————————————————
+    - name: 🗄️ Verify Redis Service
+      if: inputs.redis-enabled == 'true'
+      id: redis-verification
+      shell: bash
+      run: |
+        echo "🔍 Verifying Redis service availability..."
+        echo "📋 Redis Configuration:"
+        echo "   • Host: ${{ inputs.redis-host }}"
+        echo "   • Port: ${{ inputs.redis-port }}"
+        echo "   • Max Retries: ${{ inputs.max-retries }}"
+        echo "   • Retry Interval: ${{ inputs.retry-interval }}s"
+        echo ""
+
+        # Track connection timing
+        START_TIME=$(date +%s)
+
+        # Initialize outputs
+        REDIS_AVAILABLE="false"
+        REDIS_VERSION="unknown"
+        INSTALLATION_METHOD="unknown"
+
+        # Install redis-cli if not available
+        if ! command -v redis-cli &> /dev/null; then
+          echo "📦 Installing redis-cli..."
+          if [[ "$RUNNER_OS" == "Linux" ]]; then
+            if sudo apt-get update && sudo apt-get install -y redis-tools; then
+              echo "✅ redis-cli installed successfully on Linux"
+              INSTALLATION_METHOD="installed"
+            else
+              echo "❌ Failed to install redis-cli on Linux"
+              INSTALLATION_METHOD="unavailable"
+            fi
+          elif [[ "$RUNNER_OS" == "macOS" ]]; then
+            if brew install redis; then
+              echo "✅ redis-cli installed successfully on macOS"
+              INSTALLATION_METHOD="installed"
+            else
+              echo "❌ Failed to install redis-cli on macOS"
+              INSTALLATION_METHOD="unavailable"
+            fi
+          elif [[ "$RUNNER_OS" == "Windows" ]]; then
+            echo "⚠️ Redis CLI not available on Windows runner - skipping verification"
+            INSTALLATION_METHOD="unavailable"
+            echo "redis-available=false" >> $GITHUB_OUTPUT
+            echo "redis-version=n/a" >> $GITHUB_OUTPUT
+            echo "connection-time=0" >> $GITHUB_OUTPUT
+            echo "installation-method=$INSTALLATION_METHOD" >> $GITHUB_OUTPUT
+            exit 0
+          else
+            echo "❌ Unsupported runner OS: $RUNNER_OS"
+            INSTALLATION_METHOD="unavailable"
+          fi
+        else
+          echo "✅ redis-cli already available"
+          INSTALLATION_METHOD="pre-existing"
+        fi
+
+        # Only proceed with verification if redis-cli is available
+        if command -v redis-cli &> /dev/null; then
+          echo "🔗 Testing Redis connection..."
+
+          # Test Redis connection with retries
+          MAX_RETRIES=${{ inputs.max-retries }}
+          RETRY_INTERVAL=${{ inputs.retry-interval }}
+          RETRY_COUNT=0
+
+          while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+            if redis-cli -h ${{ inputs.redis-host }} -p ${{ inputs.redis-port }} ping > /dev/null 2>&1; then
+              echo "✅ Redis is responding to PING"
+              REDIS_AVAILABLE="true"
+              break
+            fi
+            RETRY_COUNT=$((RETRY_COUNT + 1))
+            echo "⏳ Waiting for Redis... (attempt $RETRY_COUNT/$MAX_RETRIES)"
+            sleep $RETRY_INTERVAL
+          done
+
+          if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
+            echo "❌ Redis failed to respond after $MAX_RETRIES attempts"
+            REDIS_AVAILABLE="false"
+          fi
+
+          # Get Redis version and additional info if connected
+          if [ "$REDIS_AVAILABLE" = "true" ]; then
+            echo "📊 Gathering Redis information..."
+            REDIS_VERSION=$(redis-cli -h ${{ inputs.redis-host }} -p ${{ inputs.redis-port }} INFO server 2>/dev/null | grep "redis_version:" | cut -d: -f2 | tr -d '\r\n' || echo "unknown")
+            echo "✅ Redis Version: $REDIS_VERSION"
+
+            # Set Redis connection environment variables for tests/benchmarks
+            echo "REDIS_ADDR=${{ inputs.redis-host }}:${{ inputs.redis-port }}" >> $GITHUB_ENV
+            echo "REDIS_HOST=${{ inputs.redis-host }}" >> $GITHUB_ENV
+            echo "REDIS_PORT=${{ inputs.redis-port }}" >> $GITHUB_ENV
+            echo "REDIS_URL=redis://${{ inputs.redis-host }}:${{ inputs.redis-port }}" >> $GITHUB_ENV
+
+            echo "✅ Redis environment variables configured:"
+            echo "   • REDIS_ADDR=${{ inputs.redis-host }}:${{ inputs.redis-port }}"
+            echo "   • REDIS_HOST=${{ inputs.redis-host }}"
+            echo "   • REDIS_PORT=${{ inputs.redis-port }}"
+            echo "   • REDIS_URL=redis://${{ inputs.redis-host }}:${{ inputs.redis-port }}"
+          fi
+        else
+          echo "❌ redis-cli not available - cannot verify Redis connection"
+          REDIS_AVAILABLE="false"
+        fi
+
+        # Calculate connection time
+        END_TIME=$(date +%s)
+        CONNECTION_TIME=$((END_TIME - START_TIME))
+
+        # Set outputs
+        echo "redis-available=$REDIS_AVAILABLE" >> $GITHUB_OUTPUT
+        echo "redis-version=$REDIS_VERSION" >> $GITHUB_OUTPUT
+        echo "connection-time=$CONNECTION_TIME" >> $GITHUB_OUTPUT
+        echo "installation-method=$INSTALLATION_METHOD" >> $GITHUB_OUTPUT
+
+        # Final status
+        if [ "$REDIS_AVAILABLE" = "true" ]; then
+          echo "✅ Redis service verification completed successfully (${CONNECTION_TIME}s)"
+        else
+          echo "❌ Redis service verification failed after ${CONNECTION_TIME}s"
+          exit 1
+        fi
