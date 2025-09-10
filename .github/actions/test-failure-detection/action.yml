@@ -120,7 +120,7 @@ runs:
           echo '[]' > "$signatures_file"
 
           # Define common test validation filter to avoid duplication
-          local test_failure_filter='select(.Action == "fail" and .Test != null and .Test != "" and .Test != "null" and (.Test | test("^Test[A-Za-z]")))'
+          local test_failure_filter='select(.Action == "fail" and .Test != null and .Test != "" and .Test != "null" and (.Test | test("^Test[A-Za-z].*")))'
 
           # Fast single-pass JSON extraction for test failures (< 1s for 10K lines)
           # Filter JSON lines and parse in one pass - eliminates 2-minute hang
