@@ -34,6 +34,14 @@ inputs:
   env-json:
     description: "JSON string of environment variables"
     required: true
+  redis-enabled:
+    description: "Whether Redis caching is enabled"
+    required: false
+    default: "false"
+  redis-versions:
+    description: "Comma-separated list of Redis versions to warm"
+    required: false
+    default: "7-alpine"
 
 runs:
   using: "composite"
@@ -90,6 +98,18 @@ runs:
       with:
         magex-version: ${{ env.MAGE_X_VERSION }}
         runner-os: ${{ inputs.matrix-os }}
+
+    # ————————————————————————————————————————————————————————————————
+    # Warm Redis Docker image cache
+    # ————————————————————————————————————————————————————————————————
+    - name: 🗄️ Warm Redis Cache
+      if: inputs.redis-enabled == 'true'
+      id: warm-redis
+      uses: ./.github/actions/warm-redis-cache
+      with:
+        redis-versions: ${{ inputs.redis-versions }}
+        runner-os: ${{ inputs.matrix-os }}
+        force-pull: "true"
 
     # ————————————————————————————————————————————————————————————————
     # Ensure go.sum exists and download modules
@@ -178,6 +198,14 @@ runs:
       run: |
         STATS_FILE="cache-stats-${{ inputs.matrix-os }}-${{ inputs.go-version }}.json"
 
+        # Redis cache statistics
+        REDIS_ENABLED="${{ inputs.redis-enabled }}"
+        REDIS_VERSIONS_WARMED="${{ steps.warm-redis.outputs.versions-warmed || '0' }}"
+        REDIS_TOTAL_CACHE_SIZE="${{ steps.warm-redis.outputs.total-cache-size || '0' }}"
+        REDIS_OPERATION_TIME="${{ steps.warm-redis.outputs.operation-time || '0' }}"
+        REDIS_WARMING_STATUS="${{ steps.warm-redis.outputs.warming-status || 'disabled' }}"
+        REDIS_CACHE_KEYS="${{ steps.warm-redis.outputs.cache-keys || '' }}"
+
         cat > "$STATS_FILE" << EOF
         {
           "os": "${{ inputs.matrix-os }}",
@@ -186,6 +214,12 @@ runs:
           "gobuild_cache_hit": ${{ steps.setup-go.outputs.build-cache-hit == 'true' && 'true' || 'false' }},
           "cache_size_gomod": "$(du -sh $GOMODCACHE 2>/dev/null | cut -f1 || echo '0')",
           "cache_size_gobuild": "$(du -sh $GOCACHE 2>/dev/null | cut -f1 || echo '0')",
+          "redis_enabled": "$REDIS_ENABLED",
+          "redis_versions_warmed": "$REDIS_VERSIONS_WARMED",
+          "redis_cache_size_mb": "$REDIS_TOTAL_CACHE_SIZE",
+          "redis_operation_time_s": "$REDIS_OPERATION_TIME",
+          "redis_warming_status": "$REDIS_WARMING_STATUS",
+          "redis_cache_keys": "$REDIS_CACHE_KEYS",
           "workflow": "cache-warm",
           "job_name": "warm-cache",
           "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
@@ -194,6 +228,20 @@ runs:
 
         echo "📊 Cache statistics:"
         jq . "$STATS_FILE"
+
+        # Additional Redis warming report
+        if [[ "$REDIS_ENABLED" == "true" ]]; then
+          echo ""
+          echo "🗄️ Redis Cache Warming Summary:"
+          echo "   • Versions Warmed: $REDIS_VERSIONS_WARMED"
+          echo "   • Total Cache Size: ${REDIS_TOTAL_CACHE_SIZE}MB"
+          echo "   • Operation Time: ${REDIS_OPERATION_TIME}s"
+          echo "   • Status: $REDIS_WARMING_STATUS"
+          if [[ -n "$REDIS_CACHE_KEYS" ]]; then
+            echo "   • Cache Keys:"
+            echo "$REDIS_CACHE_KEYS" | tr ',' '\n' | sed 's/^/     - /'
+          fi
+        fi
 
     # ————————————————————————————————————————————————————————————————
     # Upload cache statistics
