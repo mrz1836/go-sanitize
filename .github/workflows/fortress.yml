@@ -142,6 +142,8 @@ jobs:
         with:
           sparse-checkout: |
             .github/actions/warm-cache
+            .github/actions/warm-redis-cache
+            .github/actions/cache-redis-image
             .github/.env.base
             go.mod
             go.sum
@@ -156,9 +158,9 @@ jobs:
           echo "enable_verbose=$(echo '${{ needs.load-env.outputs.env-json }}' | jq -r '.ENABLE_VERBOSE_TEST_OUTPUT')" >> "$GITHUB_OUTPUT"
 
       # ————————————————————————————————————————————————————————————————
-      # Warm the Go caches using local action
+      # Warm the Go and Redis caches using local action
       # ————————————————————————————————————————————————————————————————
-      - name: 🔥 Warm Go Caches
+      - name: 🔥 Warm Go and Redis Caches
         uses: ./.github/actions/warm-cache # Might not resolve as it's a composite action
         with:
           go-version: ${{ matrix.go-version }}
@@ -168,6 +170,8 @@ jobs:
           go-primary-version: ${{ needs.setup.outputs.go-primary-version }}
           go-secondary-version: ${{ needs.setup.outputs.go-secondary-version }}
           env-json: ${{ needs.load-env.outputs.env-json }}
+          redis-enabled: ${{ needs.setup.outputs.redis-enabled }}
+          redis-versions: ${{ needs.setup.outputs.redis-version }}
   # ----------------------------------------------------------------------------------
   # Security Scans
   # ----------------------------------------------------------------------------------

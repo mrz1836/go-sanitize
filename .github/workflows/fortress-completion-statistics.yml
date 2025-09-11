@@ -192,8 +192,8 @@ jobs:
             {
               echo ""
               echo "### 💾 Cache Statistics"
-              echo "| Workflow/Job | OS | Go Version | Module Cache | Build Cache | Module Size | Build Size |"
-              echo "|--------------|----|-----------|--------------|-----------|-----------|------------|"
+              echo "| Workflow/Job | OS | Go Version | Module Cache | Build Cache | Module Size | Build Size | Redis Cache | Redis Size |"
+              echo "|--------------|----|-----------|--------------|-----------|-----------|------------|-------------|------------|"
             } >> statistics-section.md
 
             TOTAL_CACHE_HITS=0
@@ -211,8 +211,22 @@ jobs:
                 GOMOD_SIZE=$(jq -r '.cache_size_gomod' "$stats_file")
                 GOBUILD_SIZE=$(jq -r '.cache_size_gobuild' "$stats_file")
 
+                # Redis cache statistics
+                REDIS_ENABLED=$(jq -r '.redis_enabled // "false"' "$stats_file")
+                REDIS_HIT=$(jq -r '.redis_cache_hit // "false"' "$stats_file")
+                REDIS_SIZE=$(jq -r '.redis_image_size_mb // "0"' "$stats_file")
+
                 GOMOD_ICON=$([[ "$GOMOD_HIT" == "true" ]] && echo "✅ Hit" || echo "❌ Miss")
                 GOBUILD_ICON=$([[ "$GOBUILD_HIT" == "true" ]] && echo "✅ Hit" || echo "❌ Miss")
+
+                # Redis cache display
+                if [[ "$REDIS_ENABLED" == "true" ]]; then
+                  REDIS_ICON=$([[ "$REDIS_HIT" == "true" ]] && echo "✅ Hit" || echo "❌ Miss")
+                  REDIS_SIZE_DISPLAY="${REDIS_SIZE}MB"
+                else
+                  REDIS_ICON="➖ N/A"
+                  REDIS_SIZE_DISPLAY="➖"
+                fi
 
                 # Create workflow/job identifier
                 if [[ -n "$JOB_NAME" && "$JOB_NAME" != "null" ]]; then
@@ -221,11 +235,14 @@ jobs:
                   WORKFLOW_JOB="${WORKFLOW}"
                 fi
 
-                echo "| $WORKFLOW_JOB | $OS | $GO_VER | $GOMOD_ICON | $GOBUILD_ICON | $GOMOD_SIZE | $GOBUILD_SIZE |" >> statistics-section.md
+                echo "| $WORKFLOW_JOB | $OS | $GO_VER | $GOMOD_ICON | $GOBUILD_ICON | $GOMOD_SIZE | $GOBUILD_SIZE | $REDIS_ICON | $REDIS_SIZE_DISPLAY |" >> statistics-section.md
 
                 [[ "$GOMOD_HIT" == "true" ]] && TOTAL_CACHE_HITS=$((TOTAL_CACHE_HITS + 1))
                 [[ "$GOBUILD_HIT" == "true" ]] && TOTAL_CACHE_HITS=$((TOTAL_CACHE_HITS + 1))
+                [[ "$REDIS_ENABLED" == "true" && "$REDIS_HIT" == "true" ]] && TOTAL_CACHE_HITS=$((TOTAL_CACHE_HITS + 1))
+
                 TOTAL_CACHE_ATTEMPTS=$((TOTAL_CACHE_ATTEMPTS + 2))
+                [[ "$REDIS_ENABLED" == "true" ]] && TOTAL_CACHE_ATTEMPTS=$((TOTAL_CACHE_ATTEMPTS + 1))
 
                 # Track workflows that used cache
                 if [[ "$WORKFLOWS_WITH_CACHE" != *"$WORKFLOW"* ]]; then

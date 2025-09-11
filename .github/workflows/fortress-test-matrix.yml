@@ -193,14 +193,17 @@ jobs:
           echo "test-count=$TEST_COUNT" >> $GITHUB_OUTPUT
 
       # ————————————————————————————————————————————————————————————————
-      # Setup Redis service using composite action
+      # Setup Redis service using composite action with caching
       # ————————————————————————————————————————————————————————————————
       - name: 🗄️ Setup Redis Service
+        id: setup-redis
         uses: ./.github/actions/setup-redis-service
         with:
           redis-enabled: ${{ inputs.redis-enabled }}
+          redis-version: ${{ inputs.redis-version }}
           redis-host: ${{ inputs.redis-host }}
           redis-port: ${{ inputs.redis-port }}
+          use-cache: "true"
 
       # ————————————————————————————————————————————————————————————————
       # Setup test failure detection functions
@@ -598,6 +601,40 @@ jobs:
           cache-prefix: cache-stats
           gomod-cache-hit: ${{ steps.setup-go-test.outputs.module-cache-hit }}
           gobuild-cache-hit: ${{ steps.setup-go-test.outputs.build-cache-hit }}
+          redis-enabled: ${{ inputs.redis-enabled }}
+          redis-cache-hit: ${{ steps.setup-redis.outputs.cache-hit }}
+          redis-image-size: ${{ steps.setup-redis.outputs.image-size }}
+          redis-operation-time: ${{ steps.setup-redis.outputs.cache-operation-time }}
+
+      # ————————————————————————————————————————————————————————————————
+      # Report Redis cache performance metrics
+      # ————————————————————————————————————————————————————————————————
+      - name: 📊 Report Redis Cache Performance
+        if: inputs.redis-enabled == 'true'
+        run: |
+          echo "📊 Redis Cache Performance Report"
+          echo "================================="
+          echo "• Redis Enabled: ${{ inputs.redis-enabled }}"
+          echo "• Redis Version: ${{ inputs.redis-version }}"
+          echo "• Cache Hit: ${{ steps.setup-redis.outputs.cache-hit }}"
+          echo "• Image Size: ${{ steps.setup-redis.outputs.image-size }}MB"
+          echo "• Cache Operation Time: ${{ steps.setup-redis.outputs.cache-operation-time }}s"
+          echo "• Connection Time: ${{ steps.setup-redis.outputs.connection-time }}s"
+          echo "• Installation Method: ${{ steps.setup-redis.outputs.installation-method }}"
+
+          # Calculate total Redis setup time
+          CACHE_TIME="${{ steps.setup-redis.outputs.cache-operation-time || '0' }}"
+          CONNECTION_TIME="${{ steps.setup-redis.outputs.connection-time || '0' }}"
+          TOTAL_TIME=$((CACHE_TIME + CONNECTION_TIME))
+
+          echo "• Total Setup Time: ${TOTAL_TIME}s"
+
+          # Performance assessment
+          if [[ "${{ steps.setup-redis.outputs.cache-hit }}" == "true" ]]; then
+            echo "🚀 Performance: Redis cache hit - faster startup achieved!"
+          else
+            echo "📥 Performance: Redis pulled from Docker Hub - consider cache warming"
+          fi
 
       # ————————————————————————————————————————————————————————————————
       # Upload performance cache statistics for completion report

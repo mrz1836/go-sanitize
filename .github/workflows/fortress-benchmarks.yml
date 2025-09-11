@@ -143,14 +143,17 @@ jobs:
           runner-os: ${{ matrix.os }}
 
       # ————————————————————————————————————————————————————————————————
-      # Setup Redis service using composite action
+      # Setup Redis service using composite action with caching
       # ————————————————————————————————————————————————————————————————
       - name: 🗄️ Setup Redis Service
+        id: setup-redis
         uses: ./.github/actions/setup-redis-service
         with:
           redis-enabled: ${{ inputs.redis-enabled }}
+          redis-version: ${{ inputs.redis-version }}
           redis-host: ${{ inputs.redis-host }}
           redis-port: ${{ inputs.redis-port }}
+          use-cache: "true"
 
       # ————————————————————————————————————————————————————————————————
       # Start benchmark timer
@@ -320,6 +323,10 @@ jobs:
           cache-prefix: cache-stats
           gomod-cache-hit: ${{ steps.setup-go-bench.outputs.module-cache-hit }}
           gobuild-cache-hit: ${{ steps.setup-go-bench.outputs.build-cache-hit }}
+          redis-enabled: ${{ inputs.redis-enabled }}
+          redis-cache-hit: ${{ steps.setup-redis.outputs.cache-hit }}
+          redis-image-size: ${{ steps.setup-redis.outputs.image-size }}
+          redis-operation-time: ${{ steps.setup-redis.outputs.cache-operation-time }}
 
       # ————————————————————————————————————————————————————————————————
       # Upload performance cache statistics

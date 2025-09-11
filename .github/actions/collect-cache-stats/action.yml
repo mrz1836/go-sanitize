@@ -62,6 +62,22 @@ inputs:
     description: "Include golangci-lint cache statistics in output"
     required: false
     default: "false"
+  redis-enabled:
+    description: "Whether Redis cache statistics should be included"
+    required: false
+    default: "false"
+  redis-cache-hit:
+    description: "Whether Redis image was restored from cache"
+    required: false
+    default: "false"
+  redis-image-size:
+    description: "Size of Redis image in MB"
+    required: false
+    default: "0"
+  redis-operation-time:
+    description: "Time taken for Redis cache operations in seconds"
+    required: false
+    default: "0"
 
 outputs:
   stats-file:
@@ -120,6 +136,14 @@ runs:
           echo "  \"cache_size_golangci_lint\": \"$GOLANGCI_SIZE\"," >> "$OUTPUT_FILE"
         fi
 
+        # Include Redis cache statistics if requested
+        if [[ "${{ inputs.redis-enabled }}" == "true" ]]; then
+          echo "  \"redis_enabled\": \"${{ inputs.redis-enabled }}\"," >> "$OUTPUT_FILE"
+          echo "  \"redis_cache_hit\": \"${{ inputs.redis-cache-hit }}\"," >> "$OUTPUT_FILE"
+          echo "  \"redis_image_size_mb\": \"${{ inputs.redis-image-size }}\"," >> "$OUTPUT_FILE"
+          echo "  \"redis_operation_time_s\": \"${{ inputs.redis-operation-time }}\"," >> "$OUTPUT_FILE"
+        fi
+
         echo '  "workflow": "${{ inputs.workflow-name }}",' >> "$OUTPUT_FILE"
         echo '  "job_name": "${{ inputs.job-name }}",' >> "$OUTPUT_FILE"
         echo "  \"timestamp\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"" >> "$OUTPUT_FILE"
@@ -139,4 +163,7 @@ runs:
         echo "   - Go build: $GOBUILD_SIZE (hit: ${{ inputs.gobuild-cache-hit }})"
         if [[ "${{ inputs.include-golangci }}" == "true" ]]; then
           echo "   - golangci-lint: $GOLANGCI_SIZE (hit: ${{ inputs.golangci-cache-hit }})"
+        fi
+        if [[ "${{ inputs.redis-enabled }}" == "true" ]]; then
+          echo "   - Redis: ${{ inputs.redis-image-size }}MB (hit: ${{ inputs.redis-cache-hit }}, ${{ inputs.redis-operation-time }}s)"
         fi

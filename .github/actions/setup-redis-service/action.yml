@@ -30,6 +30,10 @@ inputs:
   redis-enabled:
     description: "Whether Redis service is enabled (true/false)"
     required: true
+  redis-version:
+    description: "Redis Docker image version for caching"
+    required: false
+    default: "7-alpine"
   redis-host:
     description: "Redis host address"
     required: false
@@ -46,6 +50,10 @@ inputs:
     description: "Seconds between retry attempts"
     required: false
     default: "2"
+  use-cache:
+    description: "Whether to use cached Redis image (true/false)"
+    required: false
+    default: "true"
 
 outputs:
   redis-available:
@@ -60,6 +68,15 @@ outputs:
   installation-method:
     description: "How redis-cli was obtained: pre-existing, installed, or unavailable"
     value: ${{ steps.redis-verification.outputs.installation-method }}
+  cache-hit:
+    description: "Whether Redis image was restored from cache (true/false)"
+    value: ${{ steps.cache-redis.outputs.cache-hit }}
+  image-size:
+    description: "Size of Redis image in MB"
+    value: ${{ steps.cache-redis.outputs.image-size }}
+  cache-operation-time:
+    description: "Time taken for cache operations in seconds"
+    value: ${{ steps.cache-redis.outputs.operation-time }}
 
 runs:
   using: "composite"
@@ -76,6 +93,18 @@ runs:
         echo "redis-version=n/a" >> $GITHUB_OUTPUT
         echo "connection-time=0" >> $GITHUB_OUTPUT
         echo "installation-method=disabled" >> $GITHUB_OUTPUT
+
+    # ————————————————————————————————————————————————————————————————
+    # Cache Redis Docker image for faster startup
+    # ————————————————————————————————————————————————————————————————
+    - name: 🗄️ Cache Redis Docker Image
+      if: inputs.redis-enabled == 'true' && inputs.use-cache == 'true'
+      id: cache-redis
+      uses: ./.github/actions/cache-redis-image
+      with:
+        redis-version: ${{ inputs.redis-version }}
+        runner-os: ${{ runner.os }}
+        cache-mode: "restore"
 
     # ————————————————————————————————————————————————————————————————
     # Verify Redis service and configure environment
@@ -195,10 +224,27 @@ runs:
         echo "connection-time=$CONNECTION_TIME" >> $GITHUB_OUTPUT
         echo "installation-method=$INSTALLATION_METHOD" >> $GITHUB_OUTPUT
 
-        # Final status
+        # Final status with cache metrics
+        CACHE_HIT="${{ steps.cache-redis.outputs.cache-hit || 'false' }}"
+        CACHE_TIME="${{ steps.cache-redis.outputs.operation-time || '0' }}"
+        IMAGE_SIZE="${{ steps.cache-redis.outputs.image-size || '0' }}"
+
         if [ "$REDIS_AVAILABLE" = "true" ]; then
-          echo "✅ Redis service verification completed successfully (${CONNECTION_TIME}s)"
+          echo "✅ Redis service verification completed successfully"
+          echo "📊 Performance Summary:"
+          echo "   • Connection Time: ${CONNECTION_TIME}s"
+          echo "   • Cache Hit: $CACHE_HIT"
+          echo "   • Cache Operation Time: ${CACHE_TIME}s"
+          echo "   • Image Size: ${IMAGE_SIZE}MB"
+          if [[ "$CACHE_HIT" == "true" ]]; then
+            echo "🚀 Redis image restored from cache - faster startup achieved!"
+          else
+            echo "📥 Redis image pulled from Docker Hub - consider cache warming"
+          fi
         else
           echo "❌ Redis service verification failed after ${CONNECTION_TIME}s"
+          if [[ "$CACHE_HIT" == "true" ]]; then
+            echo "ℹ️ Cache was available but Redis service connection failed"
+          fi
           exit 1
         fi
