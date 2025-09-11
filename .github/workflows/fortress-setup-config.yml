@@ -154,6 +154,15 @@ on:
       redis-health-timeout:
         description: "Redis health check timeout in seconds"
         value: ${{ jobs.setup-config.outputs.redis-health-timeout }}
+      redis-cache-force-pull:
+        description: "Whether to force pull Redis images even when cached"
+        value: ${{ jobs.setup-config.outputs.redis-cache-force-pull }}
+      redis-trust-service-health:
+        description: "Trust GitHub Actions service container health checks (skip redis-cli verification)"
+        value: ${{ jobs.setup-config.outputs.redis-trust-service-health }}
+      redis-service-mode:
+        description: "Redis service mode (auto, always, never)"
+        value: ${{ jobs.setup-config.outputs.redis-service-mode }}
 
 # Security: Restrictive default permissions with job-level overrides for least privilege access
 permissions:
@@ -201,6 +210,9 @@ jobs:
       redis-health-retries: ${{ steps.redis-config.outputs.redis-health-retries }}
       redis-health-interval: ${{ steps.redis-config.outputs.redis-health-interval }}
       redis-health-timeout: ${{ steps.redis-config.outputs.redis-health-timeout }}
+      redis-cache-force-pull: ${{ steps.redis-config.outputs.redis-cache-force-pull }}
+      redis-trust-service-health: ${{ steps.redis-config.outputs.redis-trust-service-health }}
+      redis-service-mode: ${{ steps.redis-config.outputs.redis-service-mode }}
 
     steps:
       # ————————————————————————————————————————————————————————————————
@@ -632,12 +644,15 @@ jobs:
             echo "| Setting | Value | Description |" >> $GITHUB_STEP_SUMMARY
             echo "|---------|-------|-------------|" >> $GITHUB_STEP_SUMMARY
             echo "| **Service Status** | \`✅ Enabled\` | Redis service container will be available for tests and benchmarks |" >> $GITHUB_STEP_SUMMARY
+            echo "| **Service Mode** | \`${{ steps.redis-config.outputs.redis-service-mode }}\` | How Redis enablement was determined (auto/always/never) |" >> $GITHUB_STEP_SUMMARY
             echo "| **Redis Version** | \`${{ steps.redis-config.outputs.redis-version }}\` | Docker image version used for service container |" >> $GITHUB_STEP_SUMMARY
             echo "| **Connection Host** | \`${{ steps.redis-config.outputs.redis-host }}\` | Redis server hostname for test connections |" >> $GITHUB_STEP_SUMMARY
             echo "| **Connection Port** | \`${{ steps.redis-config.outputs.redis-port }}\` | Redis server port for test connections |" >> $GITHUB_STEP_SUMMARY
             echo "| **Health Check Retries** | \`${{ steps.redis-config.outputs.redis-health-retries }}\` | Number of health check retries before considering service unhealthy |" >> $GITHUB_STEP_SUMMARY
             echo "| **Health Check Interval** | \`${{ steps.redis-config.outputs.redis-health-interval }}\` seconds | Time between health check attempts |" >> $GITHUB_STEP_SUMMARY
             echo "| **Health Check Timeout** | \`${{ steps.redis-config.outputs.redis-health-timeout }}\` seconds | Maximum time allowed for each health check |" >> $GITHUB_STEP_SUMMARY
+            echo "| **Force Pull Image** | $([ "${{ steps.redis-config.outputs.redis-cache-force-pull }}" == "true" ] && echo "✅ Enabled" || echo "❌ Disabled") | Always pull latest Docker image vs using cache |" >> $GITHUB_STEP_SUMMARY
+            echo "| **Trust Service Health** | $([ "${{ steps.redis-config.outputs.redis-trust-service-health }}" == "true" ] && echo "✅ Enabled" || echo "❌ Disabled") | Trust Docker service health checks vs custom script |" >> $GITHUB_STEP_SUMMARY
             echo "| **Service Container** | Docker with native health checks | Uses GitHub Actions native service containers for reliability |" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "<br><br>" >> $GITHUB_STEP_SUMMARY

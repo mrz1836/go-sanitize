@@ -73,6 +73,11 @@ on:
         required: false
         type: string
         default: "5"
+      redis-trust-service-health:
+        description: "Trust GitHub Actions service container health checks"
+        required: false
+        type: string
+        default: "true"
     secrets:
       github-token:
         description: "GitHub token for API access"
@@ -154,6 +159,7 @@ jobs:
           redis-host: ${{ inputs.redis-host }}
           redis-port: ${{ inputs.redis-port }}
           use-cache: "true"
+          trust-service-health: ${{ inputs.redis-trust-service-health }}
 
       # ————————————————————————————————————————————————————————————————
       # Start benchmark timer

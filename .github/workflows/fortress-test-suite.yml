@@ -91,6 +91,11 @@ on:
         required: false
         type: string
         default: "5"
+      redis-trust-service-health:
+        description: "Trust GitHub Actions service container health checks"
+        required: false
+        type: string
+        default: "true"
     secrets:
       github-token:
         description: "GitHub token for API access"
@@ -125,6 +130,7 @@ jobs:
       redis-health-retries: ${{ inputs.redis-health-retries }}
       redis-health-interval: ${{ inputs.redis-health-interval }}
       redis-health-timeout: ${{ inputs.redis-health-timeout }}
+      redis-trust-service-health: ${{ inputs.redis-trust-service-health }}
 
   # ----------------------------------------------------------------------------------
   # Fuzz Testing Execution (Primary platform only)
