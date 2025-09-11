@@ -84,6 +84,11 @@ on:
         required: false
         type: string
         default: "5"
+      redis-trust-service-health:
+        description: "Trust GitHub Actions service container health checks"
+        required: false
+        type: string
+        default: "true"
 
 # Security: Restrictive default permissions with job-level overrides for least privilege access
 permissions:
@@ -203,7 +208,9 @@ jobs:
           redis-version: ${{ inputs.redis-version }}
           redis-host: ${{ inputs.redis-host }}
           redis-port: ${{ inputs.redis-port }}
+          matrix-os: ${{ matrix.os }}
           use-cache: "true"
+          trust-service-health: ${{ inputs.redis-trust-service-health }}
 
       # ————————————————————————————————————————————————————————————————
       # Setup test failure detection functions

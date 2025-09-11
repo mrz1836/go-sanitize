@@ -1,7 +1,7 @@
 # ------------------------------------------------------------------------------------
 #  🏰 GoFortress - Enterprise-grade CI/CD fortress for Go applications
 #
-#  Version: 1.0.2 | Released: 2025-09-10
+#  Version: 1.0.3 | Released: 2025-09-11
 #
 #  Built Strong. Tested Harder.
 #
@@ -172,6 +172,7 @@ jobs:
           env-json: ${{ needs.load-env.outputs.env-json }}
           redis-enabled: ${{ needs.setup.outputs.redis-enabled }}
           redis-versions: ${{ needs.setup.outputs.redis-version }}
+          redis-cache-force-pull: ${{ needs.setup.outputs.redis-cache-force-pull }}
   # ----------------------------------------------------------------------------------
   # Security Scans
   # ----------------------------------------------------------------------------------
@@ -255,6 +256,7 @@ jobs:
       redis-health-retries: ${{ needs.setup.outputs.redis-health-retries }}
       redis-health-interval: ${{ needs.setup.outputs.redis-health-interval }}
       redis-health-timeout: ${{ needs.setup.outputs.redis-health-timeout }}
+      redis-trust-service-health: ${{ needs.setup.outputs.redis-trust-service-health }}
     secrets:
       github-token: ${{ secrets.GH_PAT_TOKEN != '' && secrets.GH_PAT_TOKEN || secrets.GITHUB_TOKEN }}
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
@@ -282,6 +284,7 @@ jobs:
       redis-health-retries: ${{ needs.setup.outputs.redis-health-retries }}
       redis-health-interval: ${{ needs.setup.outputs.redis-health-interval }}
       redis-health-timeout: ${{ needs.setup.outputs.redis-health-timeout }}
+      redis-trust-service-health: ${{ needs.setup.outputs.redis-trust-service-health }}
     secrets:
       github-token: ${{ secrets.GH_PAT_TOKEN != '' && secrets.GH_PAT_TOKEN || secrets.GITHUB_TOKEN }}
   # ----------------------------------------------------------------------------------

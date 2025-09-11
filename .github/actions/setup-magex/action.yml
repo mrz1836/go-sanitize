@@ -52,7 +52,7 @@ runs:
       with:
         path: |
           ~/.cache/magex-bin
-        key: ${{ inputs.runner-os }}-magex-${{ inputs.magex-version }}-v2
+        key: ${{ inputs.runner-os }}-magex-${{ inputs.magex-version }}
 
     # ————————————————————————————————————————————————————————————————
     # Make cached magex usable by copying to GOPATH/bin and adding to PATH

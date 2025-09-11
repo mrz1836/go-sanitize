@@ -42,6 +42,10 @@ inputs:
     description: "Comma-separated list of Redis versions to warm"
     required: false
     default: "7-alpine"
+  redis-cache-force-pull:
+    description: "Whether to force pull Redis images even when cached"
+    required: false
+    default: "false"
 
 runs:
   using: "composite"
@@ -109,7 +113,7 @@ runs:
       with:
         redis-versions: ${{ inputs.redis-versions }}
         runner-os: ${{ inputs.matrix-os }}
-        force-pull: "true"
+        force-pull: ${{ inputs.redis-cache-force-pull }}
 
     # ————————————————————————————————————————————————————————————————
     # Ensure go.sum exists and download modules
