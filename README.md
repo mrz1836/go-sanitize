@@ -176,6 +176,7 @@ extra baggage.
 - [`XML`](sanitize.go): Strip XML tags
 - [`XSS`](sanitize.go): Remove common XSS attack strings
 
+<br>
 
 ### Additional Documentation & Repository Management
 
