@@ -8,6 +8,7 @@ Security is a priority. We maintain a proactive stance to identify and fix vulne
 
 | Version | Status               |
 |---------|----------------------|
+| 0.x.x   | ✅ Supported & Active |
 | 1.x.x   | ✅ Supported & Active |
 
 <br/>

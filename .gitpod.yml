@@ -36,7 +36,7 @@ tasks:
       echo "📖 Quick start:"
       echo "  1. Try: magex test"
       echo "  2. Make your changes"
-      echo "  3. Run: magex format_fix && magex lint && magex test"
+      echo "  3. Run: magex format:fix && magex lint && magex test"
       echo "  4. Commit and push your changes"
       echo ""
       echo "💡 For more help: magex help"
