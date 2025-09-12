@@ -29,7 +29,7 @@
         "type=bind,source=/var/run/docker.sock,target=/var/run/docker.sock"
     ],
     "name": "go-sanitize dev container",
-    "postCreateCommand": "magex lint \u0026\u0026 magex vet \u0026\u0026 magex test",
+    "postCreateCommand": "magex lint && magex vet && magex test",
     "remoteUser": "vscode",
     "runArgs": [
         "--cap-drop=ALL",
