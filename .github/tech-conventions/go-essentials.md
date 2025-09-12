@@ -385,27 +385,12 @@ platforms.
 
 <br><br>
 
-## 💄 Prettier (YAML Formatting)
+## 💄 YAML Formatting
 
-YAML files must be formatted consistently using Prettier to ensure clean diffs and readable configuration files.
+YAML files must be formatted consistently to ensure clean diffs and readable configuration files.
 
-**Local Setup:**
 ```bash
-# Install prettier locally
-npm init -y && npm install --save-dev prettier
+magex format:fix
 ```
 
-**Format YAML files:**
-```bash
-# Check formatting
-npx prettier "**/*.{yml,yaml}" --check --config .github/.prettierrc.yml --ignore-path .github/.prettierignore
-
-# Fix formatting issues
-npx prettier "**/*.{yml,yaml}" --write --config .github/.prettierrc.yml --ignore-path .github/.prettierignore
-```
-
-**Configuration Files:**
-* [`.github/.prettierrc.yml`](../.prettierrc.yml) - Prettier configuration settings
-* [`.github/.prettierignore`](../.prettierignore) - Files and patterns to ignore during formatting
-
-> CI automatically validates YAML formatting using the same prettier configuration. All YAML files must pass formatting checks before merge.
+> The `magex format:fix` command handles YAML formatting (via yamlfmt) along with Go, JSON, and other file types. CI automatically validates formatting using the same tools.

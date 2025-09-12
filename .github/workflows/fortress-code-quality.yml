@@ -41,9 +41,9 @@ on:
       golangci-lint-version:
         description: "Version of golangci-lint used in the workflow"
         value: ${{ jobs.lint.outputs.golangci-lint-version }}
-      prettier-version:
-        description: "Version of prettier used in the workflow"
-        value: ${{ jobs.yaml-lint.outputs.prettier-version }}
+      yamlfmt-version:
+        description: "Version of yamlfmt used in the workflow"
+        value: ${{ jobs.yaml-format.outputs.yamlfmt-version }}
     secrets:
       github-token:
         description: "GitHub token for API access"
@@ -290,22 +290,20 @@ jobs:
           retention-days: 1
 
   # ----------------------------------------------------------------------------------
-  # YAML Validation (Linting)
+  # YAML/JSON Format Validation (MAGE-X)
   # ----------------------------------------------------------------------------------
-  yaml-lint:
-    name: 📐 YAML Format Validation
+  yaml-format:
+    name: 📐 YAML/JSON Format Validation
     if: ${{ inputs.yaml-lint-enabled == 'true' }}
     runs-on: ${{ inputs.primary-runner }}
     outputs:
-      prettier-version: ${{ steps.prettier-version.outputs.version }}
+      yamlfmt-version: ${{ steps.yamlfmt-version.outputs.version }}
     steps:
       # ————————————————————————————————————————————————————————————————
       # Checkout code (required for local actions)
       # ————————————————————————————————————————————————————————————————
       - name: 📥 Checkout repository
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
-        with:
-          fetch-depth: 0 # Full history for prettier ignores files
 
       # ————————————————————————————————————————————————————————————————
       # Parse environment variables
@@ -316,219 +314,112 @@ jobs:
           env-json: ${{ inputs.env-json }}
 
       # ————————————————————————————————————————————————————————————————
-      # Check for required .prettierignore file
+      # Setup Go with caching and version management
       # ————————————————————————————————————————————————————————————————
-      - name: 🔍 Check for .prettierignore
+      - name: 🏗️ Setup Go with Cache
+        id: setup-go-yaml
+        uses: ./.github/actions/setup-go-with-cache
+        with:
+          go-version: ${{ inputs.go-primary-version }}
+          matrix-os: ${{ inputs.primary-runner }}
+          go-primary-version: ${{ inputs.go-primary-version }}
+          go-secondary-version: ${{ inputs.go-primary-version }}
+
+      # ————————————————————————————————————————————————————————————————
+      # Setup MAGE-X (required for magex format:fix command)
+      # ————————————————————————————————————————————————————————————————
+      - name: 🔧 Setup MAGE-X
+        uses: ./.github/actions/setup-magex
+        with:
+          magex-version: ${{ env.MAGE_X_VERSION }}
+          runner-os: ${{ inputs.primary-runner }}
+
+      # ————————————————————————————————————————————————————————————————
+      # Get yamlfmt version from MAGE-X
+      # ————————————————————————————————————————————————————————————————
+      - name: 🔍 Get yamlfmt version
+        id: yamlfmt-version
         run: |
-          if [ -f .github/.prettierignore ]; then
-            echo "✅ Found .prettierignore in .github directory"
-            echo "PRETTIER_IGNORE_PATH=.github/.prettierignore" >> $GITHUB_ENV
-          elif [ -f .prettierignore ]; then
-            echo "✅ Found .prettierignore in root directory"
-            echo "PRETTIER_IGNORE_PATH=.prettierignore" >> $GITHUB_ENV
+          echo "✅ Using MAGE-X managed yamlfmt version"
+          echo "version=${{ env.MAGE_X_YAMLFMT_VERSION }}" >> $GITHUB_OUTPUT
+
+      # ————————————————————————————————————————————————————————————————
+      # List YAML/JSON files to be formatted (for transparency)
+      # ————————————————————————————————————————————————————————————————
+      - name: 📋 List YAML/JSON files to check
+        run: |
+          echo "📊 YAML/JSON files that will be validated:"
+          find . -type f \( -name "*.yml" -o -name "*.yaml" -o -name "*.json" \) \
+            -not -path "./.git/*" \
+            -not -path "./vendor/*" \
+            -not -path "./node_modules/*" \
+            -not -path "./dist/*" \
+            -not -path "./build/*" \
+            -not -path "./coverage/*" | sort || true
+
+          TOTAL_FILES=$(find . -type f \( -name "*.yml" -o -name "*.yaml" -o -name "*.json" \) \
+            -not -path "./.git/*" \
+            -not -path "./vendor/*" \
+            -not -path "./node_modules/*" \
+            -not -path "./dist/*" \
+            -not -path "./build/*" \
+            -not -path "./coverage/*" | wc -l | xargs)
+
+          echo "TOTAL_FILES=$TOTAL_FILES" >> $GITHUB_ENV
+          echo ""
+          echo "📈 Total YAML/JSON files found: $TOTAL_FILES"
+
+      # ————————————————————————————————————————————————————————————————
+      # Run MAGE-X format:check to validate formatting
+      # ————————————————————————————————————————————————————————————————
+      - name: 🔍 Check YAML/JSON formatting with MAGE-X
+        run: |
+          echo "🔍 Checking YAML/JSON file formatting with MAGE-X format:check..."
+          echo "📄 Configuration file: .github/.yamlfmt"
+          echo "🔧 yamlfmt version: ${{ steps.yamlfmt-version.outputs.version }}"
+          echo ""
+
+          # Run magex format:check to validate formatting without modifying files
+          if magex format:check; then
+            echo "✅ All YAML/JSON files are properly formatted"
           else
-            echo "❌ ERROR: .prettierignore file is required but not found!"
-            echo "Please create either:"
-            echo "  - .github/.prettierignore (preferred)"
-            echo "  - .prettierignore (root directory)"
+            echo "❌ YAML/JSON formatting issues detected"
+            echo ""
+            echo "🔧 To fix these issues locally, run:"
+            echo "    magex format:fix"
+            echo ""
+            echo "📚 yamlfmt Configuration (.github/.yamlfmt):"
+            echo "    • Indent style: spaces (2 spaces)"
+            echo "    • End of line: LF"
+            echo "    • Final newline: required"
+            echo "    • Line breaks: preserved where sensible"
+            echo "    • Comment padding: 1 space after #"
             exit 1
           fi
-
-      # ————————————————————————————————————————————————————————————————
-      # Set up Node.js (no caching since we don't have package.json)
-      # ————————————————————————————————————————————————————————————————
-      - name: 🏗️ Set up Node.js
-        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v4.0.4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-
-      # ————————————————————————————————————————————————————————————————
-      # Create package.json with pinned prettier and install securely
-      # ————————————————————————————————————————————————————————————————
-      - name: 📦 Create package.json with pinned prettier
-        run: |
-          echo "{
-            \"name\": \"yaml-validation\",
-            \"version\": \"1.0.0\",
-            \"private\": true,
-            \"devDependencies\": {
-              \"prettier\": \"${{ env.PRETTIER_VERSION }}\"
-            }
-          }" > package.json
-          echo "✅ Package.json created"
-
-      # ————————————————————————————————————————————————————————————————
-      # Install Prettier using existing local installation if available
-      # ————————————————————————————————————————————————————————————————
-      - name: 📦 Install Prettier (secure)
-        run: |
-          echo "📦 Installing Prettier version ${{ env.PRETTIER_VERSION }}..."
-
-          # Check if prettier is already available locally (from user's setup)
-          if [ -f "../node_modules/.bin/prettier" ]; then
-            echo "✅ Using existing prettier installation"
-            ln -sf ../node_modules .
-          elif [ -f "node_modules/.bin/prettier" ]; then
-            echo "✅ Using current prettier installation"
-          else
-            echo "📦 Installing prettier via npx (cached)..."
-            # Use npx which caches but doesn't require npm install
-            npx --yes prettier@${{ env.PRETTIER_VERSION }} --version > /dev/null
-          fi
-
-          # Capture version for output
-          PRETTIER_VERSION=$(npx prettier --version)
-          echo "📌 Prettier version: $PRETTIER_VERSION"
-          echo "version=$PRETTIER_VERSION" >> $GITHUB_OUTPUT
-        id: prettier-version
-
-      # ————————————————————————————————————————————————————————————————
-      # List YAML files to be checked (for transparency)
-      # ————————————————————————————————————————————————————————————————
-      - name: 📋 List YAML files to check
-        run: |
-          echo "📋 Using prettier ignore file: $PRETTIER_IGNORE_PATH"
-          echo ""
-          echo "📊 YAML files that will be validated:"
-          npx prettier "**/*.{yml,yaml}" --list-different --ignore-path "$PRETTIER_IGNORE_PATH" 2>/dev/null | sort || true
-
-          TOTAL_YAML=$(find . -type f \( -name "*.yml" -o -name "*.yaml" \) -not -path "./.git/*" | wc -l | xargs)
-          CHECKED_YAML=$(npx prettier "**/*.{yml,yaml}" --ignore-path "$PRETTIER_IGNORE_PATH" --list-different --log-level=silent | wc -l | xargs || echo "0")
-          # Get total files that would be processed (not just different ones)
-          PROCESSED_YAML=$(find . -type f \( -name "*.yml" -o -name "*.yaml" \) -not -path "./.git/*" | while read file; do
-            npx prettier "$file" --ignore-path "$PRETTIER_IGNORE_PATH" --list-different --log-level=silent > /dev/null 2>&1
-            if [ $? -ne 2 ]; then echo "$file"; fi
-          done | wc -l | xargs || echo "0")
-
-          # Export to environment for use in later steps
-          echo "TOTAL_YAML=$TOTAL_YAML" >> $GITHUB_ENV
-          echo "CHECKED_YAML=$CHECKED_YAML" >> $GITHUB_ENV
-          echo "PROCESSED_YAML=$PROCESSED_YAML" >> $GITHUB_ENV
-
-          echo ""
-          echo "📈 Summary:"
-          echo "   • Total YAML files found: $TOTAL_YAML"
-          echo "   • Files that would be processed: $PROCESSED_YAML"
-          echo "   • Files needing formatting: $CHECKED_YAML"
-          echo "   • Files ignored by prettier: $((TOTAL_YAML - PROCESSED_YAML))"
-
-      # ————————————————————————————————————————————————————————————————
-      # Run Prettier in check mode against YAML files
-      # ————————————————————————————————————————————————————————————————
-      - name: 🔍 Verify YAML formatting
-        id: prettier-check
-        run: |
-          echo "🔍 Checking YAML file formatting..."
-          set +e  # Don't exit on error immediately
-
-          npx prettier "**/*.{yml,yaml}" --check --config .github/.prettierrc.yml --ignore-path "$PRETTIER_IGNORE_PATH"
-          PRETTIER_EXIT_CODE=$?
-
-          if [ $PRETTIER_EXIT_CODE -eq 0 ]; then
-            echo "✅ All YAML files are properly formatted"
-            echo "check_passed=true" >> $GITHUB_OUTPUT
-          else
-            echo "❌ YAML formatting issues detected"
-            echo "check_passed=false" >> $GITHUB_OUTPUT
-          fi
-
-          exit $PRETTIER_EXIT_CODE
-
-      # ————————————————————————————————————————————————————————————————
-      # Show detailed diff when check fails (helpful for debugging)
-      # ————————————————————————————————————————————————————————————————
-      - name: 📝 Show formatting diff
-        if: failure() && steps.prettier-check.outputs.check_passed == 'false'
-        run: |
-          echo "❌ YAML files not formatted according to .editorconfig rules"
-          echo ""
-          echo "📋 Required formatting changes:"
-          echo "================================"
-
-          # Create a temporary directory for formatted files
-          mkdir -p .formatted_yaml
-
-          # Generate diffs for each file
-          find . -type f \( -name "*.yml" -o -name "*.yaml" \) \
-            -not -path "./node_modules/*" \
-            -not -path "./vendor/*" \
-            -not -path "./.git/*" \
-            -not -path "./dist/*" \
-            -not -path "./build/*" | while read -r file; do
-
-            # Format the file to a temporary location
-            npx prettier "$file" --config .github/.prettierrc.yml --ignore-path "$PRETTIER_IGNORE_PATH" > ".formatted_yaml/$(basename "$file")" 2>/dev/null
-
-            # Check if the file would change
-            if ! diff -q "$file" ".formatted_yaml/$(basename "$file")" >/dev/null 2>&1; then
-              echo ""
-              echo "📄 File: $file"
-              echo "---"
-              # Show unified diff with color
-              diff -u "$file" ".formatted_yaml/$(basename "$file")" | sed '1,2d' || true
-            fi
-          done
-
-          echo ""
-          echo "================================"
-          echo ""
-          echo "🔧 To fix these issues locally, run:"
-          echo "    npm install --no-save prettier"
-          echo "    npx prettier \"**/*.{yml,yaml}\" --write --config .github/.prettierrc.yml --ignore-path $PRETTIER_IGNORE_PATH"
-          echo ""
-          echo "📚 EditorConfig YAML rules:"
-          echo "    • Indent style: spaces (not tabs)"
-          echo "    • Indent size: 2"
-          echo "    • End of line: LF"
-          echo "    • Final newline: required"
-          echo "    • Trailing whitespace: trimmed"
-
-          # Clean up
-          rm -rf .formatted_yaml
-
-          # Exit with failure
-          exit 1
 
       # ————————————————————————————————————————————————————————————————
       # Job Summary
       # ————————————————————————————————————————————————————————————————
       - name: 📊 Job Summary
-        if: success()
         run: |
-          echo "## 📐 YAML Validation Summary" >> $GITHUB_STEP_SUMMARY
+          echo "## 📐 YAML/JSON Format Validation Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Validation Details | Status |" >> $GITHUB_STEP_SUMMARY
           echo "|---|---|" >> $GITHUB_STEP_SUMMARY
-          echo "| **Tool** | Prettier (EditorConfig-aware) |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Version** | ${{ steps.prettier-version.outputs.version }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Configuration** | .editorconfig rules |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Scope** | All .yml and .yaml files |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Tool** | MAGE-X format:fix (yamlfmt) |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Version** | ${{ steps.yamlfmt-version.outputs.version }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Configuration** | .github/.yamlfmt |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Scope** | All .yml, .yaml, and .json files |" >> $GITHUB_STEP_SUMMARY
           echo "| **Result** | ✅ All files properly formatted |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### File Processing Statistics" >> $GITHUB_STEP_SUMMARY
-          echo "- **Total YAML files found**: ${{ env.TOTAL_YAML }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Files processed by prettier**: ${{ env.PROCESSED_YAML }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Files needing formatting**: ${{ env.CHECKED_YAML }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Files ignored by prettier**: $((${{ env.TOTAL_YAML }} - ${{ env.PROCESSED_YAML }}))" >> $GITHUB_STEP_SUMMARY
+          echo "- **Total files processed**: ${{ env.TOTAL_FILES }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### EditorConfig YAML Rules Applied" >> $GITHUB_STEP_SUMMARY
-          echo "- **Indent Style**: Spaces" >> $GITHUB_STEP_SUMMARY
-          echo "- **Indent Size**: 2" >> $GITHUB_STEP_SUMMARY
+          echo "### yamlfmt Configuration Applied" >> $GITHUB_STEP_SUMMARY
+          echo "- **Indent Style**: Spaces (2 spaces)" >> $GITHUB_STEP_SUMMARY
           echo "- **Line Endings**: LF" >> $GITHUB_STEP_SUMMARY
           echo "- **Final Newline**: Required" >> $GITHUB_STEP_SUMMARY
-          echo "- **Trailing Whitespace**: Trimmed" >> $GITHUB_STEP_SUMMARY
+          echo "- **Line Breaks**: Preserved where sensible" >> $GITHUB_STEP_SUMMARY
+          echo "- **Comment Padding**: 1 space after #" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "🎯 **All YAML files meet formatting standards.**" >> $GITHUB_STEP_SUMMARY
-
-      # ————————————————————————————————————————————————————————————————
-      # Cleanup
-      # ————————————————————————————————————————————————————————————————
-      - name: 🧹 Cleanup
-        if: always()
-        run: |
-          rm -f package.json
-          # Only remove node_modules if we created it (not if it was linked)
-          if [ ! -L node_modules ]; then
-            rm -rf node_modules
-          fi
-          echo "✅ Cleanup completed"
+          echo "🎯 **All YAML/JSON files meet formatting standards via MAGE-X.**" >> $GITHUB_STEP_SUMMARY
