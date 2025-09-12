@@ -405,8 +405,7 @@ jobs:
   completion-report:
     name: 📊 Workflow Completion Report
     if: always()
-    needs:
-      [load-env, setup, test-magex, pre-commit, security, code-quality, test-suite, benchmarks, release, status-check]
+    needs: [load-env, setup, test-magex, pre-commit, security, code-quality, test-suite, benchmarks, release, status-check]
     permissions:
       contents: read # Read repository content for completion report
     uses: ./.github/workflows/fortress-completion-report.yml

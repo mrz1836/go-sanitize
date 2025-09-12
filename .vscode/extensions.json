@@ -1,3 +1,5 @@
 {
-    "recommendations": ["golang.Go"]
+    "recommendations": [
+        "golang.Go"
+    ]
 }
