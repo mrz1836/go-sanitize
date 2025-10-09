@@ -38,6 +38,17 @@
     "go.toolsManagement.autoUpdate": true,
 
     // ============================================================
+    // INLAY HINTS
+    // ============================================================
+    "go.inlayHints.assignVariableTypes": true,
+    "go.inlayHints.compositeLiteralFields": true,
+    "go.inlayHints.compositeLiteralTypes": true,
+    "go.inlayHints.constantValues": true,
+    "go.inlayHints.functionTypeParameters": true,
+    "go.inlayHints.parameterNames": true,
+    "go.inlayHints.rangeVariableTypes": true,
+
+    // ============================================================
     // LINTING
     // ============================================================
     "go.lintTool": "golangci-lint",
@@ -120,17 +131,6 @@
         "ui.completion.usePlaceholders": true,
 
         // --------------------------------------------------------
-        // Inlay Hints (Inline Type & Parameter Information)
-        // --------------------------------------------------------
-        "ui.inlayHint.assignVariableTypes": true,
-        "ui.inlayHint.compositeLiteralFields": true,
-        "ui.inlayHint.compositeLiteralTypes": true,
-        "ui.inlayHint.constantValues": true,
-        "ui.inlayHint.functionTypeParameters": true,
-        "ui.inlayHint.parameterNames": true,
-        "ui.inlayHint.rangeVariableTypes": true,
-
-        // --------------------------------------------------------
         // Symbol Navigation
         // --------------------------------------------------------
         "symbolMatcher": "fastfuzzy",
@@ -142,12 +142,10 @@
         // Extends the 60+ golangci-lint philosophy into the IDE
         // --------------------------------------------------------
         "ui.diagnostic.staticcheck": true,
-        "ui.diagnostic.vulncheck": "Imports",
         "ui.diagnostic.analyses": {
             "unusedparams": true,
             "shadow": true,
             "unusedwrite": true,
-            "fieldalignment": true,
             "nilness": true,
             "unusedvariable": true
         },
