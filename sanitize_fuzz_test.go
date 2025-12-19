@@ -6,8 +6,9 @@ import (
 	"testing"
 	"unicode"
 
-	"github.com/mrz1836/go-sanitize"
 	"github.com/stretchr/testify/require"
+
+	"github.com/mrz1836/go-sanitize"
 )
 
 // FuzzAlpha_Basic validates that Alpha only returns letters and optional spaces.

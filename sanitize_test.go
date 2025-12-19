@@ -5,9 +5,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/mrz1836/go-sanitize"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/mrz1836/go-sanitize"
 )
 
 // TestAlpha tests the alpha sanitize method
