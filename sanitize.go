@@ -202,7 +202,7 @@ func BitcoinCashAddress(original string) string {
 // See more usage examples in the `sanitize_example_test.go` file.
 // See the benchmarks in the `sanitize_benchmark_test.go` file.
 // See the fuzz tests in the `sanitize_fuzz_test.go` file.
-func Custom(original string, regExp string) string {
+func Custom(original, regExp string) string {
 	// Return the processed string or panic if regex fails
 	return regexp.MustCompile(regExp).ReplaceAllString(original, "")
 }
@@ -312,7 +312,7 @@ func Decimal(original string) string {
 // See more usage examples in the `sanitize_example_test.go` file.
 // See the benchmarks in the `sanitize_benchmark_test.go` file.
 // See the fuzz tests in the `sanitize_fuzz_test.go` file.
-func Domain(original string, preserveCase bool, removeWww bool) (string, error) {
+func Domain(original string, preserveCase, removeWww bool) (string, error) {
 	if original == "" {
 		return original, nil
 	}
