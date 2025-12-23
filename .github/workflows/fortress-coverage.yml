@@ -52,10 +52,8 @@ on:
         description: "Codecov token for uploading coverage (required when coverage-provider is codecov)"
         required: false
 
-# Security: Restrictive default permissions with job-level overrides
-permissions:
-  contents: read
-  actions: read # Required for artifact downloads
+# Security: Restrict default permissions (jobs must explicitly request what they need)
+permissions: {}
 
 jobs:
   # ----------------------------------------------------------------------------------
@@ -1011,6 +1009,7 @@ jobs:
                     if curl -L -H "Authorization: Bearer $GITHUB_TOKEN" \
                             -H "Accept: application/vnd.github+json" \
                             --connect-timeout 10 --max-time 30 \
+                            --retry 3 --retry-delay 5 --retry-all-errors \
                             "$COVERAGE_ARTIFACTS" -o "base-coverage-artifact.zip" 2>/dev/null; then
 
                       if [[ -s "base-coverage-artifact.zip" ]]; then
