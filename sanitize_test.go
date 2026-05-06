@@ -11,6 +11,11 @@ import (
 	"github.com/mrz1836/go-sanitize"
 )
 
+const (
+	testEmptyString = "empty string"
+	testSpacesOnly  = "   "
+)
+
 // TestAlpha tests the alpha sanitize method
 func TestAlpha(t *testing.T) {
 	tests := []struct {
@@ -30,7 +35,7 @@ func TestAlpha(t *testing.T) {
 		{"carriage returns with spaces", "\nThis\nThat", `ThisThat`, true},
 
 		// Edge cases
-		{"empty string", "", "", false},
+		{testEmptyString, "", "", false},
 		{"only special characters", "!@#$%^&*()", "", false},
 		{"very long string", strings.Repeat("a", 1000), strings.Repeat("a", 1000), false},
 		{"tabs", "\tThis1\tThat2", `ThisThat`, true},
@@ -40,7 +45,7 @@ func TestAlpha(t *testing.T) {
 		{"greek characters", "Σigma", "Σigma", false},
 		{"sharp s", "ßeta", "ßeta", false},
 		{"numbers only", "123456", "", false},
-		{"spaces only", "   ", "   ", true},
+		{"spaces only", testSpacesOnly, testSpacesOnly, true},
 	}
 
 	for _, test := range tests {
@@ -72,8 +77,8 @@ func TestAlphaNumeric(t *testing.T) {
 		{"tabs", "\tThis1\tThat2", `This1That2`, true},
 
 		// Edge cases
-		{"empty string", "", "", false},
-		{"spaces only", "   ", "   ", true},
+		{testEmptyString, "", "", false},
+		{"spaces only", testSpacesOnly, testSpacesOnly, true},
 		{"accents and numbers", "éclair123", "éclair123", false},
 		{"mixed unicode", "ßeta Σigma 456", "ßeta Σigma 456", true},
 		{"numbers only", "987654", "987654", false},
@@ -133,7 +138,7 @@ func TestBitcoinCashAddress(t *testing.T) {
 		{"remove spaces", " qr95tpm9f6qt8azfzd73ydyccdefhkcdv3ldk00ht0 ", "qr95tpm9f6qt8azfzd73ydyccdefhkcdv3ldk00ht0"},
 
 		// Additional test cases
-		{"empty string", "", ""},
+		{testEmptyString, "", ""},
 		{"only symbols", "!@#$%^&*()", ""},
 		{"mixed case address", "QPM2QSZNHKS23Z7629MMS6S4CWEF74VCWVY22GDX6A", "QPM2QSZNHKS23Z7629MMS6S4CWEF74VCWVY22GDX6A"},
 		{"address with newlines", "\nqpm2qsznhks23z7629mms6s4cwef74vcwvy22gdx6a\n", "qpm2qsznhks23z7629mms6s4cwef74vcwvy22gdx6a"},
@@ -238,7 +243,7 @@ func TestDecimal(t *testing.T) {
 		{"basic 5", "/n<<  $-1.034234  >>/n", "-1.034234"},
 
 		// Edge cases
-		{"empty string", "", ""},
+		{testEmptyString, "", ""},
 		{"letters only", "abc", ""},
 		{"plus sign", "+100.50", "100.50"},
 		{"multiple decimals", "1.2.3", "1.23"},
@@ -416,8 +421,8 @@ func TestEmail(t *testing.T) {
 		{"basic_8", " test_ME+2@GmAil.com ", "test_ME+2@GmAil.com", true},
 
 		// Additional edge cases
-		{"empty string", "", "", false},
-		{"spaces only", "   ", "", false},
+		{testEmptyString, "", "", false},
+		{"spaces only", testSpacesOnly, "", false},
 		{"symbols only", "!@#$%^&*()", "@", false},
 		{"invalid email format", "not-an-email", "not-an-email", false},
 		{"multiple @ symbols", "test@@example.com", "test@@example.com", false},
@@ -495,7 +500,7 @@ func TestFormalName(t *testing.T) {
 		{"basic 5", "Does #Not Work!", "Does Not Work"},
 
 		// Edge cases
-		{"empty string", "", ""},
+		{testEmptyString, "", ""},
 		{"accented characters", "José María", "José María"},
 		{"underscores", "Name_With_Underscore", "NameWithUnderscore"},
 		{"digits", "John Doe 3rd", "John Doe 3rd"},
@@ -579,8 +584,8 @@ func TestIPAddress(t *testing.T) {
 		{"basic_20", `0:0:0:0:0:0:0:0`, "::"},                                                   // Gets parsed and changes the display, see: https://en.wikipedia.org/wiki/IPv6_address
 
 		// Additional edge cases
-		{"empty string", "", ""},
-		{"spaces only", "   ", ""},
+		{testEmptyString, "", ""},
+		{"spaces only", testSpacesOnly, ""},
 		{"symbols only", "!@#$%^&*()", ""},
 		{"letters only", "abcdef", ""},
 		{"ipv4 with trailing dot", "192.168.1.1.", ""},
@@ -625,12 +630,12 @@ func TestNumeric(t *testing.T) {
 		{"basic 2", " $1.00 Price!", "100"},
 
 		// Edge cases
-		{"empty string", "", ""},
+		{testEmptyString, "", ""},
 		{"letters only", "abcd", ""},
 		{"negative decimal", "-123.45", "12345"},
 		{"phone format", "(123) 456-7890", "1234567890"},
 		{"hex prefix", "0xFF 55", "055"},
-		{"spaces only", "   ", ""},
+		{"spaces only", testSpacesOnly, ""},
 		{"leading plus", "+12345", "12345"},
 		{"mixed letters digits", "abc123def456", "123456"},
 		{"long numeric string", strings.Repeat("9", 100), strings.Repeat("9", 100)},
@@ -661,8 +666,8 @@ func TestPhoneNumber(t *testing.T) {
 		{"No plus", "123-456-7890", "1234567890"},
 		{"Letters and ext", "(555)555-5555 ext. 123", "5555555555123"},
 		{"Multiple plus", "++123++", "++123++"},
-		{"empty string", "", ""},
-		{"spaces only", "   ", ""},
+		{testEmptyString, "", ""},
+		{"spaces only", testSpacesOnly, ""},
 		{"symbols only", "!@#$%^&*()", ""},
 		{"invalid characters", "123-abc-4567", "1234567"},
 	}
@@ -688,7 +693,7 @@ func TestPathName(t *testing.T) {
 		{"basic 3", "My_Folder-Path-123_TEST", "My_Folder-Path-123_TEST"},
 
 		// Edge cases
-		{"empty string", "", ""},
+		{testEmptyString, "", ""},
 		{"file extension", "myfile.txt", "myfiletxt"},
 		{"windows path", "C:\\temp\\file.txt", "Ctempfiletxt"},
 		{"unicode chars", "naïve.txt", "navetxt"},
@@ -727,8 +732,8 @@ func TestPunctuation(t *testing.T) {
 		{"basic 7", "Does, 123^* Not & Work!?", "Does, 123 Not & Work!?"},
 
 		// Edge cases
-		{"empty string", "", ""},
-		{"spaces only", "   ", "   "},
+		{testEmptyString, "", ""},
+		{"spaces only", testSpacesOnly, testSpacesOnly},
 		{"tabs and newlines", "line1\nline2\tend", "line1\nline2\tend"},
 		{"disallowed punctuation", "Hello; world: [test] {case}", "Hello world test case"},
 		{"unicode punctuation", "¡Hola señor!", "Hola señor!"},
@@ -767,7 +772,7 @@ func TestScientificNotation(t *testing.T) {
 		{"wrapped in symbols", "/n<<  $-1.034234  >>/n", "-1.034234"},
 
 		// Edge cases
-		{"empty string", "", ""},
+		{testEmptyString, "", ""},
 		{"letters only", "abcde", "e"},
 		{"uppercase exponent", "1.2E+3", "1.2E+3"},
 		{"trailing plus", "1.0e+3+", "1.0e+3+"},
@@ -829,7 +834,7 @@ func TestSingleLine(t *testing.T) {
 		{"leading tab with newlines", "\tMark\nMc'Cuban-Host\nsomething else", " Mark Mc'Cuban-Host something else"},
 
 		// Edge cases
-		{"empty string", "", ""},
+		{testEmptyString, "", ""},
 		{"only whitespace", "\n\r\t\v\f", "     "},
 		{"mixed whitespace", "Line1\r\nLine2\tLine3\vLine4\f", "Line1  Line2 Line3 Line4 "},
 		{"leading and trailing", "\nStart\t\n", " Start  "},
@@ -861,7 +866,7 @@ func TestTime(t *testing.T) {
 		{"embedded time", "SOMETHING t00:00:00d -EST DAY", "00:00:00"},
 
 		// Edge cases
-		{"empty string", "", ""},
+		{testEmptyString, "", ""},
 		{"nonsense string", "abc", ""},
 		{"time with AM/PM", "10:20PM", "10:20"},
 		{"negative time prefix", "-10:20", "10:20"},
