@@ -14,6 +14,11 @@ import (
 const (
 	testEmptyString = "empty string"
 	testSpacesOnly  = "   "
+
+	// Fictional names, written as escapes so that no editor can recompose them
+	testDevanagariName           = "\u0930\u094b\u0939\u093f\u0924 \u0935\u0930\u094d\u092e\u093e"             // Rohit Varma
+	testThaiName                 = "\u0e2a\u0e21\u0e28\u0e31\u0e01\u0e14\u0e34\u0e4c \u0e43\u0e08\u0e14\u0e35" // Somsak Jaidee
+	testDecomposedVietnameseName = "Nguye\u0302\u0303n Va\u0306n An"                                           // Nguyen Van An, marks decomposed
 )
 
 // TestAlpha tests the alpha sanitize method
@@ -56,6 +61,38 @@ func TestAlpha(t *testing.T) {
 	}
 }
 
+// TestAlphaKeepsCombiningMarks tests that Alpha keeps the combining marks its letters carry
+func TestAlphaKeepsCombiningMarks(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+		spaces   bool
+	}{
+		{"devanagari vowel signs and virama", testDevanagariName, testDevanagariName, true},
+		{"devanagari without spaces", testDevanagariName, "\u0930\u094b\u0939\u093f\u0924\u0935\u0930\u094d\u092e\u093e", false},
+		{"thai vowels and tone marks", testThaiName, testThaiName, true},
+		{"decomposed vietnamese", testDecomposedVietnameseName, testDecomposedVietnameseName, true},
+		{"decomposed accent", "Jose\u0301!", "Jose\u0301", false},
+		{"precomposed vietnamese unchanged", "Nguy\u1ec5n", "Nguy\u1ec5n", false},
+		{"mark whose letter is removed goes too", "1\u0301a", "a", false},
+		{"mark never moves to another letter", "a!\u0301", "a", false},
+		{"leading mark removed", "\u0301a", "a", false},
+		{"mark after a space removed", "a \u0301b", "a b", true},
+		{"invisible mark before an accent removes both", "e\ufe0f\u0301x", "ex", false},
+		{"invisible marks removed", "Ann\u034fLee\ufe0f\U000e0100\u180b\u17b4", "AnnLee", false},
+		{"enclosing mark removed", "a\u20dd", "a", false},
+		{"zero-width joiners removed", "a\u200cb\u200dc", "abc", false},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			output := sanitize.Alpha(test.input, test.spaces)
+			assert.Equal(t, test.expected, output)
+		})
+	}
+}
+
 // TestAlphaNumeric tests the alphanumeric sanitize method
 func TestAlphaNumeric(t *testing.T) {
 	tests := []struct {
@@ -87,6 +124,30 @@ func TestAlphaNumeric(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			output := sanitize.AlphaNumeric(test.input, test.typeCase)
+			assert.Equal(t, test.expected, output)
+		})
+	}
+}
+
+// TestAlphaNumericKeepsCombiningMarks tests that AlphaNumeric keeps the combining marks its letters and digits carry
+func TestAlphaNumericKeepsCombiningMarks(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+		spaces   bool
+	}{
+		{"devanagari with a digit", testDevanagariName + " 2", testDevanagariName + " 2", true},
+		{"thai vowels and tone marks", testThaiName, testThaiName, true},
+		{"decomposed vietnamese with a digit", testDecomposedVietnameseName + " 3", testDecomposedVietnameseName + " 3", true},
+		{"mark on a kept digit stays", "1\u0301a", "1\u0301a", false},
+		{"keycap sequence keeps only its digit", "1\ufe0f\u20e3", "1", false},
+		{"invisible mark removed", "Ann\u034fLee", "AnnLee", false},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			output := sanitize.AlphaNumeric(test.input, test.spaces)
 			assert.Equal(t, test.expected, output)
 		})
 	}
@@ -508,7 +569,7 @@ func TestFormalName(t *testing.T) {
 		{"leading spaces", "  John", "  John"},
 		{"apostrophe and hyphen", "O'Leary-Brown", "O'Leary-Brown"},
 		{"prefix d'", "d'Artagnan", "d'Artagnan"},
-		{"curly apostrophe", "D’Angelo", "DAngelo"},
+		{"curly apostrophe", "D’Angelo", "D’Angelo"},
 		{"multiple spaces", "Van  der  Meer", "Van  der  Meer"},
 		{"accented surname", "Émilie du Châtelet", "Émilie du Châtelet"},
 		{"foreign letters", "Björk Guðmundsdóttir", "Björk Guðmundsdóttir"},
@@ -523,6 +584,54 @@ func TestFormalName(t *testing.T) {
 			assert.Equal(t, test.expected, output)
 		})
 	}
+}
+
+// TestFormalNameKeepsCombiningMarks tests that FormalName keeps the combining marks its letters and digits carry
+func TestFormalNameKeepsCombiningMarks(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{"devanagari vowel signs and virama", testDevanagariName, testDevanagariName},
+		{"thai vowels and tone marks", testThaiName, testThaiName},
+		{"decomposed vietnamese with a suffix", testDecomposedVietnameseName + ", Jr.", testDecomposedVietnameseName + ", Jr."},
+		{"mark after an apostrophe removed", "D\u2019\u0301Angelo", "D\u2019Angelo"},
+		{"invisible mark removed", "Ann\u034fLee", "AnnLee"},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			output := sanitize.FormalName(test.input)
+			assert.Equal(t, test.expected, output)
+		})
+	}
+}
+
+// TestFormalNameKeepsRightSingleQuotationMark tests that FormalName keeps the ’ apostrophe
+func TestFormalNameKeepsRightSingleQuotationMark(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{"right single quotation mark", "D’Angelo", "D’Angelo"},
+		{"with a hyphen", "O’Neil-Brown", "O’Neil-Brown"},
+		{"leading apostrophe", "’t Hooft", "’t Hooft"},
+		{"left single quotation mark removed", "‘Bob’s", "Bob’s"},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			output := sanitize.FormalName(test.input)
+			assert.Equal(t, test.expected, output)
+		})
+	}
+
+	t.Run("alpha and alphanumeric keep no apostrophe", func(t *testing.T) {
+		assert.Equal(t, "DAngelo", sanitize.Alpha("D’Angelo", false))
+		assert.Equal(t, "DAngelo", sanitize.AlphaNumeric("D’Angelo", false))
+	})
 }
 
 // TestHTML tests the HTML sanitize method

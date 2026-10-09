@@ -150,7 +150,7 @@ extra baggage.
 <br/>
 
 ### Features
-- Alpha and alphanumeric sanitization with optional spaces
+- Alpha and alphanumeric sanitization with optional spaces, keeping the combining marks letters carry (accents, vowel signs, viramas)
 - Bitcoin and Bitcoin Cash address sanitizers
 - Custom regular expression helper for arbitrary patterns
 - Precompiled regex sanitizer for repeated patterns
@@ -159,8 +159,8 @@ extra baggage.
 - URI, URL and XSS sanitization
 
 ### Functions
-- [`Alpha`](sanitize.go): Remove non-alphabetic characters, optionally keep spaces
-- [`AlphaNumeric`](sanitize.go): Remove non-alphanumeric characters, optionally keep spaces
+- [`Alpha`](sanitize.go): Remove non-alphabetic characters, optionally keep spaces; letters keep their combining marks
+- [`AlphaNumeric`](sanitize.go): Remove non-alphanumeric characters, optionally keep spaces; letters and digits keep their combining marks
 - [`BitcoinAddress`](sanitize.go): Filter input to valid Bitcoin address characters
 - [`BitcoinCashAddress`](sanitize.go): Filter input to valid Bitcoin Cash address characters
 - [`Custom`](sanitize.go): Use a custom regex to filter input _(legacy)_
@@ -169,7 +169,7 @@ extra baggage.
 - [`Domain`](sanitize.go): Sanitize domain, optionally preserving case and removing www
 - [`Email`](sanitize.go): Normalize an email address
 - [`FirstToUpper`](sanitize.go): Capitalize the first letter of a string
-- [`FormalName`](sanitize.go): Keep only formal name characters
+- [`FormalName`](sanitize.go): Keep only formal name characters, combining marks and the ’ apostrophe included
 - [`HTML`](sanitize.go): Strip HTML tags
 - [`IPAddress`](sanitize.go): Return sanitized and valid IPv4 or IPv6 address
 - [`Numeric`](sanitize.go): Remove all but numeric digits
@@ -293,10 +293,12 @@ magex bench
 
 | Benchmark                                             | Iterations |   ns/op | B/op | allocs/op |
 |-------------------------------------------------------|------------|--------:|-----:|----------:|
-| [Alpha](sanitize_benchmark_test.go)                   | 14,018,806 |   84.89 |   24 |         1 |
-| [Alpha_WithSpaces](sanitize_benchmark_test.go)        | 12,664,946 |   94.25 |   24 |         1 |
-| [AlphaNumeric](sanitize_benchmark_test.go)            | 9,161,546  |   130.6 |   32 |         1 |
-| [AlphaNumeric_WithSpaces](sanitize_benchmark_test.go) | 7,978,879  |   150.8 |   32 |         1 |
+| [Alpha](sanitize_benchmark_test.go)                   | 12,830,295 |   93.80 |   24 |         1 |
+| [Alpha_WithSpaces](sanitize_benchmark_test.go)        | 11,828,491 |   101.2 |   24 |         1 |
+| [Alpha_CombiningMarks](sanitize_benchmark_test.go)    | 2,341,200  |   511.4 |   64 |         1 |
+| [AlphaNumeric](sanitize_benchmark_test.go)            | 8,489,158  |   142.5 |   32 |         1 |
+| [AlphaNumeric_WithSpaces](sanitize_benchmark_test.go) | 7,978,382  |   152.1 |   32 |         1 |
+| [AlphaNumeric_CombiningMarks](sanitize_benchmark_test.go) | 2,025,476  |   595.3 |   64 |         1 |
 | [BitcoinAddress](sanitize_benchmark_test.go)          | 8,843,929  |   137.1 |   48 |         1 |
 | [BitcoinCashAddress](sanitize_benchmark_test.go)      | 5,892,612  |   196.2 |   48 |         1 |
 | [Custom](sanitize_benchmark_test.go) _(Legacy)_       | 938,733    | 1,249.0 |  913 |        16 |
@@ -308,7 +310,8 @@ magex bench
 | [Email](sanitize_benchmark_test.go)                   | 8,380,172  |   144.2 |   48 |         2 |
 | [Email_PreserveCase](sanitize_benchmark_test.go)      | 13,468,302 |   90.06 |   24 |         1 |
 | [FirstToUpper](sanitize_benchmark_test.go)            | 57,342,418 |   20.60 |   16 |         1 |
-| [FormalName](sanitize_benchmark_test.go)              | 14,557,754 |   83.12 |   24 |         1 |
+| [FormalName](sanitize_benchmark_test.go)              | 11,559,519 |   106.0 |   24 |         1 |
+| [FormalName_CombiningMarks](sanitize_benchmark_test.go) | 1,930,945  |   622.2 |   64 |         1 |
 | [HTML](sanitize_benchmark_test.go)                    | 2,558,787  |   468.5 |   48 |         3 |
 | [IPAddress](sanitize_benchmark_test.go)               | 11,388,638 |   102.7 |   32 |         2 |
 | [IPAddress_IPV6](sanitize_benchmark_test.go)          | 3,434,715  |   350.9 |   96 |         2 |

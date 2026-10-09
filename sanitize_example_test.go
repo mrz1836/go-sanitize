@@ -31,6 +31,12 @@ func ExampleAlpha_withSpaces() {
 	// Output: Example String
 }
 
+// ExampleAlpha_combiningMarks shows that Alpha keeps the combining marks letters carry
+func ExampleAlpha_combiningMarks() {
+	fmt.Printf("%+q\n", sanitize.Alpha("Nguye\u0302\u0303n Va\u0306n An!", true))
+	// Output: "Nguye\u0302\u0303n Va\u0306n An"
+}
+
 // ExampleBitcoinAddress example using BitcoinAddress()
 func ExampleBitcoinAddress() {
 	fmt.Println(sanitize.BitcoinAddress(":1K6c7LGpdB8LwoGNVfG51dRV9UUEijbrWs!"))
@@ -115,6 +121,12 @@ func ExampleFirstToUpper() {
 func ExampleFormalName() {
 	fmt.Println(sanitize.FormalName("John McDonald Jr.!"))
 	// Output: John McDonald Jr.
+}
+
+// ExampleFormalName_combiningMarks shows that FormalName keeps combining marks and the ’ apostrophe
+func ExampleFormalName_combiningMarks() {
+	fmt.Printf("%+q\n", sanitize.FormalName("D\u2019Angelo-Nguye\u0302\u0303n, Jr.!"))
+	// Output: "D\u2019Angelo-Nguye\u0302\u0303n, Jr."
 }
 
 // ExampleHTML example using HTML()

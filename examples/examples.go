@@ -9,11 +9,11 @@ import (
 )
 
 func main() {
-	// Alpha removes all non-letter characters.
+	// Alpha removes all non-letter characters, keeping the combining marks letters carry.
 	alphaIn := "Hello, World! 123"
 	log.Printf("Alpha(%q) => %q\n", alphaIn, sanitize.Alpha(alphaIn, false))
 
-	// AlphaNumeric removes symbols but preserves letters and numbers.
+	// AlphaNumeric removes symbols but preserves letters, numbers, and their combining marks.
 	alphaNumericIn := "Hello 2nd World!"
 	log.Printf("AlphaNumeric(%q) => %q\n", alphaNumericIn, sanitize.AlphaNumeric(alphaNumericIn, false))
 
@@ -58,7 +58,7 @@ func main() {
 	firstIn := "hello world"
 	log.Printf("FirstToUpper(%q) => %q\n", firstIn, sanitize.FirstToUpper(firstIn))
 
-	// FormalName keeps letters, numbers, dashes and common punctuation.
+	// FormalName keeps letters, numbers, combining marks, dashes, apostrophes (' and ’) and common punctuation.
 	nameIn := "John D'oe, Jr."
 	log.Printf("FormalName(%q) => %q\n", nameIn, sanitize.FormalName(nameIn))
 
