@@ -52,7 +52,8 @@ var ErrNilRegexp = errors.New("regular expression cannot be nil")
 //   - spaces: If true, spaces are preserved in the output; otherwise, they are removed.
 //
 // Returns:
-//   - A sanitized string containing only Unicode alphabetic characters and, optionally, spaces.
+//   - A sanitized string containing only Unicode letters, the combining marks they carry,
+//     and, optionally, spaces.
 //
 // Example:
 //
@@ -95,7 +96,8 @@ func Alpha(original string, spaces bool) string {
 //   - spaces: If true, spaces are preserved in the output; otherwise, they are removed.
 //
 // Returns:
-//   - A sanitized string containing only Unicode alphanumeric characters and, optionally, spaces.
+//   - A sanitized string containing only Unicode letters and digits, the combining marks they carry,
+//     and, optionally, spaces.
 //
 // Example:
 //
