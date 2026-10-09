@@ -3,8 +3,10 @@ package sanitize_test
 import (
 	"net"
 	"regexp"
+	"strings"
 	"testing"
 	"unicode"
+	"unicode/utf8"
 
 	"github.com/stretchr/testify/require"
 
@@ -291,6 +293,17 @@ func FuzzIPAddress(f *testing.F) {
 	})
 }
 
+// FuzzNameSanitizerProperties validates, on any input, the properties Alpha, AlphaNumeric, and FormalName
+// guarantee and how their results relate, seeded with the whole Unicode corpus.
+func FuzzNameSanitizerProperties(f *testing.F) {
+	for _, test := range unicodeCorpus() {
+		f.Add(test.input)
+	}
+	f.Fuzz(func(t *testing.T, input string) {
+		requireNameSanitizerProperties(t, input)
+	})
+}
+
 // FuzzNumeric validates that Numeric only returns digits.
 func FuzzNumeric(f *testing.F) {
 	seed := []string{
@@ -531,4 +544,101 @@ func keepsEverything(s string, isBase, isOther func(rune) bool) bool {
 		}
 	}
 	return true
+}
+
+// nameSanitizer is one name sanitizer and the runes it keeps by their category alone: its bases,
+// which can carry combining marks, and its other kept runes, which can't
+type nameSanitizer struct {
+	name    string
+	apply   func(string) string
+	isBase  func(rune) bool
+	isOther func(rune) bool
+}
+
+// nameSanitizers returns Alpha and AlphaNumeric, without and with spaces, and FormalName
+func nameSanitizers() []nameSanitizer {
+	isLetterOrDigit := func(r rune) bool { return unicode.IsLetter(r) || unicode.IsDigit(r) }
+	isSpace := func(r rune) bool { return r == ' ' }
+	isNothing := func(rune) bool { return false }
+	isFormalNamePunctuation := func(r rune) bool {
+		return r == '-' || r == '\'' || r == '\u2019' || r == ',' || r == '.' || unicode.IsSpace(r)
+	}
+	return []nameSanitizer{
+		{"Alpha", func(s string) string { return sanitize.Alpha(s, false) }, unicode.IsLetter, isNothing},
+		{"Alpha with spaces", func(s string) string { return sanitize.Alpha(s, true) }, unicode.IsLetter, isSpace},
+		{"AlphaNumeric", func(s string) string { return sanitize.AlphaNumeric(s, false) }, isLetterOrDigit, isNothing},
+		{"AlphaNumeric with spaces", func(s string) string { return sanitize.AlphaNumeric(s, true) }, isLetterOrDigit, isSpace},
+		{"FormalName", sanitize.FormalName, isLetterOrDigit, isFormalNamePunctuation},
+	}
+}
+
+// requireNameSanitizerProperties fails unless each name sanitizer's output for input is valid UTF-8,
+// is the input with runes removed, is unchanged when sanitized again, holds only attached marks, and
+// keeps or removes every rune that is not a mark by that rune's category alone, and unless the
+// sanitizers agree with one another
+func requireNameSanitizerProperties(t *testing.T, input string) {
+	t.Helper()
+	for _, s := range nameSanitizers() {
+		out := s.apply(input)
+		require.Truef(t, utf8.ValidString(out), "%s returned invalid UTF-8 %+q (input: %+q)", s.name, out, input)
+		require.Truef(t, isRuneSubsequence(out, input),
+			"%s returned %+q, which is not the input with runes removed (input: %+q)", s.name, out, input)
+		require.Equalf(t, out, s.apply(out), "%s output %+q changed when sanitized again (input: %+q)", s.name, out, input)
+		requireMarksAttached(t, out, input, s.isBase, s.isOther)
+		require.Equalf(t, keepByCategory(input, s.isBase, s.isOther), removeKeptMarks(out),
+			"%s kept or removed a rune other than a mark because of its neighbors (input: %+q)", s.name, input)
+	}
+	requireNameSanitizersAgree(t, input)
+}
+
+// requireNameSanitizersAgree fails unless the name sanitizers keep the same letters and marks, so that
+// running one after another changes nothing, and unless keeping spaces changes nothing but the spaces
+func requireNameSanitizersAgree(t *testing.T, input string) {
+	t.Helper()
+	for _, spaces := range []bool{false, true} {
+		alpha := sanitize.Alpha(input, spaces)
+		require.Equalf(t, alpha, sanitize.Alpha(sanitize.AlphaNumeric(input, spaces), spaces),
+			"Alpha after AlphaNumeric differs from Alpha (input: %+q, spaces: %v)", input, spaces)
+		require.Equalf(t, alpha, sanitize.Alpha(sanitize.FormalName(input), spaces),
+			"Alpha after FormalName differs from Alpha (input: %+q, spaces: %v)", input, spaces)
+	}
+	alphaNumeric := sanitize.AlphaNumeric(input, false)
+	require.Equalf(t, alphaNumeric, sanitize.AlphaNumeric(sanitize.FormalName(input), false),
+		"AlphaNumeric after FormalName differs from AlphaNumeric (input: %+q)", input)
+	require.Equalf(t, sanitize.Alpha(input, false), strings.ReplaceAll(sanitize.Alpha(input, true), " ", ""),
+		"Alpha with spaces differs from Alpha by more than its spaces (input: %+q)", input)
+	require.Equalf(t, alphaNumeric, strings.ReplaceAll(sanitize.AlphaNumeric(input, true), " ", ""),
+		"AlphaNumeric with spaces differs from AlphaNumeric by more than its spaces (input: %+q)", input)
+}
+
+// isRuneSubsequence reports whether out is in with some of its runes removed
+func isRuneSubsequence(out, in string) bool {
+	want := []rune(out)
+	i := 0
+	for _, r := range in {
+		if i < len(want) && want[i] == r {
+			i++
+		}
+	}
+	return i == len(want)
+}
+
+// keepByCategory returns s with only the runes kept by their category alone: bases and other kept runes
+func keepByCategory(s string, isBase, isOther func(rune) bool) string {
+	return strings.Map(func(r rune) rune {
+		if isBase(r) || isOther(r) {
+			return r
+		}
+		return -1
+	}, s)
+}
+
+// removeKeptMarks returns s without the combining marks the name sanitizers keep
+func removeKeptMarks(s string) string {
+	return strings.Map(func(r rune) rune {
+		if isKeptMark(r) {
+			return -1
+		}
+		return r
+	}, s)
 }
