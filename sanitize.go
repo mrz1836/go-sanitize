@@ -39,11 +39,13 @@ var (
 // ErrNilRegexp indicates that a nil regular expression was provided.
 var ErrNilRegexp = errors.New("regular expression cannot be nil")
 
-// Alpha returns a string containing only Unicode alphabetic characters from the input.
-// Optionally, it preserves spaces if the `spaces` parameter is set to true.
-// All non-alphabetic characters (and spaces, if not preserved) are removed.
-// This function supports Unicode letters (IsLetter) and is useful for sanitizing names or text fields
-// where only letters (and optional spaces) are allowed.
+// Alpha returns a string containing only the Unicode letters from the input, the combining marks
+// those letters carry, and, optionally, spaces. A combining mark (an accent, a vowel sign, a virama)
+// is kept only when the rune right before it was kept, so a mark never moves onto another letter.
+// Invisible marks (variation selectors and other default-ignorable marks) and enclosing marks are
+// removed, and nothing is normalized: decomposed input stays decomposed. Stacked marks are not
+// limited; bound them yourself if you display the result. This function is useful for sanitizing
+// names or text fields, in any script, where only letters (and optional spaces) are allowed.
 //
 // Parameters:
 //   - original: The input string to be sanitized.
@@ -64,17 +66,27 @@ var ErrNilRegexp = errors.New("regular expression cannot be nil")
 func Alpha(original string, spaces bool) string {
 	var b strings.Builder
 	b.Grow(len(original))
+	baseKept := false // the rune before was a kept letter or mark, so a mark may follow it
 	for _, r := range original {
-		if unicode.IsLetter(r) || (spaces && r == ' ') {
+		switch {
+		case unicode.IsLetter(r):
 			b.WriteRune(r)
+			baseKept = true
+		case baseKept && isNameMark(r):
+			b.WriteRune(r)
+		case spaces && r == ' ':
+			b.WriteRune(r)
+			baseKept = false
+		default:
+			baseKept = false
 		}
 	}
 	return b.String()
 }
 
-// AlphaNumeric returns a string containing only Unicode alphanumeric characters from the input.
-// Optionally, it preserves spaces if the `spaces` parameter is set to true.
-// All non-alphanumeric characters (and spaces, if not preserved) are removed.
+// AlphaNumeric returns a string containing only the Unicode letters and digits from the input,
+// the combining marks they carry, and, optionally, spaces. Marks follow Alpha's rule, and a kept
+// digit can carry one too.
 // This function supports Unicode letters and digits, making it suitable for sanitizing user input,
 // filenames, or any text where only letters, numbers, and optional spaces are allowed.
 //
@@ -97,9 +109,19 @@ func Alpha(original string, spaces bool) string {
 func AlphaNumeric(original string, spaces bool) string {
 	var b strings.Builder
 	b.Grow(len(original))
+	baseKept := false // the rune before was a kept letter, digit, or mark, so a mark may follow it
 	for _, r := range original {
-		if unicode.IsLetter(r) || unicode.IsDigit(r) || (spaces && r == ' ') {
+		switch {
+		case unicode.IsLetter(r) || unicode.IsDigit(r):
 			b.WriteRune(r)
+			baseKept = true
+		case baseKept && isNameMark(r):
+			b.WriteRune(r)
+		case spaces && r == ' ':
+			b.WriteRune(r)
+			baseKept = false
+		default:
+			baseKept = false
 		}
 	}
 	return b.String()
@@ -457,7 +479,9 @@ func FirstToUpper(original string) string {
 	return b.String()
 }
 
-// FormalName returns a sanitized string containing only characters recognized in formal names or surnames.
+// FormalName returns a sanitized string containing only characters recognized in formal names or surnames:
+// letters and digits, the combining marks they carry (kept as Alpha keeps them), whitespace,
+// hyphens (-), apostrophes (' and ’), commas (,), and periods (.).
 // This function removes any characters that are not part of the accepted formal name format,
 // including support for Unicode letters to handle international names properly.
 //
@@ -479,12 +503,19 @@ func FirstToUpper(original string) string {
 func FormalName(original string) string {
 	var b strings.Builder
 	b.Grow(len(original))
+	baseKept := false // the rune before was a kept letter, digit, or mark, so a mark may follow it
 	for _, r := range original {
-		if unicode.IsLetter(r) ||
-			unicode.IsDigit(r) ||
-			r == '-' || r == '\'' || r == ',' || r == '.' ||
-			unicode.IsSpace(r) {
+		switch {
+		case unicode.IsLetter(r) || unicode.IsDigit(r):
 			b.WriteRune(r)
+			baseKept = true
+		case baseKept && isNameMark(r):
+			b.WriteRune(r)
+		case r == '-' || r == '\'' || r == '\u2019' || r == ',' || r == '.' || unicode.IsSpace(r):
+			b.WriteRune(r)
+			baseKept = false
+		default:
+			baseKept = false
 		}
 	}
 
@@ -975,4 +1006,17 @@ func XSS(original string) string {
 	original = strings.ReplaceAll(original, "window.location", "")
 
 	return original
+}
+
+// firstCombiningMark is U+0300, the lowest code point that is a mark. A rune
+// below it is never a mark, so isNameMark needs no table lookup for it.
+const firstCombiningMark = '\u0300'
+
+// isNameMark reports whether r is a combining mark that belongs to a name: a
+// nonspacing or spacing mark, such as an accent, a vowel sign, or a virama.
+// Variation selectors and other invisible marks, and enclosing marks, are not.
+func isNameMark(r rune) bool {
+	return r >= firstCombiningMark &&
+		unicode.In(r, unicode.Mn, unicode.Mc) &&
+		!unicode.In(r, unicode.Variation_Selector, unicode.Other_Default_Ignorable_Code_Point)
 }

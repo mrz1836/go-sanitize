@@ -11,7 +11,8 @@ import (
 	"github.com/mrz1836/go-sanitize"
 )
 
-// FuzzAlpha_Basic validates that Alpha only returns letters and optional spaces.
+// FuzzAlpha_Basic validates that Alpha only returns letters, the combining marks attached to them,
+// and optional spaces, that its output is stable, and that input made only of those runes comes back unchanged.
 func FuzzAlpha_Basic(f *testing.F) {
 	seed := []struct {
 		input  string
@@ -19,6 +20,11 @@ func FuzzAlpha_Basic(f *testing.F) {
 	}{
 		{"Example 123!", false},
 		{"Another Example 456?", true},
+		{testDevanagariName, true},
+		{testThaiName, true},
+		{testDecomposedVietnameseName, true},
+		{"1\u0301a!\u0301 \u0301b", true},
+		{"Ann\u034fLee\ufe0f", false},
 	}
 	for _, tc := range seed {
 		f.Add(tc.input, tc.spaces)
@@ -26,18 +32,19 @@ func FuzzAlpha_Basic(f *testing.F) {
 
 	f.Fuzz(func(t *testing.T, input string, spaces bool) {
 		out := sanitize.Alpha(input, spaces)
-		for _, r := range out {
-			if spaces && r == ' ' {
-				continue
-			}
+		isOther := func(r rune) bool { return spaces && r == ' ' }
 
-			require.Truef(t, unicode.IsLetter(r),
-				"invalid rune %q in %q (input: %q, spaces: %v)", r, out, input, spaces)
+		requireMarksAttached(t, out, input, unicode.IsLetter, isOther)
+		require.Equalf(t, out, sanitize.Alpha(out, spaces),
+			"output %q changed when sanitized again (input: %q, spaces: %v)", out, input, spaces)
+		if keepsEverything(input, unicode.IsLetter, isOther) {
+			require.Equalf(t, input, out, "input %q was not kept unchanged (spaces: %v)", input, spaces)
 		}
 	})
 }
 
-// FuzzAlphaNumeric validates that AlphaNumeric only returns letters, digits, and optional spaces.
+// FuzzAlphaNumeric validates that AlphaNumeric only returns letters, digits, the combining marks attached to them,
+// and optional spaces, that its output is stable, and that input made only of those runes comes back unchanged.
 func FuzzAlphaNumeric(f *testing.F) {
 	seed := []struct {
 		input  string
@@ -45,19 +52,23 @@ func FuzzAlphaNumeric(f *testing.F) {
 	}{
 		{"Example 123!", false},
 		{"Another Example 456?", true},
+		{testDevanagariName + " 2", true},
+		{testDecomposedVietnameseName + " 3", true},
+		{"1\ufe0f\u20e3", false},
 	}
 	for _, tc := range seed {
 		f.Add(tc.input, tc.spaces)
 	}
 	f.Fuzz(func(t *testing.T, input string, spaces bool) {
 		out := sanitize.AlphaNumeric(input, spaces)
-		for _, r := range out {
-			if spaces && r == ' ' {
-				continue
-			}
+		isBase := func(r rune) bool { return unicode.IsLetter(r) || unicode.IsDigit(r) }
+		isOther := func(r rune) bool { return spaces && r == ' ' }
 
-			require.Truef(t, unicode.IsLetter(r) || unicode.IsDigit(r),
-				"invalid rune %q in %q (input: %q, spaces: %v)", r, out, input, spaces)
+		requireMarksAttached(t, out, input, isBase, isOther)
+		require.Equalf(t, out, sanitize.AlphaNumeric(out, spaces),
+			"output %q changed when sanitized again (input: %q, spaces: %v)", out, input, spaces)
+		if keepsEverything(input, isBase, isOther) {
+			require.Equalf(t, input, out, "input %q was not kept unchanged (spaces: %v)", input, spaces)
 		}
 	})
 }
@@ -209,7 +220,8 @@ func FuzzFirstToUpper(f *testing.F) {
 	})
 }
 
-// FuzzFormalName validates that FormalName only returns valid characters for names.
+// FuzzFormalName validates that FormalName only returns valid characters for names and the combining marks
+// attached to letters and digits, that its output is stable, and that input made only of those runes comes back unchanged.
 func FuzzFormalName(f *testing.F) {
 	seed := []string{
 		"Mark Mc'Cuban-Host",
@@ -220,6 +232,9 @@ func FuzzFormalName(f *testing.F) {
 		"Van  der  Meer",
 		"Émilie du Châtelet",
 		"Björk Guðmundsdóttir",
+		testDecomposedVietnameseName + ", Jr.",
+		testThaiName,
+		"D\u2019\u0301Angelo",
 	}
 	for _, tc := range seed {
 		f.Add(tc)
@@ -227,11 +242,15 @@ func FuzzFormalName(f *testing.F) {
 
 	f.Fuzz(func(t *testing.T, input string) {
 		out := sanitize.FormalName(input)
-		for _, r := range out {
-			valid := unicode.IsLetter(r) || unicode.IsDigit(r) ||
-				r == '-' || r == '\'' || r == ',' || r == '.' || unicode.IsSpace(r)
-			require.Truef(t, valid,
-				"invalid rune %q in %q (input: %q)", r, out, input)
+		isBase := func(r rune) bool { return unicode.IsLetter(r) || unicode.IsDigit(r) }
+		isOther := func(r rune) bool {
+			return r == '-' || r == '\'' || r == '\u2019' || r == ',' || r == '.' || unicode.IsSpace(r)
+		}
+
+		requireMarksAttached(t, out, input, isBase, isOther)
+		require.Equalf(t, out, sanitize.FormalName(out), "output %q changed when sanitized again (input: %q)", out, input)
+		if keepsEverything(input, isBase, isOther) {
+			require.Equalf(t, input, out, "input %q was not kept unchanged", input)
 		}
 	})
 }
@@ -467,4 +486,49 @@ func FuzzURL(f *testing.F) {
 				"invalid rune %q in %q (input: %q)", r, out, input)
 		}
 	})
+}
+
+// isKeptMark reports whether r is a combining mark the name sanitizers keep after a letter or digit:
+// a nonspacing or spacing mark that is neither a variation selector nor another invisible mark
+func isKeptMark(r rune) bool {
+	return r >= 0x300 &&
+		unicode.In(r, unicode.Mn, unicode.Mc) &&
+		!unicode.In(r, unicode.Variation_Selector, unicode.Other_Default_Ignorable_Code_Point)
+}
+
+// requireMarksAttached fails unless every rune of out is a base, another kept rune,
+// or a kept mark that follows a base or another kept mark
+func requireMarksAttached(t *testing.T, out, input string, isBase, isOther func(rune) bool) {
+	t.Helper()
+	afterBase := false // the rune before was a base or a kept mark, so a mark may follow it
+	for _, r := range out {
+		switch {
+		case isBase(r):
+			afterBase = true
+		case isOther(r):
+			afterBase = false
+		case isKeptMark(r):
+			require.Truef(t, afterBase, "detached mark %q in %q (input: %q)", r, out, input)
+		default:
+			require.Failf(t, "invalid rune", "invalid rune %q in %q (input: %q)", r, out, input)
+		}
+	}
+}
+
+// keepsEverything reports whether every rune of s is a base, another kept rune, or a kept mark
+// right after a base or another kept mark, so a sanitizer should return s unchanged
+func keepsEverything(s string, isBase, isOther func(rune) bool) bool {
+	afterBase := false // the rune before was a base or a kept mark, so a mark may follow it
+	for _, r := range s {
+		switch {
+		case isBase(r):
+			afterBase = true
+		case isOther(r):
+			afterBase = false
+		case afterBase && isKeptMark(r):
+		default:
+			return false
+		}
+	}
+	return true
 }
