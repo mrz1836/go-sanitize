@@ -28,10 +28,24 @@ func BenchmarkAlphaNumeric_WithSpaces(b *testing.B) {
 	}
 }
 
+// BenchmarkAlphaNumeric_CombiningMarks benchmarks the AlphaNumeric method on names with combining marks
+func BenchmarkAlphaNumeric_CombiningMarks(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_ = sanitize.AlphaNumeric(testDecomposedVietnameseName+" "+testDevanagariName+"! 2", true)
+	}
+}
+
 // BenchmarkAlpha_WithSpaces benchmarks the Alpha method
 func BenchmarkAlpha_WithSpaces(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		_ = sanitize.Alpha("This is the test string.", true)
+	}
+}
+
+// BenchmarkAlpha_CombiningMarks benchmarks the Alpha method on names with combining marks
+func BenchmarkAlpha_CombiningMarks(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_ = sanitize.Alpha(testDecomposedVietnameseName+" "+testDevanagariName+"!", true)
 	}
 }
 
@@ -117,6 +131,13 @@ func BenchmarkFirstToUpper(b *testing.B) {
 func BenchmarkFormalName(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		_ = sanitize.FormalName("John McDonald Jr.")
+	}
+}
+
+// BenchmarkFormalName_CombiningMarks benchmarks the FormalName method on names with combining marks
+func BenchmarkFormalName_CombiningMarks(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		_ = sanitize.FormalName(testDecomposedVietnameseName + ", " + testDevanagariName + " Jr.")
 	}
 }
 
