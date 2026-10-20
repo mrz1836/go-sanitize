@@ -17,6 +17,7 @@
 #   • PR titles prefixed with chore(scope): – conventional commits.
 #   • Force‑push and delete‑branch disabled via branch‑protection rules.
 #   • PR limit = 10 to avoid queue flooding.
+#   • Cooldown – new releases wait 3 days (gomod: patch 3 / minor 7 / major 14 days); trusted publishers excluded; security updates are never delayed.
 #   • All dependency PRs require passing CI checks before merging.
 # ────────────────────────────────────────────────────────────────
 
@@ -47,6 +48,11 @@ updates:
     commit-message:
       prefix: "chore"
       include: "scope"
+    cooldown:
+      default-days: 3
+      semver-major-days: 14
+      semver-minor-days: 7
+      semver-patch-days: 3
 
   # ──────────────────────────────────────────────────────────────
   # 2. GitHub Actions Workflows
@@ -70,6 +76,9 @@ updates:
     commit-message:
       prefix: "chore"
       include: "scope"
+    cooldown:
+      default-days: 3
+      exclude: ["actions/*", "github/*", "gitleaks/*", "ossf/*"]
 
   # ──────────────────────────────────────────────────────────────
   # 3. DevContainer (devcontainer.json : base image + features)
@@ -93,3 +102,6 @@ updates:
     commit-message:
       prefix: "chore"
       include: "scope"
+    cooldown:
+      default-days: 3
+      exclude: ["ghcr.io/devcontainers/features/*"]
