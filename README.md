@@ -177,7 +177,7 @@ extra baggage.
 - [`PathName`](sanitize.go): Sanitize to a path-friendly name
 - [`Punctuation`](sanitize.go): Allow letters, numbers and basic punctuation
 - [`ScientificNotation`](sanitize.go): Keep characters valid in scientific notation
-- [`Scripts`](sanitize.go): Remove scripts, iframe and object tags
+- [`Scripts`](sanitize.go): Remove script, iframe, object and embed elements _(not a complete XSS defense; escape or allow-list untrusted HTML)_
 - [`SingleLine`](sanitize.go): Replace line breaks and tabs with spaces
 - [`Time`](sanitize.go): Keep only valid time characters
 - [`URI`](sanitize.go): Keep characters allowed in a URI
@@ -320,7 +320,7 @@ magex bench
 | [PathName](sanitize_benchmark_test.go)                | 13,881,150 |   86.58 |   24 |         1 |
 | [Punctuation](sanitize_benchmark_test.go)             | 7,377,070  |   162.3 |   48 |         1 |
 | [ScientificNotation](sanitize_benchmark_test.go)      | 19,399,621 |   61.62 |   24 |         1 |
-| [Scripts](sanitize_benchmark_test.go)                 | 2,060,790  |   580.6 |   16 |         1 |
+| [Scripts](sanitize_benchmark_test.go)                 | 18,743,959 |   71.54 |   48 |         1 |
 | [SingleLine](sanitize_benchmark_test.go)              | 9,777,549  |   123.5 |   32 |         1 |
 | [Time](sanitize_benchmark_test.go)                    | 21,270,655 |   55.92 |   16 |         1 |
 | [URI](sanitize_benchmark_test.go)                     | 9,005,937  |   133.4 |   32 |         1 |

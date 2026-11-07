@@ -2,7 +2,6 @@ package sanitize_test
 
 import (
 	"net"
-	"regexp"
 	"strings"
 	"testing"
 	"unicode"
@@ -257,21 +256,35 @@ func FuzzFormalName(f *testing.F) {
 	})
 }
 
-// FuzzHTML validates that HTML removes all HTML tags.
+// FuzzHTML validates that HTML removes all HTML tags, including a tag left
+// unterminated at the end of the input, and that its output is stable.
 func FuzzHTML(f *testing.F) {
 	seed := []string{
 		"<div>Hello <b>World</b></div>",
 		"Plain <b>text</b>",
+		"x<img src=x onerror=alert(1) ",
+		"a < b",
+		"<<b>img src=x>",
 	}
 	for _, tc := range seed {
 		f.Add(tc)
 	}
 
-	htmlPattern := regexp.MustCompile(`(?i)<[^>]*>`)
-
 	f.Fuzz(func(t *testing.T, input string) {
 		out := sanitize.HTML(input)
-		require.False(t, htmlPattern.MatchString(out), "output %q still contains HTML tags", out)
+		// No '<' may be left that markup after the output could turn into a tag:
+		// none may have a '>' after it, or start a tag name, comment, or end tag.
+		if first := strings.IndexByte(out, '<'); first >= 0 {
+			require.NotContains(t, out[first:], ">", "output %q still contains an HTML tag", out)
+		}
+		for i := 0; i+1 < len(out); i++ {
+			if out[i] == '<' {
+				c := out[i+1]
+				startsTag := ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || c == '!' || c == '/' || c == '?'
+				require.False(t, startsTag, "output %q still starts an HTML tag", out)
+			}
+		}
+		require.Equal(t, out, sanitize.HTML(out), "HTML(%q) is not stable", input)
 	})
 }
 
@@ -404,21 +417,31 @@ func FuzzScientificNotation(f *testing.F) {
 	})
 }
 
-// FuzzScripts validates that Scripts removes script and embed tags.
+// FuzzScripts validates that Scripts leaves no script, iframe, object, or embed
+// tag behind, that its output is stable, and that it never adds text.
 func FuzzScripts(f *testing.F) {
 	seed := []string{
 		"<script>alert('x')</script>",
 		"<iframe src='t'></iframe>",
+		"hi<script>\nalert(document.domain)\n</script>bye",
+		"<script src=//evil.example/x.js></script >",
+		"<script>alert(1)</script\n>",
+		"<embed src=//evil/x.swf>",
+		`a<iframe srcdoc="<script>alert(1)</script>">b`,
+		"<scr<script>x</script>ipt>alert(1)</script>",
+		"<scr<embed>ipt>alert(1)</script>",
+		"<script<embed>",
+		"<object><object>a</object>b</object>c",
 	}
 	for _, tc := range seed {
 		f.Add(tc)
 	}
 
-	scriptPattern := regexp.MustCompile(`(?i)<(script|iframe|embed|object)[^>]*>.*</(script|iframe|embed|object)>`)
-
 	f.Fuzz(func(t *testing.T, input string) {
 		out := sanitize.Scripts(input)
-		require.False(t, scriptPattern.MatchString(out), "output %q still contains script tags", out)
+		require.False(t, hasScriptTag(out), "output %q still contains a script, iframe, object, or embed tag", out)
+		require.Equal(t, out, sanitize.Scripts(out), "Scripts(%q) is not stable", input)
+		require.LessOrEqual(t, len(out), len(input))
 	})
 }
 

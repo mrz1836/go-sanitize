@@ -21,6 +21,7 @@ If you have any suggestions or comments, please feel free to open an issue on th
 package sanitize
 
 import (
+	"bytes"
 	"errors"
 	"net"
 	"net/url"
@@ -30,11 +31,25 @@ import (
 	"unicode/utf8"
 )
 
-// Set all the regular expressions
-var (
-	htmlRegExp   = regexp.MustCompile(`(?i)<[^>]*>`)                                                              // HTML/XML tags or any alligator open/close tags
-	scriptRegExp = regexp.MustCompile(`(?i)<(script|iframe|embed|object)[^>]*>.*</(script|iframe|embed|object)>`) // Scripts and embeds
+// htmlRegExp matches HTML/XML tags: a complete "<...>" tag, or a tag left
+// unterminated at the end of the input ("<img src=x onerror=..."), which would
+// otherwise become live once later markup supplies the closing '>'.
+var htmlRegExp = regexp.MustCompile(`<[^>]*>|<[a-zA-Z!/?][^>]*$`)
+
+const (
+	// numScriptTags is the number of elements that Scripts removes.
+	numScriptTags = 4
+
+	// maxScriptTagHead is the length of the longest tag head Scripts looks for: "</script".
+	maxScriptTagHead = 8
 )
+
+// scriptTagNames returns the elements that Scripts removes, in lowercase. No name
+// is a prefix of another, which scriptTagIndex.match relies on. The [...] literal
+// stops compiling if its length and numScriptTags ever disagree.
+func scriptTagNames() [numScriptTags]string {
+	return [...]string{"script", "iframe", "object", "embed"}
+}
 
 // ErrNilRegexp indicates that a nil regular expression was provided.
 var ErrNilRegexp = errors.New("regular expression cannot be nil")
@@ -526,6 +541,8 @@ func FormalName(original string) string {
 
 // HTML returns a string without any HTML tags.
 // This function removes all HTML tags from the input string, leaving only the text content.
+// A tag left unterminated at the end of the input ("<img src=x") is removed through the end,
+// so that markup placed after the result cannot complete it.
 //
 // Parameters:
 // - original: The input string containing HTML tags to be sanitized.
@@ -754,27 +771,252 @@ func ScientificNotation(original string) string {
 	return b.String()
 }
 
-// Scripts removes all script, iframe, embed, and object tags from the input string.
-// This function is designed to sanitize input by removing potentially harmful tags
-// that can be used for cross-site scripting (XSS) attacks or other malicious purposes.
+// Scripts removes script, iframe, object, and embed elements from the input string.
+//
+// Each element is removed from its start tag through its matching end tag, together
+// with everything between them. Tags are read the way browsers read them: names match
+// in any letter case, an element may span several lines, and an end tag may hold
+// whitespace or other text before its '>' ("</script >"). A start or end tag without
+// a partner is removed on its own, and a tag still open at the end of the input is
+// removed through the end. Removing a tag never joins the text around it into a new
+// one: "<scr<script></script>ipt>" becomes "", not "<script>".
+//
+// WARNING: Scripts is not a complete XSS defense. Other markup can still run script,
+// such as event handler attributes (<img src=x onerror=...>) and javascript: URLs.
+// To render untrusted HTML, escape it (html/template, html.EscapeString) or use an
+// allow-list sanitizer such as github.com/microcosm-cc/bluemonday.
 //
 // Parameters:
 // - original: The input string containing HTML or script tags to be sanitized.
 //
 // Returns:
-// - A sanitized string with all script, iframe, embed, and object tags removed.
+// - The input with every script, iframe, object, and embed element removed.
 //
 // Example:
 //
-//	input := "<script>alert('test');</script><iframe src='example.com'></iframe>"
+//	input := "<p>Hello</p><script>\nalert('test');\n</script><iframe src='example.com'></iframe>"
 //	result := sanitize.Scripts(input)
-//	fmt.Println(result) // Output: "alert('test');"
+//	fmt.Println(result) // Output: "<p>Hello</p>"
 //
 // See more usage examples in the `sanitize_example_test.go` file.
 // See the benchmarks in the `sanitize_benchmark_test.go` file.
 // See the fuzz tests in the `sanitize_fuzz_test.go` file.
 func Scripts(original string) string {
-	return scriptRegExp.ReplaceAllString(original, "")
+	if strings.IndexByte(original, '<') < 0 {
+		return original
+	}
+
+	out := make([]byte, 0, len(original))
+	tags := scriptTagIndex{s: original}
+	for pos := 0; pos < len(original); {
+		lt := strings.IndexByte(original[pos:], '<')
+		if lt < 0 {
+			out = append(out, original[pos:]...)
+			break
+		}
+		out = append(out, original[pos:pos+lt]...)
+		pos += lt
+
+		end, ok := tags.match(pos, nil)
+		if !ok {
+			out = append(out, '<')
+			pos++
+			continue
+		}
+		pos = end
+
+		// Removing a tag joins the text on either side of it. When the kept text ends
+		// with the start of a tag ("<scr") and the text after the removal completes it
+		// ("ipt>"), the join forms a new tag, so remove that one too, and repeat.
+		for {
+			k := pendingScriptTag(out)
+			if k < 0 {
+				break
+			}
+			if end, ok = tags.match(pos, out[k:]); !ok {
+				break
+			}
+			out = out[:k]
+			pos = end
+		}
+	}
+	return string(out)
+}
+
+// scriptTagIndex finds the tags that Scripts removes in s.
+//
+// Scripts moves forward through s, so every search starts at or after the one
+// before it. Keeping the last result of each search lets the next one resume where
+// it stopped instead of rescanning s, which keeps Scripts linear in len(s) on any
+// input, including input built to force rescans.
+type scriptTagIndex struct {
+	s       string
+	tagEnds forwardSearch                // the next '>'
+	endTags [numScriptTags]forwardSearch // the next end tag, per tag name
+}
+
+// match reports whether a tag that Scripts removes starts at s[pos:], or, when head
+// is set, at head followed by s[pos:]. The head is the unfinished tag ("<scr") at the
+// end of the text Scripts has kept, which a removal has just joined to s[pos:].
+// It returns the index in s at which the text to remove ends.
+func (x *scriptTagIndex) match(pos int, head []byte) (int, bool) {
+	var buf [2 * maxScriptTagHead]byte
+	w := append(buf[:0], head...)
+	rest := x.s[pos:]
+	if len(rest) > maxScriptTagHead {
+		rest = rest[:maxScriptTagHead]
+	}
+	w = append(w, rest...)
+	if len(w) < 2 || w[0] != '<' {
+		return 0, false
+	}
+
+	start := 1
+	isEndTag := w[1] == '/'
+	if isEndTag {
+		start = 2
+	}
+	for i, name := range scriptTagNames() {
+		end := start + len(name)
+		if end > len(w) || !equalFoldASCII(w[start:end], name) {
+			continue
+		}
+		nameEnd := pos + end - len(head) // index in s just past the tag name
+		if nameEnd < len(x.s) && !isTagNameEnd(x.s[nameEnd]) {
+			return 0, false // a longer tag name, such as <scripts>
+		}
+		tagEnd := x.tagEnd(nameEnd)
+		if isEndTag || tagEnd == len(x.s) {
+			return tagEnd, true
+		}
+		endTag := x.endTag(i, tagEnd)
+		if endTag < 0 {
+			return tagEnd, true // no end tag: remove the start tag on its own
+		}
+		return x.tagEnd(endTag + 2 + len(name)), true
+	}
+	return 0, false
+}
+
+// tagEnd returns the index just past the '>' that closes the tag whose text
+// continues at from, or len(s) when no '>' follows.
+func (x *scriptTagIndex) tagEnd(from int) int {
+	at, ok := x.tagEnds.cached(from)
+	if !ok {
+		if at = strings.IndexByte(x.s[from:], '>'); at >= 0 {
+			at += from
+		}
+		x.tagEnds.store(from, at)
+	}
+	if at < 0 {
+		return len(x.s)
+	}
+	return at + 1
+}
+
+// endTag returns the index of the first end tag for scriptTagNames()[i] at or after
+// from, or -1 when there is none.
+func (x *scriptTagIndex) endTag(i, from int) int {
+	at, ok := x.endTags[i].cached(from)
+	if !ok {
+		at = findEndTag(x.s, scriptTagNames()[i], from)
+		x.endTags[i].store(from, at)
+	}
+	return at
+}
+
+// forwardSearch holds the result of the last search for the first match at or
+// after an index.
+type forwardSearch struct {
+	from int  // where the search started
+	at   int  // the first match at or after from, or -1 for none
+	done bool // whether a search has run
+}
+
+// cached returns the first match at or after from when the stored search already
+// answers that: it started at or before from, and found nothing in between.
+func (f *forwardSearch) cached(from int) (int, bool) {
+	if f.done && from >= f.from && (f.at < 0 || f.at >= from) {
+		return f.at, true
+	}
+	return 0, false
+}
+
+// store records the result of a search that started at from.
+func (f *forwardSearch) store(from, at int) {
+	f.from, f.at, f.done = from, at, true
+}
+
+// findEndTag returns the index of the first "</name" end tag in s at or after
+// from, or -1 when there is none.
+func findEndTag(s, name string, from int) int {
+	for from < len(s) {
+		k := strings.Index(s[from:], "</")
+		if k < 0 {
+			return -1
+		}
+		at := from + k
+		nameEnd := at + 2 + len(name)
+		if nameEnd <= len(s) && equalFoldASCII(s[at+2:nameEnd], name) &&
+			(nameEnd == len(s) || isTagNameEnd(s[nameEnd])) {
+			return at
+		}
+		from = at + 2
+	}
+	return -1
+}
+
+// pendingScriptTag returns the index of the '<' that starts an unfinished tag
+// Scripts could remove ("<", "<scr", "</ifr", up to "</script") at the end of
+// out, or -1 when out does not end with one.
+func pendingScriptTag(out []byte) int {
+	from := len(out) - maxScriptTagHead
+	if from < 0 {
+		from = 0
+	}
+	k := bytes.LastIndexByte(out[from:], '<')
+	if k < 0 {
+		return -1
+	}
+	k += from
+
+	partial := out[k+1:]
+	if len(partial) > 0 && partial[0] == '/' {
+		partial = partial[1:]
+	}
+	for _, name := range scriptTagNames() {
+		if len(partial) <= len(name) && equalFoldASCII(partial, name[:len(partial)]) {
+			return k
+		}
+	}
+	return -1
+}
+
+// isTagNameEnd reports whether c ends an HTML tag name. Browsers read "\r" as "\n".
+func isTagNameEnd(c byte) bool {
+	switch c {
+	case '\t', '\n', '\f', '\r', ' ', '/', '>':
+		return true
+	}
+	return false
+}
+
+// equalFoldASCII reports whether s equals lower, ignoring the case of ASCII
+// letters only, as browsers do for tag names. lower must be in lowercase.
+func equalFoldASCII[T string | []byte](s T, lower string) bool {
+	if len(s) != len(lower) {
+		return false
+	}
+	for i := 0; i < len(s); i++ {
+		c := s[i]
+		if 'A' <= c && c <= 'Z' {
+			c += 'a' - 'A'
+		}
+		if c != lower[i] {
+			return false
+		}
+	}
+	return true
 }
 
 // SingleLine returns a sanitized version of the input string as a single line of text.

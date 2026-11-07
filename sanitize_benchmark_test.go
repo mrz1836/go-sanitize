@@ -2,6 +2,7 @@ package sanitize_test
 
 import (
 	"regexp"
+	"strings"
 	"testing"
 
 	"github.com/mrz1836/go-sanitize"
@@ -201,6 +202,24 @@ func BenchmarkScientificNotation(b *testing.B) {
 func BenchmarkScripts(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		_ = sanitize.Scripts("<script>$(){ var remove='me'; }</script>")
+	}
+}
+
+// BenchmarkScripts_Document benchmarks the Scripts method on a page of mixed markup
+func BenchmarkScripts_Document(b *testing.B) {
+	input := strings.Repeat("<p>Some <b>text</b> here.</p>\n<script>\nvar remove = 'me';\n</script >\n<embed src=x>\n", 20)
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_ = sanitize.Scripts(input)
+	}
+}
+
+// BenchmarkScripts_Adversarial benchmarks the Scripts method on start tags that have no end tags
+func BenchmarkScripts_Adversarial(b *testing.B) {
+	input := strings.Repeat("<script>", 1000)
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_ = sanitize.Scripts(input)
 	}
 }
 

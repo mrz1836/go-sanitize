@@ -1,6 +1,7 @@
 package sanitize_test
 
 import (
+	"bytes"
 	"regexp"
 	"strings"
 	"testing"
@@ -646,7 +647,11 @@ func TestHTML(t *testing.T) {
 		{"test_3", "<html><b class='test'>This works?</b><i></i></br></html>", "This works?"},
 		{"nested tags", "Hello <div>world <span>!</span></div>", "Hello world !"},
 		{"unclosed tag", "<div>test", "test"},
-		{"partial closing", "<div>test</div", "test</div"},
+		{"partial closing", "<div>test</div", "test"},
+		{"unterminated tag at end", "x<img src=x onerror=alert(1) ", "x"},
+		{"unterminated comment at end", "a<!-- x", "a"},
+		{"less-than in text kept", "a < b", "a < b"},
+		{"less-than at end kept", "a <", "a <"},
 		{"html comments", "<!-- comment -->text", "text"},
 		{"script tag remains", "<script>alert('x')</script>", "alert('x')"},
 		{"comment with script", "<!--comment--><script>alert('x')</script>text", "alert('x')text"},
@@ -915,19 +920,129 @@ func TestScripts(t *testing.T) {
 		{"test_4", `this <iframe width="50" class="something"></iframe>`, "this "},
 		{"test_5", `this <embed width="50" class="something"></embed>`, "this "},
 		{"test_6", `this <object width="50" class="something"></object>`, "this "},
-		{"multiple scripts", "pre<script>1</script>mid<script>2</script>post", "prepost"},
+		{"multiple scripts keep text between", "pre<script>1</script>mid<script>2</script>post", "premidpost"},
 		{"mismatched tags", "<script>one</iframe>two</script>", ""},
 		{"uppercase script", "this <SCRIPT>evil()</SCRIPT> works", "this  works"},
-		{"unclosed script", "<script>oops", "<script>oops"},
-		{"closing only", "oops</script>", "oops</script>"},
+		{"mixed case script", "a<ScRiPt>alert(1)</sCrIpT>b", "ab"},
+		{"unclosed script", "<script>oops", "oops"},
+		{"closing only", "oops</script>", "oops"},
+
+		// Line breaks and whitespace, as browsers read them
+		{"multi-line script body", "hi<script>\nalert(document.domain)\n</script>bye", "hibye"},
+		{"multi-line iframe", "<iframe src=\"https://evil\">\n</iframe>", ""},
+		{"multi-line object", "<object data=javascript:alert(1)>\n</object>", ""},
+		{"crlf line breaks", "a<script>\r\nalert(1)\r\n</script>b", "ab"},
+		{"newline in start tag", "a<script\nsrc=//evil/x.js></script>b", "ab"},
+		{"tab after tag name", "a<script\tsrc=//evil/x.js></script>b", "ab"},
+		{"slash after tag name", "a<script/src=//evil/x.js></script>b", "ab"},
+		{"space in end tag", "<script src=//evil.example/x.js></script >", ""},
+		{"newline in end tag", "<script>alert(1)</script\n>", ""},
+		{"attributes in end tag", "a<script>alert(1)</script foo=bar>b", "ab"},
+		{"self-closing end tag", "a<script>alert(1)</script/>b", "ab"},
+		{"quoted angle bracket in start tag", `a<script data-x=">">alert(1)</script>b`, "ab"},
+
+		// Tags without a partner
+		{"void embed", "a<embed src=//evil/x.swf>b", "ab"},
+		{"self-closing embed", "a<embed src=//evil/x.swf/>b", "ab"},
+		{"embed with end tag", "a<embed src=//evil/x.swf></embed>b", "ab"},
+		{"unclosed script with src", "a<script src=//evil/x.js>b", "ab"},
+		{"unclosed object", "a<object data=//evil/x>b", "ab"},
+		{"unclosed iframe with srcdoc", `a<iframe srcdoc="<script>alert(1)</script>">b`, `aalert(1)">b`},
+		{"unterminated start tag", "a<script src=//evil/x.js", "a"},
+		{"start tag at end of input", "a<script", "a"},
+		{"unterminated end tag", "a<script>x</script", "a"},
+		{"stray end tags", "a</iframe>b</object>c</embed>d", "abcd"},
+
+		// Removals that would join the text around them into a new tag
+		{"split start tag", "<scr<script>x</script>ipt>alert(1)</script>", ""},
+		{"split start tag around embed", "<scr<embed>ipt>alert(1)</script>", ""},
+		{"split end tag", "<script>alert(1)</scr<embed>ipt>", "alert(1)"},
+		{"split tag name at end of input", "<script<embed>", ""},
+		{"split end tag at start of input", "</scr<embed>ipt>", ""},
+		{"nested split start tags", "<scr<scr<script></script>ipt>ipt>alert(1)</script>", "<scr"},
+
+		// Nesting and interleaving
+		{"nested objects", "<object><object>a</object>b</object>c", "bc"},
+		{"script inside iframe", "<iframe><script>alert(1)</script></iframe>ok", "ok"},
+		{"interleaved elements", "<iframe><script></iframe>alert(1)</script>", "alert(1)"},
+		{"comment inside script", "<script><!--<script>--></script>alert(1)</script>", "alert(1)"},
+		{"elements keep text between", "<iframe src=a></iframe>keep<object></object>", "keep"},
+
+		// Text and other markup are kept
+		{testEmptyString, "", ""},
+		{"plain text", "plain text", "plain text"},
+		{"other tags kept", "<p>hi</p><b>x</b>", "<p>hi</p><b>x</b>"},
+		{"longer tag names kept", "<scripts>a</scripts><objects>", "<scripts>a</scripts><objects>"},
+		{"non-ascii case folding not applied", "<ſcript>a</ſcript>", "<ſcript>a</ſcript>"},
+		{"angle brackets in text", "1 < 2 > 0", "1 < 2 > 0"},
+		{"lone angle bracket", "<", "<"},
+		{"angle bracket at end", "abc<", "abc<"},
+		{"multibyte text kept", "héllo<script>x</script>wörld", "héllowörld"},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			output := sanitize.Scripts(test.input)
 			assert.Equal(t, test.expected, output)
+			assert.False(t, hasScriptTag(output), "output %q still contains a script, iframe, object, or embed tag", output)
+			assert.Equal(t, output, sanitize.Scripts(output), "Scripts is not idempotent")
 		})
 	}
+}
+
+// TestScriptsAdversarialInputs runs Scripts on large inputs built to force a
+// sanitizer to rescan its input, which would take quadratic time. Scripts must
+// stay linear on them, so this test finishes in milliseconds.
+func TestScriptsAdversarialInputs(t *testing.T) {
+	const n = 100_000
+	tests := []struct {
+		name  string
+		input string
+	}{
+		{"start tags without end tags", strings.Repeat("<script>", n)},
+		{"start tags without a closing bracket", strings.Repeat("<script ", n)},
+		{"end tag openers", "<script>" + strings.Repeat("</", n)},
+		{"near-miss end tags", strings.Repeat("<iframe></ifram", n)},
+		{"nested split tags", strings.Repeat("<scr", n) + "<embed>" + strings.Repeat("ipt>", n)},
+		{"split tags without end tags", strings.Repeat("<scr<embed>ipt>x", n)},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			output := sanitize.Scripts(test.input)
+			assert.False(t, hasScriptTag(output), "output still contains a script, iframe, object, or embed tag")
+		})
+	}
+}
+
+// hasScriptTag reports whether s still holds a tag that a browser reads as a
+// script, iframe, object, or embed start or end tag. It is written separately
+// from Scripts so that the tests and fuzz tests can check Scripts against it.
+func hasScriptTag(s string) bool {
+	lower := []byte(s)
+	for i, c := range lower {
+		if 'A' <= c && c <= 'Z' {
+			lower[i] = c + 'a' - 'A'
+		}
+	}
+	for _, name := range []string{"script", "iframe", "object", "embed"} {
+		for _, head := range []string{"<" + name, "</" + name} {
+			rest := lower
+			for {
+				i := bytes.Index(rest, []byte(head))
+				if i < 0 {
+					break
+				}
+				rest = rest[i+len(head):]
+				// A tag name ends at whitespace, '/', or '>'; at the end of the
+				// input, markup placed after s could still complete the tag.
+				if len(rest) == 0 || strings.IndexByte("\t\n\f\r />", rest[0]) >= 0 {
+					return true
+				}
+			}
+		}
+	}
+	return false
 }
 
 // TestSingleLine tests the SingleLine method

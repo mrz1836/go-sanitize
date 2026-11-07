@@ -183,6 +183,12 @@ func ExampleScripts() {
 	// Output: DoesWork?
 }
 
+// ExampleScripts_multiLine example using Scripts() on elements that span several lines
+func ExampleScripts_multiLine() {
+	fmt.Println(sanitize.Scripts("<p>Hello</p><script>\nalert('test');\n</script><iframe src='example.com'></iframe>"))
+	// Output: <p>Hello</p>
+}
+
 // ExampleSingleLine example using SingleLine()
 func ExampleSingleLine() {
 	fmt.Println(sanitize.SingleLine(`Does
